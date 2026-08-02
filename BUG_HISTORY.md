@@ -60,6 +60,16 @@
 - 验证结果：通过；2 个 Skill frontmatter、25 个必要文件、3 个插件 JSON、独立项目根目录规则、模板、评估提示、README、安装文档和仓库边界均通过；文本空白检查无错误。
 - 未验证风险：尚未在真实新建项目任务中执行端到端评估。
 
+## 2026-08-02：导入项目整理必须先确认并验证
+
+- 现象：导入已有项目时，原维护规则没有专门规定“是否整理”的确认步骤，也没有规定整理前后必须对比测试结果，容易在未经同意时移动文件，或整理后引入回归而未被识别。
+- 根因：`ai-project-maintainer` 只有普通局部修复和模块抽离流程，没有把导入项目整理作为高风险结构变更单独处理。
+- 修改文件：`.agents/skills/ai-project-maintainer/SKILL.md`、`.agents/skills/ai-project-maintainer/references/maintenance-workflow.md`、`evals/prompts.md`、`scripts/verify-skill-repo.mjs`、`README.md`、`docs/installation.md`、`ARCHITECTURE.md`、`AGENTS.md`、`.claude-plugin/marketplace.json`、`.claude-plugin/plugin.json`、`.codex-plugin/plugin.json`、`CHANGELOG.md`、`BUG_HISTORY.md`。
+- 修改方式：增加导入项目浅层检查和明确询问；用户同意后先建立测试/语法/构建/启动基线，再分批整理、更新引用并执行整理后回归；区分已有失败、整理引入的失败和环境失败；验证失败时停止或恢复失败批次；插件版本升至 `0.2.3`。
+- 验证命令：`node scripts/verify-skill-repo.mjs`、插件 JSON 解析和 `git diff --check`，并同步用户级 maintainer Skill。
+- 验证结果：通过；2 个 Skill frontmatter、25 个必要文件、3 个插件 JSON、导入整理确认/基线/回归/恢复规则、评估提示、README、安装文档和仓库边界均通过；关键规则检索通过；文本空白检查无错误。
+- 未验证风险：尚未在真实导入项目上执行端到端整理评估；不同技术栈的基线命令需要按项目实际配置选择。
+
 ## 记录格式
 
 以后每次修复或规则缺陷都追加一条，不覆盖历史：

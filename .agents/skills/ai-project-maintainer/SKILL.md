@@ -1,6 +1,6 @@
 ---
 name: ai-project-maintainer
-description: Use when maintaining an existing software project: fixing bugs, changing a function, refactoring a module, extracting responsibilities, updating tests, or investigating a regression. First build the smallest relevant context, protect existing work, make the smallest justified change, verify it, and record the result. Trigger even when the user says only "修 Bug", "改一下这个函数", "排查报错", "重构模块", or "为什么这里不工作".
+description: Use when maintaining an existing software project: fixing bugs, changing a function, refactoring a module, extracting responsibilities, importing or taking over an existing project, organizing a legacy project, updating tests, or investigating a regression. First build the smallest relevant context, protect existing work, make the smallest justified change, verify it, and record the result. Trigger even when the user says only "修 Bug", "改一下这个函数", "接手这个项目", "整理导入的项目", "排查报错", "重构模块", or "为什么这里不工作".
 ---
 
 # AI Project Maintainer
@@ -25,7 +25,24 @@ Once this Skill is installed in a supported AI client, users do not need to past
 11. After a bug fix or module extraction, append a concise entry to `BUG_HISTORY.md` (or the project's equivalent). Update `ARCHITECTURE.md` when responsibilities, interfaces, or call relationships changed.
 12. At the end, report changed files, root cause, verification, and unverified risks. Keep unrelated cleanup out of the patch.
 
-## Context budget
+## Imported project organization
+
+When the user says they are importing, taking over, or organizing an existing project, treat this as a separate structural-maintenance scenario. Do not move, rename, or reorganize files automatically.
+
+1. Confirm the existing project root and make a shallow map of top-level directories, entry points, configuration, package manager, tests, startup commands, version-control state, and existing project records. Do not recursively read unrelated source, caches, generated files, or vendored dependencies.
+2. Before any structural edit, ask for explicit consent with this meaning:
+
+   > 这是一个已导入的已有项目。是否要将它整理为便于维护的项目结构？整理会移动或重命名部分文件并更新引用；我会先运行现有测试建立基线，再整理并重新测试。选择“否”则保持当前结构，只进行普通维护。
+
+3. If the user says no, keep the current structure and continue only with the requested local maintenance. Do not treat silence or an incomplete answer as consent.
+4. If the user agrees, show the target layout, file-migration map, compatibility entries, configuration changes, and risks before moving files. Use a Git branch or a non-overwriting timestamped backup before structural edits.
+5. Run a pre-organization baseline: existing unit/integration tests, syntax/type checks, build checks, and a startup smoke check when available. Record missing tests and pre-existing failures.
+6. Organize only inside the imported project's current root. Do not automatically wrap it in a new same-named outer folder. Create or reuse `src/`, `tests/`, `config/`, `docs/`, or `scripts/` only when they fit the project's stack.
+7. Move files in small batches, update imports, build/start/test paths, and keep compatibility wrappers unless removal is explicitly authorized.
+8. Run the same baseline checks after organization, plus affected-module, import/path, and startup smoke checks. Compare before/after results and distinguish pre-existing failures, organization regressions, and environment failures.
+9. Update `ARCHITECTURE.md` with the new responsibilities and call flow. Record the baseline, changes, post-organization results, and remaining risks in `BUG_HISTORY.md` when a defect or regression was found.
+10. If post-organization verification fails, do not claim completion. Stop or restore the failed batch using the declared recovery path before continuing.
+
 
 A first read of an important module should update the architecture record only if the module's responsibility, public interface, dependency boundary, or known risk is not already documented. Do not create a note for every ordinary file read. This preserves a useful map without turning maintenance into documentation churn.
 

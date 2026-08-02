@@ -74,7 +74,7 @@ const codexPlugin = parseJson('.codex-plugin/plugin.json');
 for (const [label, plugin] of [['Claude', claudePlugin], ['Codex', codexPlugin]]) {
   if (!plugin) continue;
   check(plugin.name === 'ai-maintenance-skills', `${label} plugin name mismatch`);
-  check(plugin.version === '0.2.2', `${label} plugin version mismatch`);
+  check(plugin.version === '0.2.3', `${label} plugin version mismatch`);
   check(plugin.license === 'Apache-2.0', `${label} plugin license mismatch`);
   check(plugin.skills === './.agents/skills/', `${label} plugin skill path mismatch`);
   check(plugin.interface?.capabilities?.includes('Read'), `${label} plugin Read capability missing`);
@@ -88,10 +88,12 @@ check(readme.includes('npx skills add https://github.com/canglei9527/ai-maintena
 check(readme.includes('模板') && (readme.includes('不是每次') || readme.includes('不是日常')), 'README optional template guidance missing');
 check(existsSync(join(root, 'docs', 'installation.md')), 'installation guide missing');
 
-const bootstrapper = readFileSync(join(root, '.agents', 'skills', 'ai-project-bootstrapper', 'SKILL.md'), 'utf8');
-const bootstrapTemplate = readFileSync(join(root, '.agents', 'skills', 'ai-project-bootstrapper', 'references', 'project-docs-template.md'), 'utf8');
-check(bootstrapper.includes('dedicated project root') && bootstrapper.includes('do not scatter new files'), 'bootstrapper project root isolation rule missing');
-check(bootstrapTemplate.includes('Project root') && bootstrapTemplate.includes('不要把新项目文件直接散落'), 'bootstrapper project root template missing');
+const maintainer = readFileSync(join(root, '.agents', 'skills', 'ai-project-maintainer', 'SKILL.md'), 'utf8');
+const workflow = readFileSync(join(root, '.agents', 'skills', 'ai-project-maintainer', 'references', 'maintenance-workflow.md'), 'utf8');
+const evals = readFileSync(join(root, 'evals', 'prompts.md'), 'utf8');
+check(maintainer.includes('explicit consent') && maintainer.includes('pre-organization baseline') && maintainer.includes('post-organization verification fails'), 'imported project consent/baseline/recovery rules missing');
+check(workflow.includes('导入项目整理') && workflow.includes('没有明确同意就不整理') && workflow.includes('整理前基线'), 'imported project workflow reference missing');
+check(evals.includes('导入已有项目但未同意整理') && evals.includes('同意整理导入项目') && evals.includes('整理后验证失败'), 'imported project evaluation prompts missing');
 
 const forbiddenDirectories = new Set(['.zcode', 'node_modules', 'dist', 'build']);
 const walk = (directory) => {
