@@ -19,6 +19,10 @@ const required = [
   'LICENSE',
   '.gitignore',
   '.github/workflows/verify.yml',
+  '.claude-plugin/marketplace.json',
+  '.claude-plugin/plugin.json',
+  '.codex-plugin/plugin.json',
+  'docs/installation.md',
   'evals/prompts.md',
   'evals/rubric.md',
   'examples/minimal-project/AGENTS.md',
@@ -54,6 +58,35 @@ const references = [
   '.agents/skills/ai-project-bootstrapper/references/project-docs-template.md'
 ];
 for (const file of references) check(existsSync(join(root, file)), `missing reference ${file}`);
+
+const parseJson = (relativePath) => {
+  try {
+    return JSON.parse(readFileSync(join(root, relativePath), 'utf8'));
+  } catch (error) {
+    failures.push(`${relativePath}: invalid JSON (${error.message})`);
+    return null;
+  }
+};
+
+const marketplace = parseJson('.claude-plugin/marketplace.json');
+const claudePlugin = parseJson('.claude-plugin/plugin.json');
+const codexPlugin = parseJson('.codex-plugin/plugin.json');
+for (const [label, plugin] of [['Claude', claudePlugin], ['Codex', codexPlugin]]) {
+  if (!plugin) continue;
+  check(plugin.name === 'ai-maintenance-skills', `${label} plugin name mismatch`);
+  check(plugin.version === '0.2.0', `${label} plugin version mismatch`);
+  check(plugin.license === 'Apache-2.0', `${label} plugin license mismatch`);
+  check(plugin.skills === './.agents/skills/', `${label} plugin skill path mismatch`);
+  check(plugin.interface?.capabilities?.includes('Read'), `${label} plugin Read capability missing`);
+  check(plugin.interface?.capabilities?.includes('Write'), `${label} plugin Write capability missing`);
+}
+if (marketplace) {
+  check(marketplace.plugins?.some((plugin) => plugin.name === 'ai-maintenance-skills'), 'Claude marketplace plugin entry missing');
+}
+const readme = readFileSync(join(root, 'README.md'), 'utf8');
+check(readme.includes('npx skills add https://github.com/canglei9527/ai-maintenance-skills'), 'README recommended install command missing');
+check(readme.includes('模板') && (readme.includes('不是每次') || readme.includes('不是日常')), 'README optional template guidance missing');
+check(existsSync(join(root, 'docs', 'installation.md')), 'installation guide missing');
 
 const forbiddenDirectories = new Set(['.zcode', 'node_modules', 'dist', 'build']);
 const walk = (directory) => {

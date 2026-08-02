@@ -44,26 +44,52 @@
 
 ### 安装
 
-将仓库中的 `.agents/skills/` 复制到项目根目录，或复制到工具支持的用户级 Skills 目录：
+#### 推荐：一条命令安装
+
+需要 Node.js 和 `npx`：
 
 ```bash
-# 在目标项目根目录执行
+npx skills add https://github.com/canglei9527/ai-maintenance-skills
+```
+
+只安装一个 Skill 时，可以使用安装器支持的筛选选项：
+
+```bash
+npx skills add https://github.com/canglei9527/ai-maintenance-skills --skill ai-project-maintainer
+```
+
+`npx skills` 是独立的安装器，具体选项以 `npx skills --help` 为准。
+
+#### Claude Code
+
+支持插件 marketplace 的版本可以使用：
+
+```text
+/plugin marketplace add canglei9527/ai-maintenance-skills
+/plugin install ai-maintenance-skills@ai-maintenance-skills
+```
+
+#### Codex 和其他插件客户端
+
+在客户端的 Plugins/Marketplace 中搜索 `ai-maintenance-skills`，或使用客户端支持的 GitHub 插件安装入口。仓库提供 `.codex-plugin/plugin.json` 和 `.claude-plugin/plugin.json`。如果客户端不识别插件清单，使用上面的 `npx skills` 安装器。
+
+#### 手工后备
+
+没有 Node.js、插件管理器或安装器时，在目标项目根目录执行：
+
+```bash
+mkdir -p .agents
 cp -R /path/to/ai-maintenance-skills/.agents/skills ./.agents/
 ```
 
-如果你的工具发现目录不同，请把两个 Skill 目录放到该工具的 Skills 目录中，并保留每个目录内的 `SKILL.md` 和 `references/`。
+Windows PowerShell：
 
-安装后可以直接描述任务，例如：
-
-```text
-搜索结果把漫画显示到了小说筛选页，请定位根因并修复。只读取直接依赖和最小测试，修复后记录 Bug 历史。
+```powershell
+New-Item -ItemType Directory -Force .agents | Out-Null
+Copy-Item -Recurse -Force C:\path\to\ai-maintenance-skills\.agents\skills .agents\
 ```
 
-或：
-
-```text
-从零创建一个 Python + Flask 的书源搜索服务。先给目录结构和模块职责，再创建代码、测试和项目维护文档。
-```
+更完整的项目级/用户级安装、更新、卸载和兼容性说明见 [`docs/installation.md`](docs/installation.md)。
 
 ### 项目记录文件
 
@@ -106,7 +132,22 @@ The workflow is deliberately stack-agnostic. It favors the smallest relevant con
 
 ### Install
 
-Copy `.agents/skills/` into the target project's root or into the user-level skills directory supported by your AI tool. Keep each Skill's `SKILL.md` and `references/` together.
+Recommended one-command installation:
+
+```bash
+npx skills add https://github.com/canglei9527/ai-maintenance-skills
+```
+
+For Claude Code, use the marketplace commands when supported:
+
+```text
+/plugin marketplace add canglei9527/ai-maintenance-skills
+/plugin install ai-maintenance-skills@ai-maintenance-skills
+```
+
+Codex and other plugin clients can search for `ai-maintenance-skills` in their Plugins/Marketplace UI or use the repository URL. If a client does not recognize plugin metadata, use `npx skills` or the manual `.agents/skills` fallback described in [`docs/installation.md`](docs/installation.md).
+
+After installation, ask for a bug fix or a new project in natural language. You do not need to paste the prompt template or mention a Skill name.
 
 ### Verify
 
