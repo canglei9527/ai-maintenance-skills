@@ -74,7 +74,7 @@ const codexPlugin = parseJson('.codex-plugin/plugin.json');
 for (const [label, plugin] of [['Claude', claudePlugin], ['Codex', codexPlugin]]) {
   if (!plugin) continue;
   check(plugin.name === 'ai-maintenance-skills', `${label} plugin name mismatch`);
-  check(plugin.version === '0.2.4', `${label} plugin version mismatch`);
+  check(plugin.version === '0.2.5', `${label} plugin version mismatch`);
   check(plugin.license === 'Apache-2.0', `${label} plugin license mismatch`);
   check(plugin.skills === './.agents/skills/', `${label} plugin skill path mismatch`);
   check(plugin.interface?.capabilities?.includes('Read'), `${label} plugin Read capability missing`);
@@ -96,7 +96,14 @@ check(workflow.includes('导入项目整理') && workflow.includes('没有明确
 check(evals.includes('导入已有项目但未同意整理') && evals.includes('同意整理导入项目') && evals.includes('整理后验证失败'), 'imported project evaluation prompts missing');
 const bootstrapperSkill = readFileSync(join(root, '.agents', 'skills', 'ai-project-bootstrapper', 'SKILL.md'), 'utf8');
 check(maintainer.includes('existing-project evidence') && maintainer.includes('Do not scan the current workspace'), 'maintainer routing boundary missing');
+check(maintainer.includes('Read boundary and context stages') && maintainer.includes('ai-context/ARCHITECTURE.md') && maintainer.includes('Do not open every module or function'), 'maintainer staged read boundary missing');
+check(maintainer.includes('Default maximum: 50 search hits, 12 candidate files opened') && maintainer.includes('one call/dependency hop'), 'maintainer search limits missing');
+check(maintainer.includes('Full-project scanning is reserved for an explicit repository audit'), 'maintainer expansion gate missing');
+check(workflow.includes('两阶段读取协议') && workflow.includes('搜索闸门') && workflow.includes('扩大范围条件') && workflow.includes('架构记录是定位工作的索引'), 'maintenance workflow read boundary missing');
 check(bootstrapperSkill.includes('standalone service') && bootstrapperSkill.includes('current workspace may contain unrelated projects'), 'bootstrapper standalone routing boundary missing');
+check(bootstrapperSkill.includes('Read boundary for new projects') && bootstrapperSkill.includes('ai-context/ARCHITECTURE.md') && bootstrapperSkill.includes('cap a search at 50 hits'), 'bootstrapper staged read boundary missing');
+const bootstrapperTemplate = readFileSync(join(root, '.agents', 'skills', 'ai-project-bootstrapper', 'references', 'project-docs-template.md'), 'utf8');
+check(bootstrapperTemplate.includes('ai-context/') && bootstrapperTemplate.includes('FUNCTION_INDEX.md') && bootstrapperTemplate.includes('不能作为打开全部模块的理由'), 'bootstrapper context template missing');
 check(evals.includes('独立程序需求的分流') && evals.includes('现有项目证据的维护分流') && evals.includes('意图不明确时只问一次'), 'task routing evaluation prompts missing');
 
 const forbiddenDirectories = new Set(['.zcode', 'node_modules', 'dist', 'build']);

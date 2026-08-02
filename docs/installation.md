@@ -58,7 +58,7 @@ Codex 插件元数据位于 `.codex-plugin/plugin.json`。不同客户端的插�
 从零创建一个 Python + Flask 的书源搜索服务。
 ```
 
-AI 应自动判断请求属于已有项目维护还是新项目初始化，然后执行对应流程：读取项目规则、定位目标、限制上下文、进行最小修改、运行验证并记录结果。
+AI 应自动判断请求属于已有项目维护还是新项目初始化，然后执行对应流程：先确认 `project_root` 和 `target_anchor`，读取 `AGENTS.md` 与 `ai-context/` 索引，再按目标锚点读取实现、一跳项目自有依赖、实际配置/数据结构和最小测试。它不会因为架构索引列出了模块，就打开同目录全部源码。
 
 `AI修Bug提问模板.md` 只用于复杂问题交接或一次性补充完整复现信息，不是日常使用的必填提示。
 
@@ -71,10 +71,17 @@ AI 应自动判断请求属于已有项目维护还是新项目初始化，然�
 选择不整理时，保持原项目结构，只进行普通 Bug 修复或其他明确请求的维护工作。
 
 
-安装后使用 `ai-project-bootstrapper` 创建新程序时，Skill 会先选择或创建独立项目根目录。例如当前工作区是 `workspace/`，新项目应放在：
+安装后使用 `ai-project-bootstrapper` 创建新程序时，Skill 会先选择或创建独立项目根目录，并在根目录放置 `AGENTS.md`，在 `ai-context/` 放置架构、函数索引和 Bug 历史。例如当前工作区是 `workspace/`，新项目应放在：
 
 ```text
 workspace/book-source-search/
+├── AGENTS.md
+├── ai-context/
+│   ├── ARCHITECTURE.md
+│   ├── FUNCTION_INDEX.md
+│   └── BUG_HISTORY.md
+├── src/
+└── tests/
 ```
 
 源码、测试、配置、文档和资产全部放入这个目录，不直接写入 `workspace/`，也不与其他项目源码混合。只有用户明确指定一个已有空目录作为目标时，才可以直接在该目录初始化。

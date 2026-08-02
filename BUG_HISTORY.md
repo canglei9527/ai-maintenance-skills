@@ -80,7 +80,16 @@
 - 验证结果：通过；2 个 Skill frontmatter、25 个必要文件、3 个插件 JSON、维护/新建分流边界、独立项目目录、导入整理规则、3 个分流评估场景和仓库边界均通过；文本空白检查无错误。验证器曾因空格/连字符匹配差异误报，已修正后通过。
 - 未验证风险：无法在静态脚本中真正模拟模型 Skill 竞争触发；需要在新会话中用原始 GLM 路由器提示进行人工评估。
 
-## 记录格式
+## 2026-08-02：增加两阶段上下文读取边界
+
+- 现象：读取架构说明后，AI 仍可能把模块职责表误解为逐文件读取清单，继续遍历同目录或整个项目源码；“直接依赖”和“相关配置”也可能被递归展开。
+- 根因：原 Skill 只描述“先读架构、再读目标和直接依赖”，没有定义 `project_root`、目标锚点、阶段边界、搜索上限、一跳依赖和扩大范围条件；项目架构记录也没有单独的函数索引入口。
+- 修改文件：`.agents/skills/ai-project-maintainer/SKILL.md`、`.agents/skills/ai-project-maintainer/references/maintenance-workflow.md`、`.agents/skills/ai-project-maintainer/references/project-record-templates.md`、`.agents/skills/ai-project-bootstrapper/SKILL.md`、`.agents/skills/ai-project-bootstrapper/references/project-docs-template.md`、`README.md`、`docs/installation.md`、`ARCHITECTURE.md`、`AGENTS.md`、`evals/prompts.md`、`scripts/verify-skill-repo.mjs`、插件元数据和版本记录。
+- 修改方式：增加 `ai-context/` 两阶段读取协议；把架构和函数索引定义为定位索引；默认排除依赖、缓存、生成物、vendor 和秘密文件；搜索最多 50 个命中、默认打开 12 个候选文件并只追踪一跳；只有明确证据才按目录、package、项目根逐层扩大；新项目模板生成根 `AGENTS.md` 和 `ai-context/` 记录。
+- 验证命令：`node scripts/verify-skill-repo.mjs`、插件 JSON 解析、`git diff --check`、本机用户级 Skill 与源仓库 SHA-256 对比。
+- 验证结果：通过；`node scripts/verify-skill-repo.mjs`、插件 JSON 解析、`git diff --check` 和用户级/源仓库 SHA-256 对比均通过。
+- 未验证风险：提示词可以约束默认行为，但不能替代工具层路径白名单；用户明确要求全仓审计时仍可进行全量扫描。
+
 
 以后每次修复或规则缺陷都追加一条，不覆盖历史：
 

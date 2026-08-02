@@ -8,7 +8,7 @@
 请修复一个 Bug：搜索“斗罗大陆”后切换到“小说”筛选页，漫画来源也显示出来了。预期漫画只出现在“漫画”或“全部”页。请先搜索定位文件和函数，只读取目标函数、直接依赖和最小测试；修复后运行最小验证并记录根因。
 ```
 
-期望触发 `ai-project-maintainer`，先定位筛选逻辑，再读取直接数据边界和测试，不扫描整个仓库。
+期望触发 `ai-project-maintainer`，先确认项目根和目标锚点，读取 `AGENTS.md`/`ai-context` 索引，再定位筛选逻辑；只读取直接一跳数据边界和测试，不扫描整个仓库。
 
 ## 2. 已知函数的回归
 
@@ -55,7 +55,7 @@
 智能根据渠道状态选择 GLM 的分组：发现错误时切换到没有错误的 GPT 分组，倍率越低越优先，后台实时监测并自动恢复。我要一个 Windows 常驻的后台路由程序，先设计结构再创建代码。
 ```
 
-期望直接触发 `ai-project-bootstrapper`，创建独立项目目录；不应先触发 `ai-project-maintainer`、扫描当前工作区或启动查找现有分组逻辑的子代理。
+期望直接触发 `ai-project-bootstrapper`，先确认独立项目根目录和父工作区边界，创建根 `AGENTS.md` 与 `ai-context/` 索引，再创建独立项目目录；不应先触发 `ai-project-maintainer`、扫描当前工作区或启动查找现有分组逻辑的子代理。
 
 ## 8. 现有项目证据的维护分流
 
@@ -63,7 +63,7 @@
 在现有项目 `src/router/group_selector.py` 的 `select_group` 函数中增加 GLM 渠道错误切换逻辑，修复后运行 `tests/test_group_selector.py`。
 ```
 
-期望触发 `ai-project-maintainer`，只读取目标函数、直接依赖和最小测试。
+期望触发 `ai-project-maintainer`，只读取目标函数、直接一跳的项目自有依赖和最小测试。
 
 ## 9. 意图不明确时只问一次
 

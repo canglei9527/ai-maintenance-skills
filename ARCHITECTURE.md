@@ -4,7 +4,7 @@
 
 `ai-maintenance-skills` 是一组可安装的 AI 软件工程 Skills，用于把项目维护流程固定为“局部理解、最小修改、可验证、可追溯”。它不是某个应用的业务代码，也不要求使用特定编程语言或框架。
 
-技术路线：Markdown Skill 指令 + Claude/Codex 插件元数据 + `npx skills` 安装入口 + 按需加载的参考模板 + Node.js 内置模块静态验证 + Markdown 评估提示。`.agents/skills/` 是跨工具兼容后备目录；仓库本身不依赖 npm 运行时包或构建系统。
+技术路线：Markdown Skill 指令 + Claude/Codex 插件元数据 + `npx skills` 安装入口 + `ai-context/` 按需加载的参考模板 + Node.js 内置模块静态验证 + Markdown 评估提示。`.agents/skills/` 是跨工具兼容后备目录；仓库本身不依赖 npm 运行时包或构建系统。
 
 ## 目录和职责
 
@@ -14,10 +14,10 @@
 | `.claude-plugin/plugin.json` | Claude 插件元数据、能力和 Skill 路径 |
 | `.codex-plugin/plugin.json` | Codex 插件元数据、能力和 Skill 路径 |
 | `docs/installation.md` | 一条命令、插件、手工后备安装及更新卸载说明 |
-| `.agents/skills/ai-project-maintainer/references/maintenance-workflow.md` | 维护场景决策表、读取边界和验证分级 |
-| `.agents/skills/ai-project-maintainer/references/project-record-templates.md` | 架构记录和 Bug 历史的可复制格式 |
-| `.agents/skills/ai-project-bootstrapper/SKILL.md` | 新项目或新模块的结构设计、创建、测试和记录流程 |
-| `.agents/skills/ai-project-bootstrapper/references/project-docs-template.md` | 新项目文档的最小模板和填写规则 |
+| `.agents/skills/ai-project-maintainer/references/maintenance-workflow.md` | 维护场景决策表、两阶段读取边界、搜索闸门和验证分级 |
+| `.agents/skills/ai-project-maintainer/references/project-record-templates.md` | 架构、函数索引和 Bug 历史的可复制格式 |
+| `.agents/skills/ai-project-bootstrapper/SKILL.md` | 新项目或新模块的结构设计、独立目录创建、两阶段读取和记录流程 |
+| `.agents/skills/ai-project-bootstrapper/references/project-docs-template.md` | 新项目 `AGENTS.md`、`ai-context/` 文档和填写规则 |
 | `examples/minimal-project/` | 与语言无关的项目文档示例，不包含真实业务代码 |
 | `evals/prompts.md` | 触发和行为评估用的真实提示 |
 | `evals/rubric.md` | 评估结果的通过标准和常见失败模式 |
@@ -42,10 +42,10 @@
        -> `.agents/skills/`
             -> 用户维护请求
                  -> ai-project-maintainer
-                      -> 项目 AGENTS.md / 架构 / Bug 历史
-                      -> 目标函数及直接依赖
+                      -> 项目 `AGENTS.md` / `ai-context/` 索引
+                      -> 目标函数及一跳项目自有依赖
                       -> 最小测试与验证
-                      -> Bug 历史、架构记录
+                      -> Bug 历史、架构和函数索引记录
 
 导入已有项目
   -> 浅层项目地图与基线能力检查
@@ -55,7 +55,9 @@
 
 用户新建项目请求
   -> ai-project-bootstrapper
-       -> 需求与工作区检查
+       -> 需求与父工作区元数据检查
+       -> 独立项目根目录
+       -> 根 `AGENTS.md` 和 `ai-context/` 索引
        -> 模块职责和接口设计
        -> 代码、测试、项目文档
        -> 启动和验证命令
