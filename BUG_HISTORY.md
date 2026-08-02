@@ -70,6 +70,16 @@
 - 验证结果：通过；2 个 Skill frontmatter、25 个必要文件、3 个插件 JSON、导入整理确认/基线/回归/恢复规则、评估提示、README、安装文档和仓库边界均通过；关键规则检索通过；文本空白检查无错误。
 - 未验证风险：尚未在真实导入项目上执行端到端整理评估；不同技术栈的基线命令需要按项目实际配置选择。
 
+## 2026-08-02：修复新建程序被误判为已有项目维护
+
+- 现象：用户描述“根据 GLM 渠道状态选择分组、错误时切换分组、低倍率优先、后台监测”的独立路由程序需求时，先触发了 `ai-project-maintainer`，开始尝试扫描当前工作区和寻找已有分组逻辑；用户实际要求的是新建程序。
+- 根因：maintainer 的触发描述过宽，bootstrapper 的触发描述过窄；没有任务分流门，也没有规定在意图未确定前禁止扫描和启动子代理。当前工作区非空进一步放大了误判。
+- 修改文件：`.agents/skills/ai-project-maintainer/SKILL.md`、`.agents/skills/ai-project-bootstrapper/SKILL.md`、`evals/prompts.md`、`scripts/verify-skill-repo.mjs`、`README.md`、`ARCHITECTURE.md`、`AGENTS.md`、`.claude-plugin/marketplace.json`、`.claude-plugin/plugin.json`、`.codex-plugin/plugin.json`、`CHANGELOG.md`、`BUG_HISTORY.md`。
+- 修改方式：收紧 maintainer 为“必须有已有项目证据”；扩展 bootstrapper 到独立服务、路由器、守护进程、CLI 和自动化工具；增加任务分流规则；歧义时只问一次；加入 GLM 路由器、已有文件路径和歧义请求三个评估场景；验证脚本检查分流边界。
+- 验证命令：`node scripts/verify-skill-repo.mjs`、插件 JSON 解析、`git diff --check`，并用 `rg` 检查分流关键文本。
+- 验证结果：通过；2 个 Skill frontmatter、25 个必要文件、3 个插件 JSON、维护/新建分流边界、独立项目目录、导入整理规则、3 个分流评估场景和仓库边界均通过；文本空白检查无错误。验证器曾因空格/连字符匹配差异误报，已修正后通过。
+- 未验证风险：无法在静态脚本中真正模拟模型 Skill 竞争触发；需要在新会话中用原始 GLM 路由器提示进行人工评估。
+
 ## 记录格式
 
 以后每次修复或规则缺陷都追加一条，不覆盖历史：

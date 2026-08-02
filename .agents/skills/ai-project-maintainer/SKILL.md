@@ -1,13 +1,24 @@
 ---
 name: ai-project-maintainer
-description: Use when maintaining an existing software project: fixing bugs, changing a function, refactoring a module, extracting responsibilities, importing or taking over an existing project, organizing a legacy project, updating tests, or investigating a regression. First build the smallest relevant context, protect existing work, make the smallest justified change, verify it, and record the result. Trigger even when the user says only "修 Bug", "改一下这个函数", "接手这个项目", "整理导入的项目", "排查报错", "重构模块", or "为什么这里不工作".
+description: Use when maintaining an existing software project with evidence of that project: an existing project path, file, function, class, route, stack trace, failing test, call path, or an explicit request to modify the current codebase. Handles bug fixes, focused changes, imported-project organization, module extraction, and regression verification. Do not use as the default for a standalone service, router, daemon, CLI, automation tool, or complete application request that has no existing-project evidence.
 ---
 
 # AI Project Maintainer
 
 Use this skill for an existing project where behavior, structure, or tests must be changed safely.
 
-## Automatic use
+## Task routing
+
+Choose this Skill only when the request contains evidence of an existing project: a project path, file, function, class, route, stack trace, failing test, call path, or explicit wording such as “在当前项目中修改”. A non-empty workspace is not evidence that the user's requested program belongs there.
+
+If the user describes a standalone service, router, daemon, background program, CLI tool, automation tool, or complete application without existing-project evidence, route to `ai-project-bootstrapper`. Do not scan the current workspace or start subagents first.
+
+If the request could mean either “create a new independent program” or “add a feature to an existing project”, ask exactly one focused question before reading code:
+
+```text
+这是新建独立程序，还是在现有项目中增加功能？如果是现有项目，请提供项目路径或目标文件。
+```
+
 
 Once this Skill is installed in a supported AI client, users do not need to paste a template or mention this Skill by name. Treat ordinary requests such as “修复这个 Bug”“为什么这里不工作”“帮我改一下筛选逻辑” as maintenance requests and run the workflow below automatically. The user only needs to describe the symptom, desired behavior, or task in their own words. Use `AI修Bug提问模板.md` only when the user wants help preparing a detailed handoff or when missing context must be collected explicitly.
 

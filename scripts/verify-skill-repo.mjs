@@ -74,7 +74,7 @@ const codexPlugin = parseJson('.codex-plugin/plugin.json');
 for (const [label, plugin] of [['Claude', claudePlugin], ['Codex', codexPlugin]]) {
   if (!plugin) continue;
   check(plugin.name === 'ai-maintenance-skills', `${label} plugin name mismatch`);
-  check(plugin.version === '0.2.3', `${label} plugin version mismatch`);
+  check(plugin.version === '0.2.4', `${label} plugin version mismatch`);
   check(plugin.license === 'Apache-2.0', `${label} plugin license mismatch`);
   check(plugin.skills === './.agents/skills/', `${label} plugin skill path mismatch`);
   check(plugin.interface?.capabilities?.includes('Read'), `${label} plugin Read capability missing`);
@@ -94,6 +94,10 @@ const evals = readFileSync(join(root, 'evals', 'prompts.md'), 'utf8');
 check(maintainer.includes('explicit consent') && maintainer.includes('pre-organization baseline') && maintainer.includes('post-organization verification fails'), 'imported project consent/baseline/recovery rules missing');
 check(workflow.includes('导入项目整理') && workflow.includes('没有明确同意就不整理') && workflow.includes('整理前基线'), 'imported project workflow reference missing');
 check(evals.includes('导入已有项目但未同意整理') && evals.includes('同意整理导入项目') && evals.includes('整理后验证失败'), 'imported project evaluation prompts missing');
+const bootstrapperSkill = readFileSync(join(root, '.agents', 'skills', 'ai-project-bootstrapper', 'SKILL.md'), 'utf8');
+check(maintainer.includes('existing-project evidence') && maintainer.includes('Do not scan the current workspace'), 'maintainer routing boundary missing');
+check(bootstrapperSkill.includes('standalone service') && bootstrapperSkill.includes('current workspace may contain unrelated projects'), 'bootstrapper standalone routing boundary missing');
+check(evals.includes('独立程序需求的分流') && evals.includes('现有项目证据的维护分流') && evals.includes('意图不明确时只问一次'), 'task routing evaluation prompts missing');
 
 const forbiddenDirectories = new Set(['.zcode', 'node_modules', 'dist', 'build']);
 const walk = (directory) => {

@@ -1,13 +1,22 @@
 ---
 name: ai-project-bootstrapper
-description: Use when creating a new software project, adding a new application from scratch, or establishing a new module architecture. Design responsibilities and interfaces first, then create a maintainable project skeleton with centralized configuration, minimal tests, Chinese project records, startup instructions, and explicit verification boundaries. Trigger for requests such as "从零创建项目", "搭建一个应用", "新建模块体系", or "帮我设计项目结构".
+description: Use when creating a new independent software project, standalone service, router, daemon, background program, CLI tool, automation tool, complete application, or a new module architecture. Design responsibilities and interfaces first, create a dedicated project folder, and build a maintainable skeleton with centralized configuration, minimal tests, project records, startup instructions, and explicit verification boundaries. Trigger even when the user describes the product or behavior without saying “从零创建”.
 ---
 
 # AI Project Bootstrapper
 
 Use this skill before writing the first implementation of a new project or a substantial new module.
 
-## Automatic use
+## Task routing
+
+Prefer this Skill when the user describes a standalone product or program such as a service, router, daemon, background process, CLI, automation tool, or complete application, and does not provide an existing project path, file, function, stack trace, failing test, or call path. The current workspace may contain unrelated projects; that does not make this a maintenance request.
+
+If the user explicitly supplies existing-project evidence or says to modify the current codebase, use `ai-project-maintainer` instead. If the intent is ambiguous, ask exactly one focused question before scanning or creating files:
+
+```text
+这是新建独立程序，还是在现有项目中增加功能？如果是现有项目，请提供项目路径或目标文件。
+```
+
 
 Once this Skill is installed in a supported AI client, users do not need to paste a template or mention this Skill by name. Treat ordinary requests such as “创建一个 Flask 项目”“从零搭建应用”“帮我设计项目结构” as bootstrap requests and run the workflow below automatically. The user only needs to describe the goal and constraints in their own words. Use `AI修Bug提问模板.md` only when the user wants help preparing a detailed project brief or when important requirements are missing.
 

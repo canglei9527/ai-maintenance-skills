@@ -31,6 +31,12 @@
 ## 调用关系
 
 ```text
+用户请求
+  -> 任务分流门
+       -> 有现有项目证据 -> ai-project-maintainer
+       -> 独立程序/服务/路由器/CLI/自动化需求 -> ai-project-bootstrapper
+       -> 无法判断 -> 只询问一次，不扫描、不创建文件
+
 安装器/插件客户端
   -> `.claude-plugin/`、`.codex-plugin/` 或 `npx skills`
        -> `.agents/skills/`
