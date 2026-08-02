@@ -40,6 +40,16 @@
 - 验证结果：通过；2 个 Skill frontmatter、25 个必要文件、3 个插件 JSON、Skill 路径、README 安装命令、安装文档、引用、示例、许可证和仓库边界均通过；文本空白检查无错误。验证脚本曾因匹配条件过窄误报，已放宽为检查“模板可选且不是每次必填”的等价语义后通过。
 - 未验证风险：不同客户端对插件 manifest 字段和 `npx skills` 可选参数的支持可能随版本变化；文档明确要求优先查看客户端或安装器当前帮助。
 
+## 2026-08-02：补全中英文仓库和插件描述
+
+- 现象：GitHub About 和插件元数据描述只有英文，中文用户在仓库页或插件安装界面无法直接理解用途。
+- 根因：初始插件化发布只关注安装路径和英文生态兼容，没有同步补齐中文展示文案。
+- 修改文件：`.claude-plugin/marketplace.json`、`.claude-plugin/plugin.json`、`.codex-plugin/plugin.json`、`scripts/verify-skill-repo.mjs`、`CHANGELOG.md`、`BUG_HISTORY.md`。
+- 修改方式：将 marketplace、Claude plugin 和 Codex plugin 的主描述、短描述和长描述改为中英文双语；插件版本提升到 `0.2.1`；验证脚本同步检查新版本。
+- 验证命令：`node scripts/verify-skill-repo.mjs`、插件 JSON 解析和 `git diff --check`。
+- 验证结果：通过；2 个 Skill frontmatter、25 个必要文件、3 个插件 JSON、Skill 路径、README 安装命令、安装文档、引用、示例、许可证和仓库边界均通过；插件 JSON 均显示 `0.2.1` 且描述包含中英文；文本空白检查无错误。
+- 未验证风险：GitHub About 描述需要通过 GitHub API 单独更新，不能只靠仓库文件提交。
+
 ## 记录格式
 
 以后每次修复或规则缺陷都追加一条，不覆盖历史：

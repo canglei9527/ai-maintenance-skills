@@ -1,6 +1,6 @@
 {
   "name": "ai-maintenance-skills",
-  "description": "Reusable AI workflows for safe, focused, verifiable software project maintenance.",
+  "description": "AI 项目维护与初始化工作流：局部读取、最小修改、验证和 Bug 记录。Reusable workflows for focused maintenance, verification, and project bootstrap.",
   "owner": {
     "name": "canglei9527",
     "url": "https://github.com/canglei9527"
@@ -8,8 +8,8 @@
   "plugins": [
     {
       "name": "ai-maintenance-skills",
-      "description": "Automatic project maintenance and project bootstrap workflows with local context limits, verification, and bug history.",
-      "version": "0.2.0",
+      "description": "AI 项目维护与初始化工作流：修复 Bug、最小修改、验证与记录。Workflows for bug fixes, focused changes, verification, and project bootstrap.",
+      "version": "0.2.1",
       "source": "./",
       "author": {
         "name": "canglei9527",

@@ -74,7 +74,7 @@ const codexPlugin = parseJson('.codex-plugin/plugin.json');
 for (const [label, plugin] of [['Claude', claudePlugin], ['Codex', codexPlugin]]) {
   if (!plugin) continue;
   check(plugin.name === 'ai-maintenance-skills', `${label} plugin name mismatch`);
-  check(plugin.version === '0.2.0', `${label} plugin version mismatch`);
+  check(plugin.version === '0.2.1', `${label} plugin version mismatch`);
   check(plugin.license === 'Apache-2.0', `${label} plugin license mismatch`);
   check(plugin.skills === './.agents/skills/', `${label} plugin skill path mismatch`);
   check(plugin.interface?.capabilities?.includes('Read'), `${label} plugin Read capability missing`);

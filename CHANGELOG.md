@@ -1,5 +1,11 @@
 # 变更记录
 
+## 0.2.1 - 2026-08-02
+
+- 将 GitHub 仓库简介和插件元数据描述改为中英文双语。
+- 同步 Claude marketplace、Claude plugin 和 Codex plugin 的展示描述。
+- 更新验证脚本中的插件版本检查到 `0.2.1`。
+
 ## 0.2.0 - 2026-08-02
 
 - 增加 Claude marketplace、Claude plugin 和 Codex plugin 元数据。
