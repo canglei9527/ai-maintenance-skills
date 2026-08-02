@@ -2,6 +2,24 @@
 
 以下是与语言和框架无关的最小项目文档。按项目实际情况填写，不要保留无意义的占位文字。
 
+## Project root / 项目根目录
+
+新建程序时先确定独立项目根目录，例如：
+
+```text
+{workspace}/book-source-search/
+├── src/
+├── tests/
+├── config/
+├── scripts/
+├── AGENTS.md
+├── ARCHITECTURE.md
+├── BUG_HISTORY.md
+└── AI修Bug提问模板.md
+```
+
+不要把新项目文件直接散落在父级工作区，也不要和已有无关项目源码混写。只有当用户明确指定一个已有空目录作为目标时，才直接在该目录内初始化项目。
+
 ## `AGENTS.md`
 
 ```markdown

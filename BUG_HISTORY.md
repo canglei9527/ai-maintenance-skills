@@ -50,6 +50,16 @@
 - 验证结果：通过；2 个 Skill frontmatter、25 个必要文件、3 个插件 JSON、Skill 路径、README 安装命令、安装文档、引用、示例、许可证和仓库边界均通过；插件 JSON 均显示 `0.2.1` 且描述包含中英文；文本空白检查无错误。
 - 未验证风险：GitHub About 描述需要通过 GitHub API 单独更新，不能只靠仓库文件提交。
 
+## 2026-08-02：新建项目默认创建独立目录
+
+- 现象：新建程序时，Skill 只要求检查当前工作区和不要覆盖已有项目，但没有明确要求先创建独立项目文件夹，可能把新项目源码、测试和文档散落到当前父级工作区，与其他项目混在一起。
+- 根因：`ai-project-bootstrapper` 的工作流缺少“选择/创建项目根目录”的强制步骤，文档模板和评估提示也没有覆盖目录隔离。
+- 修改文件：`.agents/skills/ai-project-bootstrapper/SKILL.md`、`.agents/skills/ai-project-bootstrapper/references/project-docs-template.md`、`evals/prompts.md`、`scripts/verify-skill-repo.mjs`、`.claude-plugin/marketplace.json`、`.claude-plugin/plugin.json`、`.codex-plugin/plugin.json`、`CHANGELOG.md`、`BUG_HISTORY.md`。
+- 修改方式：新增 dedicated project root 规则；要求新项目所有源码、测试、配置、文档、资产都放入独立项目目录；模板增加项目根目录示例；评估提示要求检查目录隔离；验证脚本检查规则和模板存在；插件版本升至 `0.2.2`。
+- 验证命令：`node scripts/verify-skill-repo.mjs`、插件 JSON 解析、`git diff --check`，并检查 bootstrapper 行数。
+- 验证结果：通过；2 个 Skill frontmatter、25 个必要文件、3 个插件 JSON、独立项目根目录规则、模板、评估提示、README、安装文档和仓库边界均通过；文本空白检查无错误。
+- 未验证风险：尚未在真实新建项目任务中执行端到端评估。
+
 ## 记录格式
 
 以后每次修复或规则缺陷都追加一条，不覆盖历史：

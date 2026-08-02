@@ -91,7 +91,23 @@ Copy-Item -Recurse -Force C:\path\to\ai-maintenance-skills\.agents\skills .agent
 
 更完整的项目级/用户级安装、更新、卸载和兼容性说明见 [`docs/installation.md`](docs/installation.md)。
 
-### 项目记录文件
+### 新建项目的目录隔离
+
+使用 `ai-project-bootstrapper` 创建新程序时，AI 会先确定一个独立的项目根目录，例如：
+
+```text
+workspace/book-source-search/
+├── src/
+├── tests/
+├── config/
+├── scripts/
+├── AGENTS.md
+├── ARCHITECTURE.md
+└── BUG_HISTORY.md
+```
+
+源码、测试、配置、文档和资产都会放在这个项目目录内，不会直接散落到当前工作区根目录，也不会和其他项目源码混在一起。只有你明确指定一个已有空目录作为目标时，AI 才会直接在该目录初始化。
+
 
 Skill 推荐新项目使用以下文件，但不会强迫已有项目改名：
 
