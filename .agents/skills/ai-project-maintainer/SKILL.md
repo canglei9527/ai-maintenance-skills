@@ -7,7 +7,10 @@ description: Use when maintaining an existing software project: fixing bugs, cha
 
 Use this skill for an existing project where behavior, structure, or tests must be changed safely.
 
-## Operating contract
+## Automatic use
+
+Once this Skill is installed in a supported AI client, users do not need to paste a template or mention this Skill by name. Treat ordinary requests such as “修复这个 Bug”“为什么这里不工作”“帮我改一下筛选逻辑” as maintenance requests and run the workflow below automatically. The user only needs to describe the symptom, desired behavior, or task in their own words. Use `AI修Bug提问模板.md` only when the user wants help preparing a detailed handoff or when missing context must be collected explicitly.
+
 
 1. Inspect the project rules before editing. Read `AGENTS.md` if present, then `ARCHITECTURE.md`, `BUG_HISTORY.md`, or their project-local equivalents when relevant.
 2. Check the working tree before touching files. Preserve user changes, generated files, and uncommitted work that is unrelated to the request. Do not reset, checkout, delete, or overwrite work you did not create.

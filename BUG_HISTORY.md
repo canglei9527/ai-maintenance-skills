@@ -19,7 +19,16 @@
 - 未验证风险：尚未在实际 AI 客户端中运行三组 Skill 触发评估；`git diff --check` 需在 Git 初始化后执行。
 
 
-以后每次修复或规则缺陷都追加一条，不覆盖历史：
+## 2026-08-02：明确模板不是日常使用前提
+
+- 现象：README 的示例提示和提问模板容易让使用者误以为每次修 Bug 或创建项目前都必须复制整段提示。
+- 根因：文档只展示了完整提示示例，没有明确区分“Skill 自动触发”和“复杂问题的可选交接模板”。
+- 修改文件：`.agents/skills/ai-project-maintainer/SKILL.md`、`.agents/skills/ai-project-bootstrapper/SKILL.md`、`README.md`、`AI修Bug提问模板.md`、`ARCHITECTURE.md`、`AGENTS.md`、`evals/prompts.md`。
+- 修改方式：在两个 Skill 增加自动使用说明；README 明确自然语言即可触发；将中文模板和评估提示标为可选辅助材料；在仓库规则中禁止让自动执行依赖模板。
+- 验证命令：`node scripts/verify-skill-repo.mjs`、`git diff --check`，并检查两个 `SKILL.md` 的行数和 frontmatter。
+- 验证结果：通过；2 个 Skill frontmatter、21 个必要文件、引用、示例、许可证和仓库边界检查均通过；两个 Skill 正文分别为 39 行和 54 行；文本空白检查无错误。
+- 未验证风险：尚未在独立 AI 客户端中重复运行自动触发评估。
+
 
 ```markdown
 ## YYYY-MM-DD：简短标题

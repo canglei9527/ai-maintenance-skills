@@ -7,7 +7,10 @@ description: Use when creating a new software project, adding a new application 
 
 Use this skill before writing the first implementation of a new project or a substantial new module.
 
-## Workflow
+## Automatic use
+
+Once this Skill is installed in a supported AI client, users do not need to paste a template or mention this Skill by name. Treat ordinary requests such as “创建一个 Flask 项目”“从零搭建应用”“帮我设计项目结构” as bootstrap requests and run the workflow below automatically. The user only needs to describe the goal and constraints in their own words. Use `AI修Bug提问模板.md` only when the user wants help preparing a detailed project brief or when important requirements are missing.
+
 
 1. Capture the goal, primary users, core workflows, constraints, preferred technology, runtime, deployment target, and acceptance checks. Do not choose an architecture that the request rules out.
 2. Inspect the workspace for existing code, instructions, package managers, and uncommitted files. Reuse compatible conventions; do not overwrite an existing project without explicit authorization.
