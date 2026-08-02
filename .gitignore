@@ -1,0 +1,24 @@
+# Generated files and local state
+node_modules/
+dist/
+build/
+coverage/
+.tmp/
+*.log
+
+# Local AI client/session data
+.zcode/
+.agents/state/
+
+# Secrets and machine-specific configuration
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# OS/editor files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
