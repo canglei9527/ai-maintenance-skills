@@ -15,5 +15,6 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
+      - run: node --test scripts/skill-frontmatter.test.mjs
       - run: node scripts/verify-skill-repo.mjs
       - run: git diff --check

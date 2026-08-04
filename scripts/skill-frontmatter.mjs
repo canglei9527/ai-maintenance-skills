@@ -1,0 +1,51 @@
+const FRONTMATTER = /^---\r?\n([\s\S]*?)\r?\n---(?:\r?\n|$)/;
+const ALLOWED_KEYS = new Set(['name', 'description']);
+
+export function parseSkillDocument(text) {
+  if (typeof text !== 'string') throw new TypeError('Skill document must be text');
+
+  const match = text.match(FRONTMATTER);
+  if (!match) throw new Error('YAML frontmatter missing');
+
+  const metadata = {};
+  for (const [index, line] of match[1].split(/\r?\n/).entries()) {
+    if (!line.trim()) continue;
+
+    const separator = line.indexOf(':');
+    if (separator < 1) throw new Error(`frontmatter line ${index + 1} is malformed`);
+
+    const key = line.slice(0, separator).trim();
+    const rawValue = line.slice(separator + 1).trim();
+    if (!ALLOWED_KEYS.has(key)) throw new Error(`unsupported frontmatter key: ${key}`);
+    if (Object.hasOwn(metadata, key)) throw new Error(`duplicate frontmatter key: ${key}`);
+
+    if (key === 'name') {
+      if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(rawValue)) {
+        throw new Error('name must use lower-case hyphen-case');
+      }
+      metadata.name = rawValue;
+      continue;
+    }
+
+    if (!rawValue.startsWith('"') || !rawValue.endsWith('"')) {
+      throw new Error('description must be a JSON-quoted YAML string');
+    }
+
+    let description;
+    try {
+      description = JSON.parse(rawValue);
+    } catch (error) {
+      throw new Error(`description is not a valid quoted string: ${error.message}`);
+    }
+    if (typeof description !== 'string' || !description.trim()) {
+      throw new Error('description must be a non-empty string');
+    }
+    metadata.description = description;
+  }
+
+  for (const key of ALLOWED_KEYS) {
+    if (!Object.hasOwn(metadata, key)) throw new Error(`frontmatter ${key} missing`);
+  }
+
+  return { metadata, body: text.slice(match[0].length) };
+}

@@ -1,8 +1,10 @@
 import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
-import { join, relative } from 'node:path';
+import { dirname, join, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { parseSkillDocument } from './skill-frontmatter.mjs';
 
-const root = join(fileURLToPath(new URL('.', import.meta.url)), '..');
+const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
+const releaseVersion = '0.3.0';
 const failures = [];
 const check = (condition, message) => {
   if (!condition) failures.push(message);
@@ -29,35 +31,42 @@ const required = [
   'examples/minimal-project/ARCHITECTURE.md',
   'examples/minimal-project/BUG_HISTORY.md',
   'examples/minimal-project/AI修Bug提问模板.md',
-  '.agents/skills/ai-project-maintainer/SKILL.md',
-  '.agents/skills/ai-project-maintainer/references/maintenance-workflow.md',
-  '.agents/skills/ai-project-maintainer/references/project-record-templates.md',
-  '.agents/skills/ai-project-bootstrapper/SKILL.md',
-  '.agents/skills/ai-project-bootstrapper/references/project-docs-template.md'
+  'skills/ai-project-maintainer/SKILL.md',
+  'skills/ai-project-maintainer/references/maintenance-workflow.md',
+  'skills/ai-project-maintainer/references/project-record-templates.md',
+  'skills/ai-project-bootstrapper/SKILL.md',
+  'skills/ai-project-bootstrapper/references/project-docs-template.md',
+  'scripts/skill-frontmatter.mjs',
+  'scripts/skill-frontmatter.test.mjs'
 ];
 
 for (const file of required) check(existsSync(join(root, file)), `missing ${file}`);
 
-const skills = ['ai-project-maintainer', 'ai-project-bootstrapper'];
-for (const name of skills) {
-  const skillPath = join(root, '.agents', 'skills', name, 'SKILL.md');
+const skillNames = ['ai-project-maintainer', 'ai-project-bootstrapper'];
+const skillDocuments = new Map();
+for (const name of skillNames) {
+  const skillRoot = join(root, 'skills', name);
+  const skillPath = join(skillRoot, 'SKILL.md');
   if (!existsSync(skillPath)) continue;
-  const text = readFileSync(skillPath, 'utf8');
-  const frontmatter = text.match(/^---\n([\s\S]*?)\n---\n/);
-  check(frontmatter, `${name}: YAML frontmatter missing`);
-  if (!frontmatter) continue;
-  const body = frontmatter[1];
-  check(new RegExp(`^name: ${name}$`, 'm').test(body), `${name}: frontmatter name mismatch`);
-  check(/^description: .+/m.test(body), `${name}: description missing`);
-  check(text.split(/\r?\n/).length <= 500, `${name}: SKILL.md exceeds 500 lines`);
-}
 
-const references = [
-  '.agents/skills/ai-project-maintainer/references/maintenance-workflow.md',
-  '.agents/skills/ai-project-maintainer/references/project-record-templates.md',
-  '.agents/skills/ai-project-bootstrapper/references/project-docs-template.md'
-];
-for (const file of references) check(existsSync(join(root, file)), `missing reference ${file}`);
+  const text = readFileSync(skillPath, 'utf8');
+  try {
+    const document = parseSkillDocument(text);
+    skillDocuments.set(name, { ...document, text });
+    check(document.metadata.name === name, `${name}: frontmatter name mismatch`);
+    check(document.metadata.description.length <= 360, `${name}: description exceeds 360 characters`);
+    check(document.body.length <= 6000, `${name}: SKILL.md body exceeds 6000 characters`);
+    check(text.split(/\r?\n/).length <= 100, `${name}: SKILL.md exceeds 100 lines`);
+
+    const pointers = [...text.matchAll(/`((?:references\/|\.\.\/)[^`]+\.md)`/g)].map((match) => match[1]);
+    for (const pointer of pointers) {
+      check(!pointer.startsWith('../'), `${name}: cross-skill reference is not self-contained (${pointer})`);
+      check(existsSync(resolve(skillRoot, pointer)), `${name}: missing reference ${pointer}`);
+    }
+  } catch (error) {
+    failures.push(`${name}: invalid frontmatter (${error.message})`);
+  }
+}
 
 const parseJson = (relativePath) => {
   try {
@@ -74,51 +83,58 @@ const codexPlugin = parseJson('.codex-plugin/plugin.json');
 for (const [label, plugin] of [['Claude', claudePlugin], ['Codex', codexPlugin]]) {
   if (!plugin) continue;
   check(plugin.name === 'ai-maintenance-skills', `${label} plugin name mismatch`);
-  check(plugin.version === '0.2.5', `${label} plugin version mismatch`);
+  check(plugin.version === releaseVersion, `${label} plugin version mismatch`);
   check(plugin.license === 'Apache-2.0', `${label} plugin license mismatch`);
-  check(plugin.skills === './.agents/skills/', `${label} plugin skill path mismatch`);
+  check(plugin.skills === './skills/', `${label} plugin skill path mismatch`);
+  check(!Object.hasOwn(plugin, 'hooks'), `${label} plugin unsupported hooks field present`);
   check(plugin.interface?.capabilities?.includes('Read'), `${label} plugin Read capability missing`);
   check(plugin.interface?.capabilities?.includes('Write'), `${label} plugin Write capability missing`);
 }
 if (marketplace) {
-  check(marketplace.plugins?.some((plugin) => plugin.name === 'ai-maintenance-skills'), 'Claude marketplace plugin entry missing');
+  const entry = marketplace.plugins?.find((plugin) => plugin.name === 'ai-maintenance-skills');
+  check(entry, 'Claude marketplace plugin entry missing');
+  check(entry?.version === releaseVersion, 'Claude marketplace version mismatch');
 }
-const readme = readFileSync(join(root, 'README.md'), 'utf8');
-check(readme.includes('npx skills add https://github.com/canglei9527/ai-maintenance-skills'), 'README recommended install command missing');
-check(readme.includes('模板') && (readme.includes('不是每次') || readme.includes('不是日常')), 'README optional template guidance missing');
-check(existsSync(join(root, 'docs', 'installation.md')), 'installation guide missing');
 
-const maintainer = readFileSync(join(root, '.agents', 'skills', 'ai-project-maintainer', 'SKILL.md'), 'utf8');
-const workflow = readFileSync(join(root, '.agents', 'skills', 'ai-project-maintainer', 'references', 'maintenance-workflow.md'), 'utf8');
+const readme = readFileSync(join(root, 'README.md'), 'utf8');
+const installation = readFileSync(join(root, 'docs', 'installation.md'), 'utf8');
+check(readme.includes('npx skills add https://github.com/canglei9527/ai-maintenance-skills'), 'README install command missing');
+check(readme.includes('skills/ai-project-maintainer/SKILL.md'), 'README canonical skill path missing');
+check(installation.includes('--skill ai-project-maintainer'), 'single-skill install guidance missing');
+check(installation.includes('npx skills add . --list'), 'local discovery verification missing');
+
+const maintainer = skillDocuments.get('ai-project-maintainer')?.text ?? '';
+const bootstrapper = skillDocuments.get('ai-project-bootstrapper')?.text ?? '';
+const workflow = readFileSync(join(root, 'skills', 'ai-project-maintainer', 'references', 'maintenance-workflow.md'), 'utf8');
+const template = readFileSync(join(root, 'skills', 'ai-project-bootstrapper', 'references', 'project-docs-template.md'), 'utf8');
 const evals = readFileSync(join(root, 'evals', 'prompts.md'), 'utf8');
-check(maintainer.includes('explicit consent') && maintainer.includes('pre-organization baseline') && maintainer.includes('post-organization verification fails'), 'imported project consent/baseline/recovery rules missing');
-check(workflow.includes('导入项目整理') && workflow.includes('没有明确同意就不整理') && workflow.includes('整理前基线'), 'imported project workflow reference missing');
-check(evals.includes('导入已有项目但未同意整理') && evals.includes('同意整理导入项目') && evals.includes('整理后验证失败'), 'imported project evaluation prompts missing');
-const bootstrapperSkill = readFileSync(join(root, '.agents', 'skills', 'ai-project-bootstrapper', 'SKILL.md'), 'utf8');
-check(maintainer.includes('existing-project evidence') && maintainer.includes('Do not scan the current workspace'), 'maintainer routing boundary missing');
-check(maintainer.includes('Read boundary and context stages') && maintainer.includes('ai-context/ARCHITECTURE.md') && maintainer.includes('Do not open every module or function'), 'maintainer staged read boundary missing');
-check(maintainer.includes('Default maximum: 50 search hits, 12 candidate files opened') && maintainer.includes('one call/dependency hop'), 'maintainer search limits missing');
-check(maintainer.includes('Full-project scanning is reserved for an explicit repository audit'), 'maintainer expansion gate missing');
-check(workflow.includes('两阶段读取协议') && workflow.includes('搜索闸门') && workflow.includes('扩大范围条件') && workflow.includes('架构记录是定位工作的索引'), 'maintenance workflow read boundary missing');
-check(bootstrapperSkill.includes('standalone service') && bootstrapperSkill.includes('current workspace may contain unrelated projects'), 'bootstrapper standalone routing boundary missing');
-check(bootstrapperSkill.includes('Read boundary for new projects') && bootstrapperSkill.includes('ai-context/ARCHITECTURE.md') && bootstrapperSkill.includes('cap a search at 50 hits'), 'bootstrapper staged read boundary missing');
-const bootstrapperTemplate = readFileSync(join(root, '.agents', 'skills', 'ai-project-bootstrapper', 'references', 'project-docs-template.md'), 'utf8');
-check(bootstrapperTemplate.includes('ai-context/') && bootstrapperTemplate.includes('FUNCTION_INDEX.md') && bootstrapperTemplate.includes('不能作为打开全部模块的理由'), 'bootstrapper context template missing');
-check(evals.includes('独立程序需求的分流') && evals.includes('现有项目证据的维护分流') && evals.includes('意图不明确时只问一次'), 'task routing evaluation prompts missing');
+
+check(maintainer.includes('project evidence') && maintainer.includes('target_anchor'), 'maintainer routing boundary missing');
+check(maintainer.includes('50 search hits') && maintainer.includes('12 candidate files') && maintainer.includes('one dependency hop'), 'maintainer search limits missing');
+check(maintainer.includes('ai-context/INDEX.md') && maintainer.includes('architecture topic') && maintainer.includes('ai-context/bugs/'), 'maintainer topic-index workflow missing');
+check(maintainer.includes('references/maintenance-workflow.md') && maintainer.includes('approval, baseline, and recovery gates'), 'maintainer conditional workflow pointer missing');
+check(workflow.includes('导入项目整理') && workflow.includes('没有明确同意就不整理') && workflow.includes('整理前基线'), 'imported-project workflow missing');
+check(bootstrapper.includes('dedicated project root') && bootstrapper.includes('no existing-project evidence'), 'bootstrapper routing/root boundary missing');
+check(bootstrapper.includes('ai-context/INDEX.md') && bootstrapper.includes('architecture/*.md') && bootstrapper.includes('bugs/INDEX.md') && bootstrapper.includes('operations/verification.md'), 'bootstrapper lightweight context indexes missing');
+check(bootstrapper.includes('references/project-docs-template.md') && !bootstrapper.includes('../ai-project-maintainer'), 'bootstrapper self-contained template pointer missing');
+check(template.includes('ai-context/') && template.includes('FUNCTION_INDEX.md'), 'bootstrapper project records missing');
+check(evals.includes('独立程序需求的分流') && evals.includes('现有项目证据的维护分流') && evals.includes('意图不明确时只问一次'), 'routing evaluation prompts missing');
+check((evals.match(/是否先读取项目规则和最小直接上下文。/g) ?? []).length === 1, 'evaluation checklist is duplicated');
 
 const forbiddenDirectories = new Set(['.zcode', 'node_modules', 'dist', 'build']);
 const walk = (directory) => {
   for (const entry of readdirSync(directory, { withFileTypes: true })) {
+    if (entry.name === '.git') continue;
     if (forbiddenDirectories.has(entry.name)) {
       failures.push(`forbidden directory present: ${relative(root, join(directory, entry.name))}`);
       continue;
     }
-    const fullPath = join(directory, entry.name);
-    if (entry.isDirectory()) walk(fullPath);
+    if (entry.isDirectory()) walk(join(directory, entry.name));
   }
 };
 walk(root);
 
+check(!existsSync(join(root, '.agents', 'skills')), 'legacy .agents/skills directory must not be published');
 check(!existsSync(join(root, 'src')), 'application source directory must not be included');
 check(!existsSync(join(root, 'assets')), 'application assets directory must not be included');
 check(!existsSync(join(root, 'vendor')), 'application vendor directory must not be included');
@@ -129,7 +145,8 @@ if (failures.length) {
   process.exitCode = 1;
 } else {
   console.log('PASS AI maintenance skills repository verification');
-  console.log(`PASS ${skills.length} Skills with valid frontmatter`);
-  console.log(`PASS ${required.length} required repository files present`);
+  console.log(`PASS ${skillNames.length} Skills with strict frontmatter and self-contained references`);
+  console.log('PASS runtime context budgets: description <= 360 chars, body <= 6000 chars, SKILL.md <= 100 lines');
+  console.log(`PASS ${required.length} required repository files and plugin version ${releaseVersion}`);
   console.log('PASS references, examples, license, and repository boundaries checked');
 }

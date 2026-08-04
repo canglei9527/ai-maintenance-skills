@@ -17,10 +17,18 @@ npx skills add https://github.com/canglei9527/ai-maintenance-skills --skill ai-p
 npx skills add https://github.com/canglei9527/ai-maintenance-skills --skill ai-project-bootstrapper
 ```
 
+两个 Skill 都包含自己的参考文件，单独安装不会产生跨 Skill 断链。
+
 `npx skills` 是独立的第三方安装器；命令和可用选项以其当前版本为准。安装前可查看帮助：
 
 ```bash
 npx skills --help
+```
+
+发布者或本地开发者可在仓库根目录确认安装器能发现两个 Skill：
+
+```bash
+npx skills add . --list
 ```
 
 ## Claude Code
@@ -108,14 +116,14 @@ npx skills --help
 
 ```bash
 mkdir -p .agents
-cp -R /path/to/ai-maintenance-skills/.agents/skills ./.agents/
+cp -R /path/to/ai-maintenance-skills/skills ./.agents/
 ```
 
 Windows PowerShell：
 
 ```powershell
 New-Item -ItemType Directory -Force .agents | Out-Null
-Copy-Item -Recurse -Force C:\path\to\ai-maintenance-skills\.agents\skills .agents\
+Copy-Item -Recurse -Force C:\path\to\ai-maintenance-skills\skills .agents\
 ```
 
 手工安装后，确认两个文件存在：

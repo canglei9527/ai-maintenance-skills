@@ -90,6 +90,16 @@
 - 验证结果：通过；`node scripts/verify-skill-repo.mjs`、插件 JSON 解析、`git diff --check` 和用户级/源仓库 SHA-256 对比均通过。
 - 未验证风险：提示词可以约束默认行为，但不能替代工具层路径白名单；用户明确要求全仓审计时仍可进行全量扫描。
 
+## 2026-08-04：修复安装漏项并压缩运行时上下文
+
+- 现象：`ai-project-maintainer` 的 `description` 含未加引号的冒号，`npx skills` 会跳过该 Skill；仓库验证器仍误报 frontmatter 有效。单独安装 bootstrapper 时，它引用 maintainer 目录中的模板，形成断链。两份 `SKILL.md` 还重复承载按需细节，增加每次触发的上下文成本。
+- 根因：frontmatter 仅用正则检查字段外形，没有按安装器可接受的 YAML 子集解析；标准源目录和插件路径仍使用旧的 `.agents/skills/`；bootstrapper 没有保持引用自包含；核心流程与复杂分支未充分做渐进披露。
+- 修改文件：`skills/ai-project-maintainer/`、`skills/ai-project-bootstrapper/`、`scripts/skill-frontmatter.mjs`、`scripts/skill-frontmatter.test.mjs`、`scripts/verify-skill-repo.mjs`、插件清单、CI、安装/架构/贡献/变更文档和评估提示。
+- 修改方式：迁移标准源到 `skills/`；用双引号保护 description；增加严格、无依赖的 frontmatter 解析与回归测试；检查自包含引用和运行时预算；将复杂维护分支保留在本 Skill 的 `references/` 中按需读取；移除无效插件 `hooks` 字段并将版本升至 `0.3.0`。
+- 验证命令：`node --test scripts/skill-frontmatter.test.mjs`；`node scripts/verify-skill-repo.mjs`；两份官方 `quick_validate.py`；官方 `validate_plugin.py .`；插件 JSON 解析；`git diff --check`；`npx.cmd skills add . --list`；隔离的全量/单 Skill 安装与 SHA-256 对比；maintainer 和 bootstrapper 独立前向测试。
+- 验证结果：4 个 frontmatter 回归测试通过；仓库验证、两份 Skill 官方校验、插件官方校验、3 份 JSON 和空白检查通过；安装器发现 2 个 Skill，全量及单独安装均完整且源/安装文件哈希一致；maintainer fixture 2 个测试通过，bootstrapper fixture 4 个测试、编译和 CLI 冒烟通过。`SKILL.md` 字符数分别从 12,036 降至 3,326（72.4%）和从 8,394 降至 3,240（61.4%）。
+- 未验证风险：精确 `o200k_base` token 统计因词表下载 TLS 失败而未完成；字符降幅不等同于精确 token 降幅。GitHub URL 安装需在推送后复验。
+
 
 以后每次修复或规则缺陷都追加一条，不覆盖历史：
 

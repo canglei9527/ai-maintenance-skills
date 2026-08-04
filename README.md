@@ -13,6 +13,8 @@
 - `ai-project-maintainer`：维护已有项目，适用于修 Bug、修改函数、排查回归、导入项目检查、经用户同意后的结构整理、模块抽离和小范围重构。
 - `ai-project-bootstrapper`：创建新项目或新模块，适用于先设计职责、接口、目录和最小测试，再开始写代码。
 
+仓库中的标准源路径是 `skills/ai-project-maintainer/SKILL.md` 和 `skills/ai-project-bootstrapper/SKILL.md`。两个 Skill 都是自包含的，可以一起安装，也可以单独安装。
+
 它们不绑定 Python、JavaScript、React、Flask 或任何具体框架。项目可以使用自己的规则文件；Skill 只要求先读取并遵循它们。
 
 ### 核心原则
@@ -67,6 +69,8 @@ npx skills add https://github.com/canglei9527/ai-maintenance-skills
 npx skills add https://github.com/canglei9527/ai-maintenance-skills --skill ai-project-maintainer
 ```
 
+单 Skill 安装不会依赖另一个 Skill 目录中的模板或参考文件。
+
 `npx skills` 是独立的安装器，具体选项以 `npx skills --help` 为准。
 
 #### Claude Code
@@ -88,14 +92,14 @@ npx skills add https://github.com/canglei9527/ai-maintenance-skills --skill ai-p
 
 ```bash
 mkdir -p .agents
-cp -R /path/to/ai-maintenance-skills/.agents/skills ./.agents/
+cp -R /path/to/ai-maintenance-skills/skills ./.agents/
 ```
 
 Windows PowerShell：
 
 ```powershell
 New-Item -ItemType Directory -Force .agents | Out-Null
-Copy-Item -Recurse -Force C:\path\to\ai-maintenance-skills\.agents\skills .agents\
+Copy-Item -Recurse -Force C:\path\to\ai-maintenance-skills\skills .agents\
 ```
 
 更完整的项目级/用户级安装、更新、卸载和兼容性说明见 [`docs/installation.md`](docs/installation.md)。
@@ -145,11 +149,12 @@ Skill 推荐新项目使用以下文件，但不会强迫已有项目改名：
 本仓库无 npm 运行时依赖。运行：
 
 ```bash
+node --test scripts/skill-frontmatter.test.mjs
 node scripts/verify-skill-repo.mjs
 git diff --check
 ```
 
-`evals/` 提供三组人工评估提示，覆盖已有项目 Bug、已知函数修复和从零创建项目。静态脚本不能替代在实际 AI 客户端中的触发评估，因此发布说明会区分自动验证和人工评估。
+`evals/` 提供九组人工评估提示，覆盖已有项目 Bug、已知函数修复、导入整理、任务分流和从零创建项目。静态脚本不能替代在实际 AI 客户端中的触发评估，因此发布说明会区分自动验证和人工评估。
 
 ### 仓库边界
 
@@ -192,6 +197,7 @@ After installation, ask for a bug fix or a new project in natural language. You 
 ### Verify
 
 ```bash
+node --test scripts/skill-frontmatter.test.mjs
 node scripts/verify-skill-repo.mjs
 git diff --check
 ```

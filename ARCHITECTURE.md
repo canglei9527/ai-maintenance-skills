@@ -4,7 +4,7 @@
 
 `ai-maintenance-skills` 是一组可安装的 AI 软件工程 Skills，用于把项目维护流程固定为“局部理解、最小修改、可验证、可追溯”。它不是某个应用的业务代码，也不要求使用特定编程语言或框架。
 
-技术路线：Markdown Skill 指令 + Claude/Codex 插件元数据 + `npx skills` 安装入口 + `ai-context/` 按需加载的参考模板 + Node.js 内置模块静态验证 + Markdown 评估提示。`.agents/skills/` 是跨工具兼容后备目录；仓库本身不依赖 npm 运行时包或构建系统。
+技术路线：标准 `skills/` 目录中的 Markdown Skill 指令 + Claude/Codex 插件元数据 + `npx skills` 安装入口 + `ai-context/` 按需加载的参考模板 + Node.js 内置模块静态验证和回归测试 + Markdown 评估提示。手工安装时可把仓库 `skills/` 复制到目标项目的 `.agents/skills/`；仓库本身不依赖 npm 运行时包或构建系统。
 
 ## 目录和职责
 
@@ -14,14 +14,17 @@
 | `.claude-plugin/plugin.json` | Claude 插件元数据、能力和 Skill 路径 |
 | `.codex-plugin/plugin.json` | Codex 插件元数据、能力和 Skill 路径 |
 | `docs/installation.md` | 一条命令、插件、手工后备安装及更新卸载说明 |
-| `.agents/skills/ai-project-maintainer/references/maintenance-workflow.md` | 维护场景决策表、两阶段读取边界、搜索闸门和验证分级 |
-| `.agents/skills/ai-project-maintainer/references/project-record-templates.md` | 架构、函数索引和 Bug 历史的可复制格式 |
-| `.agents/skills/ai-project-bootstrapper/SKILL.md` | 新项目或新模块的结构设计、独立目录创建、两阶段读取和记录流程 |
-| `.agents/skills/ai-project-bootstrapper/references/project-docs-template.md` | 新项目 `AGENTS.md`、`ai-context/` 文档和填写规则 |
+| `skills/ai-project-maintainer/SKILL.md` | 已有项目维护的触发、边界门、最小修改和验证闭环 |
+| `skills/ai-project-maintainer/references/maintenance-workflow.md` | 扩域、导入整理、高风险变更和验证分级的按需参考 |
+| `skills/ai-project-maintainer/references/project-record-templates.md` | 架构、函数索引和 Bug 历史的自包含格式 |
+| `skills/ai-project-bootstrapper/SKILL.md` | 新项目的边界门、独立目录、接口设计、实现和验证闭环 |
+| `skills/ai-project-bootstrapper/references/project-docs-template.md` | 新项目 `AGENTS.md`、`ai-context/` 文档和填写规则 |
 | `examples/minimal-project/` | 与语言无关的项目文档示例，不包含真实业务代码 |
 | `evals/prompts.md` | 触发和行为评估用的真实提示 |
 | `evals/rubric.md` | 评估结果的通过标准和常见失败模式 |
 | `scripts/verify-skill-repo.mjs` | 检查文件、frontmatter、引用和仓库边界 |
+| `scripts/skill-frontmatter.mjs` | 解析仓库限定的无依赖 frontmatter 子集，拒绝未引用冒号和额外字段 |
+| `scripts/skill-frontmatter.test.mjs` | frontmatter 合法、CRLF、非法冒号、重复/额外字段的回归测试 |
 | `README.md` | 安装、触发场景、验证和贡献入口 |
 | `CONTRIBUTING.md` | 修改 Skill、运行评估和提交变更的规则 |
 | `AGENTS.md` | 本仓库自身的维护边界 |
@@ -39,7 +42,7 @@
 
 安装器/插件客户端
   -> `.claude-plugin/`、`.codex-plugin/` 或 `npx skills`
-       -> `.agents/skills/`
+       -> `skills/`
             -> 用户维护请求
                  -> ai-project-maintainer
                       -> 项目 `AGENTS.md` / `ai-context/` 索引
@@ -64,6 +67,8 @@
 ```
 
 两个 Skill 可以先后使用：bootstrapper 负责建立边界，maintainer 负责后续局部维护。维护 Skill 不强制 bootstrapper 生成的文件名；它会识别项目的等价文档并遵循现有约定。
+
+两个 Skill 的运行时文件分别自包含：正文只保留每次运行必需的步骤和完成条件，复杂分支通过本 Skill 自身的 `references/` 按需加载。这样既支持单 Skill 安装，也避免把复杂导入和模板细节放入每次触发的上下文。
 
 ## 对外接口
 

@@ -1,5 +1,15 @@
 # 变更记录
 
+## 0.3.0 - 2026-08-04
+
+- 将 Skill 标准源目录从 `.agents/skills/` 迁移到插件兼容的 `skills/`，保持 GitHub 和 `npx skills add` 入口不变。
+- 修复 `ai-project-maintainer` 中含未引用冒号的非法 YAML frontmatter，恢复两个 Skill 的完整发现和安装。
+- 将两个 `SKILL.md` 精简为边界门、核心闭环、完成条件和条件引用，复杂规则继续在各自 `references/` 中按需加载。
+- 移除 bootstrapper 对 maintainer 模板的跨 Skill 引用，保证两个 Skill 可以单独安装。
+- 增加无依赖 frontmatter 解析器和 Node 回归测试；验证器现在检查严格元数据、自包含引用和运行时上下文预算。
+- 修复 Codex/Claude 插件清单路径，移除无效 `hooks` 字段，并同步版本到 `0.3.0`。
+- 清理重复评估清单，更新安装、架构、贡献和验证文档。
+
 ## 0.2.5 - 2026-08-02
 
 - 增加两阶段读取协议：先确认 `project_root`、`target_anchor`、读取范围和排除范围，再按目标锚点读取源码。

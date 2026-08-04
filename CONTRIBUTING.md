@@ -11,8 +11,11 @@
 ## 修改 Skill
 
 - 保持 frontmatter 的 `name` 与目录名一致。
+- frontmatter 只保留 `name` 和 `description`；`description` 使用双引号包裹，确保冒号等 YAML 特殊字符可安全解析。
 - `description` 要同时说明触发场景和 Skill 要完成的工作；不要只写抽象口号。
 - 正文优先写执行顺序和决策边界，具体表格和长模板放到 `references/`。
+- 每个 Skill 必须可单独安装，引用只指向自身目录内的 `references/`，不跨 Skill 取文件。
+- 运行时预算：`description` 不超过 360 字符，正文不超过 6000 字符，`SKILL.md` 不超过 100 行；超过时优先做渐进披露。
 - 保留项目无关的表达。若规则只适用于某个框架或团队，应放到示例或单独 Skill，而不是污染通用 Skill。
 - 不以更多大写的 MUST/NEVER 代替清晰的原因和行动步骤。
 - 修改触发语义时，至少在 `evals/prompts.md` 增加或调整一个评估提示。
@@ -22,6 +25,7 @@
 在仓库根目录运行：
 
 ```bash
+node --test scripts/skill-frontmatter.test.mjs
 node scripts/verify-skill-repo.mjs
 git diff --check
 ```
