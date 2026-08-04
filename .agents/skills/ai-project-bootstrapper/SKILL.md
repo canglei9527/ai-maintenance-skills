@@ -10,7 +10,7 @@ Create the first maintainable version of a new independent project.
 
 ## Routing
 
-Use this Skill for a standalone application, service, router, daemon, background process, CLI, or automation tool with no evidence that it belongs to an existing codebase. A populated parent workspace may contain unrelated projects and does not change this routing.
+Use this Skill for a standalone service, application, router, daemon, background process, CLI, or automation tool with no evidence that it belongs to an existing codebase. The current workspace may contain unrelated projects and does not change this routing.
 
 Use `ai-project-maintainer` when the request names an existing project path, file, symbol, route, stack trace, failing test, call path, or asks to modify the current codebase. Existing-project features and module extraction are maintenance, not bootstrap work. If intent is genuinely ambiguous, ask:
 
@@ -23,6 +23,10 @@ Use `ai-project-maintainer` when the request names an existing project path, fil
 Confirm one dedicated `project_root` and the user's goal before writing. If no target directory is supplied, create a clearly named child directory under the workspace. Do not scatter project files into the parent workspace or scan sibling projects for conventions.
 
 Inspect only shallow metadata in the confirmed target. If it is non-empty or ownership is unclear, do not overwrite it; resolve the target boundary first. Exclude dependencies, build output, caches, generated files, media, secrets, credentials, cookies, and tokens.
+
+## Read boundary for new projects
+
+Create and follow `ai-context/INDEX.md` first. `ai-context/ARCHITECTURE.md` remains a legacy compatibility layout, not a default full read. When a scoped search is necessary during initialization, cap a search at 50 hits and narrow it before expanding.
 
 ## Workflow
 
