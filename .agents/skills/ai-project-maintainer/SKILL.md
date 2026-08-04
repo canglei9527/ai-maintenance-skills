@@ -10,7 +10,7 @@ Maintain an existing project with the smallest evidence-backed read and edit sco
 
 ## Routing
 
-Use this Skill only when the request identifies an existing project through a path, file, symbol, route, stack trace, failing test, call path, or explicit current-codebase wording. A populated workspace alone is not evidence.
+Use this Skill only when the request identifies an existing project through a path, file, symbol, route, stack trace, failing test, call path, or explicit current-codebase wording. A populated workspace alone is not evidence. Use existing-project evidence to establish the maintenance boundary. Do not scan the current workspace to invent one.
 
 Route a new independent application, service, router, daemon, CLI, or automation tool with no existing-project evidence to `ai-project-bootstrapper`. If the intent is genuinely ambiguous, ask one question before scanning:
 
@@ -41,6 +41,10 @@ Read only the target implementation, required one-hop project-owned callers or c
 
 Use exact paths, symbols, routes, configuration keys, error text, or test names for search. Expand one level at a time only when current evidence requires it. Detailed limits and expansion criteria live in `references/maintenance-workflow.md` and should be loaded only when scope expansion, imported-project organization, or a non-local decision requires them.
 
+### Compatibility boundary
+
+Read boundary and context stages remain index-first: legacy `ai-context/ARCHITECTURE.md` is a compatibility fallback, not a default full read. Do not open every module or function listed by an index. Default maximum: 50 search hits, 12 candidate files opened, and one call/dependency hop before evidence justifies expansion. Full-project scanning is reserved for an explicit repository audit.
+
 ## Maintenance workflow
 
 1. Check project rules and the working tree. Preserve unrelated user changes; never reset, delete, overwrite, or reformat them.
@@ -52,6 +56,8 @@ Use exact paths, symbols, routes, configuration keys, error text, or test names 
 7. Update project records only when useful: add a concise entry to the matching `ai-context/bugs/` topic and its index, or use the project's existing equivalent. Update an architecture topic and `FUNCTION_INDEX.md` only when responsibilities, public interfaces, direct dependencies, or lookup paths changed.
 
 Imported-project reorganization, moves, renames, dependency/schema changes, public contract changes, destructive actions, and external actions require their applicable approval and broader verification. See `references/maintenance-workflow.md` for that workflow.
+
+Imported-project organization requires explicit consent, a pre-organization baseline, and a stop or recovery decision if post-organization verification fails.
 
 ## Close-out
 
