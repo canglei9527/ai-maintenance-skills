@@ -1,0 +1,23 @@
+# Scripts Index
+
+| File | Responsibility | Public interface | Direct dependencies | Read when |
+|---|---|---|---|---|
+| `release.mjs` | Parses release CLI options and sequences release phases. | `node scripts/release.mjs` | release config, version, Git, GitHub modules | Running or resuming a release. |
+| `release-config.mjs` | Owns release paths, defaults, verification commands, and retry settings. | exported constants | none | Changing repository release conventions. |
+| `release-version.mjs` | Validates SemVer, synchronizes version metadata, and inserts changelog sections. | metadata read/prepare/apply exports | release config, Node fs | Version or changelog changes. |
+| `release-git.mjs` | Inspects Git state and owns commit, push, tag, and retry operations. | Git inspection and mutation exports | release config, Node child process | Git preflight or retry behavior. |
+| `release-github.mjs` | Owns authenticated `gh` release lookup and publication. | GitHub auth/release exports | release Git retry helpers | GitHub Release behavior. |
+| `release.test.mjs` | Offline tests for release module behavior. | Node test suite | release version, Git, GitHub modules | Changing release behavior. |
+| `verify-skill-repo.mjs` | Read-only repository integrity verification. | `node scripts/verify-skill-repo.mjs` | frontmatter parser | Validating repository content. |
+| `skill-frontmatter.mjs` | Parses the repository's restricted Skill frontmatter. | parser export | none | Changing Skill metadata rules. |
+| `skill-frontmatter.test.mjs` | Regression tests for frontmatter parsing. | Node test suite | frontmatter parser | Changing frontmatter parser. |
+
+## Release Read Paths
+
+| Task | First file | One direct dependency | Focused test | Implementation lines |
+|---|---|---|---|---|
+| Change release flags or phase order | `release.mjs` | `release-config.mjs` | `release.test.mjs` | under 400 |
+| Change version/changelog behavior | `release-version.mjs` | `release-config.mjs` | `release.test.mjs` | under 300 |
+| Diagnose push/tag/Release retry | `release-git.mjs` or `release-github.mjs` | `release-config.mjs` | `release.test.mjs` | under 350 |
+
+The release CLI does not store credentials or persistent state. It derives resume state from Git tags, commits, and GitHub Release records.

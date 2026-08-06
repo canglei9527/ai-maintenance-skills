@@ -156,6 +156,24 @@ git diff --check
 
 `evals/` 提供九组人工评估提示，覆盖已有项目 Bug、已知函数修复、导入整理、任务分流和从零创建项目。静态脚本不能替代在实际 AI 客户端中的触发评估，因此发布说明会区分自动验证和人工评估。
 
+### 发布
+
+先在干净的 `main` 工作区完成并提交功能修改。使用 release CLI 做本地预检；默认 dry-run，不会修改文件、提交、推送、创建 tag 或 GitHub Release：
+
+```bash
+node scripts/release.mjs --version 0.5.0 --title "Release title" --notes-file release-notes.md
+```
+
+确认摘要、版本、变更记录和验证命令后，才执行真实发布：
+
+```bash
+node scripts/release.mjs --version 0.5.0 --title "Release title" --notes-file release-notes.md --publish
+```
+
+无人值守时增加 `--yes`。工具会同步 3 份插件元数据、验证器版本和 `CHANGELOG.md`，运行验证，创建发布提交和 annotated tag，推送 `main` 与 tag，再通过已认证的 `gh` CLI 创建 Release。网络超时或 GitHub 传播延迟时，已完成步骤不会回滚；核对后用相同参数增加 `--resume --publish --yes` 继续。不会写入或输出 token、凭据或持久状态文件。
+
+实现边界和最小读取路径见 [`scripts/INDEX.md`](scripts/INDEX.md)。
+
 ### 仓库边界
 
 这是独立的 Skill 仓库，不包含任何具体应用源码、`.zcode` 会话目录、凭据或生成文件。示例只展示项目记录的结构，不代表某个真实业务项目。

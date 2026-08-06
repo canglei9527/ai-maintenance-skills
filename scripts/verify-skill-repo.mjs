@@ -37,7 +37,14 @@ const required = [
   'skills/ai-project-bootstrapper/SKILL.md',
   'skills/ai-project-bootstrapper/references/project-docs-template.md',
   'scripts/skill-frontmatter.mjs',
-  'scripts/skill-frontmatter.test.mjs'
+  'scripts/skill-frontmatter.test.mjs',
+  'scripts/release.mjs',
+  'scripts/release-config.mjs',
+  'scripts/release-version.mjs',
+  'scripts/release-git.mjs',
+  'scripts/release-github.mjs',
+  'scripts/release.test.mjs',
+  'scripts/INDEX.md'
 ];
 
 for (const file of required) check(existsSync(join(root, file)), `missing ${file}`);

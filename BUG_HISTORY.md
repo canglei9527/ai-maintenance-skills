@@ -101,6 +101,16 @@
 - 未验证风险：精确 `o200k_base` token 统计因词表下载 TLS 失败而未完成；字符降幅不等同于精确 token 降幅。GitHub URL 安装需在推送后复验。
 
 
+## 2026-08-06：发布步骤分散且网络中断难恢复
+
+- 现象：版本同步、验证、提交、push、标签和 GitHub Release 需要分步手工执行；网络超时后难以判断已完成阶段，容易漏推 `main`、漏推 tag 或漏建 Release。
+- 根因：仓库只有内容验证脚本，没有版本元数据同步、Git/GitHub 发布编排、有限重试或由远端状态推导的恢复路径。
+- 修改文件：`scripts/release*.mjs`、`scripts/INDEX.md`、`.github/workflows/verify.yml`、`scripts/verify-skill-repo.mjs`、`AGENTS.md`、`CONTRIBUTING.md`、`README.md`、`ARCHITECTURE.md`。
+- 修改方式：新增无依赖 Node release CLI。默认 dry-run 只做本地预检；`--publish` 才同步版本与 changelog、运行验证、提交、push、创建 annotated tag 和通过已认证 `gh` 创建 Release。Git/GitHub 网络操作使用有限指数退避；中断后保留完成阶段并使用 `--resume` 从 Git tag、提交与 Release 状态继续，不保存凭据或持久状态。
+- 验证命令：`node --test scripts/skill-frontmatter.test.mjs scripts/release.test.mjs`；`node scripts/verify-skill-repo.mjs`；`git diff --check`；隔离 Git fixture 上的 `node scripts/release.mjs --version 0.5.0 --title "Dry run" --notes-file release-notes.md`。
+- 验证结果：10 个 Node 离线测试通过；仓库验证通过；`git diff --check` 通过；隔离 fixture dry-run 保持工作区不变且未创建 `v0.5.0` tag。
+- 未验证风险：本轮不执行真实 `--publish`、远端 tag 或 GitHub Release API 调用；真实认证、权限和网络传播将在首次发布时由工具的 preflight 与重试逻辑覆盖。
+
 以后每次修复或规则缺陷都追加一条，不覆盖历史：
 
 ```markdown

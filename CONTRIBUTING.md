@@ -15,7 +15,7 @@
 - `description` 要同时说明触发场景和 Skill 要完成的工作；不要只写抽象口号。
 - 正文优先写执行顺序和决策边界，具体表格和长模板放到 `references/`。
 - 每个 Skill 必须可单独安装，引用只指向自身目录内的 `references/`，不跨 Skill 取文件。
-- 运行时预算：`description` 不超过 360 字符，正文不超过 6000 字符，`SKILL.md` 不超过 100 行；超过时优先做渐进披露。
+- 运行时预算：`description` 不超过 600 字符，正文不超过 14000 字符，`SKILL.md` 不超过 200 行；超过时优先做渐进披露。
 - 保留项目无关的表达。若规则只适用于某个框架或团队，应放到示例或单独 Skill，而不是污染通用 Skill。
 - 不以更多大写的 MUST/NEVER 代替清晰的原因和行动步骤。
 - 修改触发语义时，至少在 `evals/prompts.md` 增加或调整一个评估提示。
@@ -25,7 +25,7 @@
 在仓库根目录运行：
 
 ```bash
-node --test scripts/skill-frontmatter.test.mjs
+node --test scripts/skill-frontmatter.test.mjs scripts/release.test.mjs
 node scripts/verify-skill-repo.mjs
 git diff --check
 ```
@@ -43,6 +43,12 @@ maintainer: clarify dependency boundary for bug fixes
 ```
 
 结构、Skill 名称、引用路径、安装方式或许可证变化时，同步更新 `ARCHITECTURE.md`、`README.md` 或 `BUG_HISTORY.md`。新文件必须经过内容检查后再提交。
+
+## 发布
+
+功能修改应先通过验证并作为普通提交完成。发布提交、版本元数据、标签和 GitHub Release 统一由 `scripts/release.mjs` 管理：先执行不写入的 dry-run，再使用 `--publish` 执行真实发布；无人值守需同时使用 `--yes`。不要手动分别修改版本、创建标签和补 Release，除非正在恢复一条已记录的故障。
+
+发布前工具要求干净工作区、正确分支、未落后 upstream、合法且递增的 SemVer 版本，以及一致的 Claude/Codex/marketplace/验证器版本。它依赖已认证的 `gh` CLI，但不会读取或输出其凭据。推送或 Release 传播中断时，保留已完成阶段，核对后使用相同参数加 `--resume --publish --yes` 继续。
 
 ## Pull Request
 

@@ -23,6 +23,13 @@
 | `evals/prompts.md` | 触发和行为评估用的真实提示 |
 | `evals/rubric.md` | 评估结果的通过标准和常见失败模式 |
 | `scripts/verify-skill-repo.mjs` | 检查文件、frontmatter、引用和仓库边界 |
+| `scripts/release.mjs` | 发布 CLI 编排：dry-run、版本准备、验证、提交、推送、tag 和 Release 阶段 |
+| `scripts/release-config.mjs` | 发布路径、默认分支、验证命令和重试策略的唯一所有者 |
+| `scripts/release-version.mjs` | SemVer、四处版本元数据同步和 changelog 顶部段落 |
+| `scripts/release-git.mjs` | Git 预检、提交、推送、tag 与可重试命令执行 |
+| `scripts/release-github.mjs` | 认证的 `gh` Release 查询、创建和传播轮询 |
+| `scripts/release.test.mjs` | 发布模块的离线行为测试 |
+| `scripts/INDEX.md` | 发布与验证脚本的任务路由和最小读取路径 |
 | `scripts/skill-frontmatter.mjs` | 解析仓库限定的无依赖 frontmatter 子集，拒绝未引用冒号和额外字段 |
 | `scripts/skill-frontmatter.test.mjs` | frontmatter 合法、CRLF、非法冒号、重复/额外字段的回归测试 |
 | `README.md` | 安装、触发场景、验证和贡献入口 |
@@ -67,6 +74,20 @@
 ```
 
 两个 Skill 可以先后使用：bootstrapper 负责建立边界，maintainer 负责后续局部维护。维护 Skill 不强制 bootstrapper 生成的文件名；它会识别项目的等价文档并遵循现有约定。
+
+## 发布调用关系
+
+```text
+release.mjs
+  -> release-config.mjs: 默认路径、分支、验证和重试策略
+  -> release-version.mjs: 读取/校验/同步版本与 CHANGELOG
+  -> release-git.mjs: 本地预检、提交、push、annotated tag、重试
+  -> release-github.mjs: gh 身份检查、Release 幂等查询与创建
+
+默认 dry-run: 只读取本地 Git 和版本元数据，不修改文件且不访问远端。
+--publish: 元数据 -> 验证 -> 确认 -> 提交 -> push -> tag -> GitHub Release。
+--resume: 仅从 Git tag、提交和现有 GitHub Release 推导已完成阶段，不写持久状态文件。
+```
 
 两个 Skill 的运行时文件分别自包含：正文只保留每次运行必需的步骤和完成条件，复杂分支通过本 Skill 自身的 `references/` 按需加载。这样既支持单 Skill 安装，也避免把复杂导入和模板细节放入每次触发的上下文。
 

@@ -1,6 +1,6 @@
 # AI 项目维护规则
 
-这是 `ai-maintenance-skills` 自身的维护约定。通用执行流程在 `.agents/skills/ai-project-maintainer/SKILL.md` 和 `.agents/skills/ai-project-bootstrapper/SKILL.md` 中；本文件只记录本仓库特有的边界。
+这是 `ai-maintenance-skills` 自身的维护约定。通用执行流程在 `skills/ai-project-maintainer/SKILL.md` 和 `skills/ai-project-bootstrapper/SKILL.md` 中；本文件只记录本仓库特有的边界。
 
 ## 修改前
 
@@ -21,9 +21,10 @@
 
 ## 验证和发布
 
-1. 运行 `node scripts/verify-skill-repo.mjs` 和 `git diff --check`。
+1. 运行 `node --test scripts/skill-frontmatter.test.mjs scripts/release.test.mjs`、`node scripts/verify-skill-repo.mjs` 和 `git diff --check`。
 2. 增加或修改 Skill 后，至少用 `evals/prompts.md` 中的一组提示检查触发语义和输出要求；没有独立 Skill 运行时测试时，明确标记为人工评估。
 3. 修复验证脚本或文档问题后，在 `BUG_HISTORY.md` 记录现象、根因、修改和验证结果。
 4. 更改目录、Skill 名称、引用关系或安装方式时，更新 `ARCHITECTURE.md` 和 `README.md`。
-5. 新增依赖、修改公开接口、改变许可证或发布到 GitHub 前，说明影响范围并检查文件清单。
-6. 推送前确认仓库地址、可见性和提交内容；禁止把凭据、令牌或本机路径发布到远程仓库。
+5. 功能改动先独立提交，发布时使用 `node scripts/release.mjs --version X.Y.Z --title "..." --notes-file release-notes.md` 查看 dry-run。只有核对摘要后才增加 `--publish`；无人值守时还必须增加 `--yes`。
+6. 发布工具只使用当前仓库、受控版本文件和已认证的 `gh` CLI，不读取或输出凭据。推送或 Release 阶段中断时，保留已完成步骤，核对状态后用相同参数增加 `--resume`；不得删除 tag、回滚已推送提交或覆盖用户文件。
+7. 推送前确认仓库地址、可见性和提交内容；禁止把凭据、令牌或本机路径发布到远程仓库。
