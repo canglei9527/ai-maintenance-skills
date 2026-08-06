@@ -18,7 +18,11 @@
 │   └── operations/
 │       └── verification.md
 ├── src/
+│   ├── INDEX.md
+│   └── {small responsibility files}
 ├── tests/
+│   ├── INDEX.md
+│   └── {focused tests}
 ├── config/
 └── scripts/
 ```
@@ -45,6 +49,32 @@
 - 环境或外部验证：`{command}`（{前置条件和是否需要确认}）
 ```
 
+## 源码目录 `INDEX.md`
+
+每个维护中的源码目录都放一个短索引。索引只用于选择文件，不复制实现细节。
+
+```markdown
+# {目录名} 文件索引
+
+| 文件 | 单一职责 | 对外接口 | 一跳依赖 | 何时读取 | 行数预算 |
+|---|---|---|---|---|---|
+| `{file}` | `{responsibility}` | `{symbols}` | `{one file or none}` | `{task/symptom}` | `100-300，最大400` |
+```
+
+索引、入口和 facade 本身不超过 200 行。任何日常维护路径不能指向超过 400 行的手写源码文件。
+
+## 项目任务到文件路由
+
+在 `ai-context/INDEX.md` 的“按任务读取”中直接列源码路径，不只列架构主题：
+
+```markdown
+| 任务或现象 | 第一源码文件 | 可选一跳依赖 | 最小测试 | 主题记录 | 实现读取行数 |
+|---|---|---|---|---|---|
+| `{task}` | `{src/small-file}` | `{src/dependency or none}` | `{test}` | `{architecture/bug note}` | `<=800` |
+```
+
+至少为三个高频维护任务填写真实路径和行数。超过 800 实现行说明边界仍太粗，完成前必须继续拆分。
+
 ## `ai-context/INDEX.md`
 
 ```markdown
@@ -57,9 +87,9 @@
 - {不能被普通修改破坏的行为或安全边界}
 
 ## 按任务读取
-| 任务 | 首读主题 | 必要时再读 | 最小验证 |
-|---|---|---|---|
-| {task} | `architecture/{topic}.md` | `bugs/{topic}.md`、`FUNCTION_INDEX.md` | `{command}` |
+| 任务或现象 | 第一源码文件 | 可选一跳依赖 | 最小测试 | 首读主题 | 实现读取行数 |
+|---|---|---|---|---|---|
+| {task} | `{src/file}` | `{src/dependency or none}` | `{command or test}` | `architecture/{topic}.md` | `<=800` |
 
 ## 兼容记录
 {旧文档的位置和何时需要查阅；没有则省略}
