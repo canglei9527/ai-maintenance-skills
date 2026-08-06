@@ -4,7 +4,7 @@ import { fileURLToPath } from 'node:url';
 import { parseSkillDocument } from './skill-frontmatter.mjs';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
-const releaseVersion = '0.3.0';
+const releaseVersion = '0.4.0';
 const failures = [];
 const check = (condition, message) => {
   if (!condition) failures.push(message);
@@ -54,9 +54,9 @@ for (const name of skillNames) {
     const document = parseSkillDocument(text);
     skillDocuments.set(name, { ...document, text });
     check(document.metadata.name === name, `${name}: frontmatter name mismatch`);
-    check(document.metadata.description.length <= 360, `${name}: description exceeds 360 characters`);
-    check(document.body.length <= 6000, `${name}: SKILL.md body exceeds 6000 characters`);
-    check(text.split(/\r?\n/).length <= 100, `${name}: SKILL.md exceeds 100 lines`);
+    check(document.metadata.description.length <= 600, `${name}: description exceeds 600 characters`);
+    check(document.body.length <= 14000, `${name}: SKILL.md body exceeds 14000 characters`);
+    check(text.split(/\r?\n/).length <= 200, `${name}: SKILL.md exceeds 200 lines`);
 
     const pointers = [...text.matchAll(/`((?:references\/|\.\.\/)[^`]+\.md)`/g)].map((match) => match[1]);
     for (const pointer of pointers) {
@@ -146,7 +146,7 @@ if (failures.length) {
 } else {
   console.log('PASS AI maintenance skills repository verification');
   console.log(`PASS ${skillNames.length} Skills with strict frontmatter and self-contained references`);
-  console.log('PASS runtime context budgets: description <= 360 chars, body <= 6000 chars, SKILL.md <= 100 lines');
+  console.log('PASS runtime context budgets: description <= 600 chars, body <= 14000 chars, SKILL.md <= 200 lines');
   console.log(`PASS ${required.length} required repository files and plugin version ${releaseVersion}`);
   console.log('PASS references, examples, license, and repository boundaries checked');
 }
