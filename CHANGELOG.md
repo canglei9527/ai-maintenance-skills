@@ -1,5 +1,20 @@
 # 变更记录
 
+## 0.4.1 - 2026-08-07
+
+- 本次 v0.4.1 发布同步两个项目 Skill 的 V2 重构，目标是让新建、维护、只读分析和结构迁移有清晰边界，让规则按需加载，并让完成声明与真实验证证据一致。
+- 新建项目分流：当目标实现尚不存在时，即使用户提供了路径、spec、素材或空目录，仍由 ai-project-bootstrapper 负责；已有 monorepo 中新增 package、修改现有源码或解释现有项目，则由 ai-project-maintainer 负责。路径和附件只用于定位，不自动授予写入权限。
+- Bootstrapper 档位：引入 MICRO、STANDARD、DURABLE 三档。MICRO 适用于一次性脚本、教学实验、快速原型和明确要求的单文件工具，保持单文件并只提供必要的运行错误处理和最小验证，不自动创建完整治理树。STANDARD 适用于普通 CLI、桌面工具、Web 应用、服务和自动化工具，建立明确入口、集中配置、模块职责、启动说明和最小测试。DURABLE 只在长期 AI 维护、多人或多 AI 协作、多入口、多工作流，或安全、硬件、财务、数据一致性要求较高时启用，并按需建立任务路由、架构主题、操作验证和严格结构证据。
+- Maintainer 路径：引入 READ_ONLY、NORMAL_CHANGE、STRUCTURAL_CHANGE，并将 EXTERNAL_ACTION 作为删除、推送、发布、部署和远端变更的独立授权门。READ_ONLY 只解释、审查和诊断，不写源码、测试、Bug 记录、索引、分支或备份。NORMAL_CHANGE 采用最小兼容修改，普通 Bug 修复不因目标文件较大而强制先重构。STRUCTURAL_CHANGE 仅在明确要求或批准范围内执行结构迁移。
+- 结构迁移证据：结构任务必须先建立基线，明确批准范围、消费者、公共入口和兼容路径，并使用职责迁移表记录旧所有者、新规范所有者、消费者、兼容路径、旧实现删除证据和验证结果。只有完整职责真正迁移、消费者和测试跟随新所有者、旧实现被删除且证据充分时，才能报告 Completed for approved scope；仅搭目录、添加 facade、复制代码或保留影子实现只能报告 Scaffolded 或 Partially extracted。
+- 预算策略：400 行手写实现、200 行入口/facade/兼容模块/索引，以及约 800 行典型维护读取路径现在默认是审查阈值，不是所有任务的无条件失败门。只有 DURABLE、STRUCTURAL_CHANGE、明确要求上下文优化或明确要求文件治理时，才可将其作为严格验收门；拆分仍须证明职责独立、接口清晰、可独立验证并实际减少读取范围，同时避免 facade 链、循环依赖、重复类型和重复规则。
+- 导航和记录：任务地图、目录索引、函数索引、架构主题和 Bug 记录只在具有当前导航价值或历史价值时创建或更新。不会因为 Skill 被加载就创建空文档树，不会将索引当作逐文件读取清单，也不会把未来可能的需求预先写成项目记录。
+- 例外和规范所有权：生成代码、vendor、声明式数据、框架约束、ABI、内存布局和实时控制代码按实际所有权和验证约束处理。多实现仅在公共接口、唯一选择逻辑、统一配置来源、一致性测试和明确所有权都存在时共存；同一业务规则不得在多个位置复制。
+- TMS320/CCS 和实时固件：涉及控制 ISR、ADC/PWM 链、CLA Task、保护逻辑、启动代码、中断向量、链接段或必须内联算法时，必须按需确认 ISR 周期和触发源、ADC SOC/EOC、EPWM 时序、CLA/CPU 与 Shared/Message RAM 数据所有权、CODE_SECTION/DATA_SECTION 和 linker .cmd、优化与内联、最坏执行时间及保护优先级。不能仅凭行数或主机测试宣称实时安全。
+- 验证状态：验证结果统一使用 PASS、FAIL、NOT_RUN、NOT_AVAILABLE、BLOCKED_BY_EXISTING_FAILURE。语法/静态分析、编译、链接、仿真、目标板下载、实时波形、ISR 执行时间、保护触发时序和外部服务检查分别报告；未运行、硬件不可用或已有失败不能写成通过。
+- Reference 迁移：删除旧的 project-docs-template.md、maintenance-workflow.md 和 project-record-templates.md，新增并从两个 SKILL.md 一跳直达 V2 references。Bootstrapper 使用 workflow.md、navigation-and-budgets.md、verification-and-exceptions.md；Maintainer 使用 fast-path.md、structural-change.md、verification-and-safety.md，并在 v2-migration-notes.md 中保留详细迁移说明。
+- 仓库验证：本地 Node.js frontmatter/release 测试通过，技能仓库验证通过，git diff --check 通过，V2 入口和 reference 链接已检查。当前未在真实 AI 客户端重新执行交互式 12 项 forward-test，未运行目标项目硬件、仿真、实时波形或部署验证；这些限制在发布说明中明确标注。
+
 ## 0.4.0 - 2026-08-06
 
 - 强制新建项目和已有项目整理使用 100-300 行的单一职责手写文件。
