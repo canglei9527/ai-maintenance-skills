@@ -1,175 +1,76 @@
 ---
 name: ai-project-maintainer
-description: "Maintain an existing project when the request names a path, file, symbol, route, stack trace, failing test, or current-codebase change. Use for bug fixes, regressions, focused features, module extraction, imported-project cleanup, and approved restructuring. For AI-maintainable organization, enforce many indexed 100-300 line files, a 400-line hand-written source limit, task-to-file routing, and small read sets; never accept a renamed giant legacy file or facade chain as completion."
+description: "Explain, diagnose, review, fix, extend, or restructure an existing software project when the request concerns existing source, tests, build configuration, symbols, routes, failures, or repository behavior. Select a read-only, normal-change, or structural-change path from the user's intent. Do not infer write authorization merely from the presence of a path, file, or attachment."
 ---
 
 # AI Project Maintainer
 
-Maintain existing projects through an evidence-backed boundary, the smallest compatible edit, and a completion claim proportional to what was actually delivered. For organization work, optimize the repository for selective AI reading: many small, single-purpose files plus directory indexes that route future maintenance to the minimum context.
+Maintain an existing project with evidence proportional to the requested outcome. A path, file, symbol, log, or attachment identifies a target; it does not authorize writing. First select the operation path, then read only the context needed for that path.
 
-## Boundary Gate
+## Route First
 
-Before reading implementation, establish:
+| User intent or situation | Path | Default write permission |
+|---|---|---|
+| Explain code, review behavior, diagnose a failure, find a symbol, read logs, or report status without asking for a fix | `READ_ONLY` | None |
+| Fix a bug, add a focused feature, adjust configuration, change existing behavior, or update a local regression test | `NORMAL_CHANGE` | Only the named compatible scope |
+| Explicitly refactor, split, migrate, modularize, organize an imported project, reduce AI context, or implement an approved structural scope | `STRUCTURAL_CHANGE` | Only the approved structural scope |
+| Delete, push, publish, deploy, alter production/remote state, send data, or create/execute remotely-triggering CI | `EXTERNAL_ACTION` gate | Separate confirmation for the exact action |
 
-- `project_root` from a user-supplied path or target and its nearest project marker;
-- one concrete `target_anchor`, such as a symbol, route, error, failing test, configuration key, or reproduction;
-- the smallest relevant scope and its exclusions;
-- whether the request is a focused maintenance change or a structural outcome such as "整理", "重构", "拆分", "模块化", "容易维护", migration, move, or rename.
+“Help me see how the structure is” is `READ_ONLY`; it does not authorize moving files. An existing monorepo receiving a new package is maintainer work because an existing repository boundary and workspace contract change. A new or empty independent project belongs to `ai-project-bootstrapper`.
 
-If the request instead describes a standalone program without existing-project evidence, use `ai-project-bootstrapper`. If intent is genuinely ambiguous, ask one question before scanning or creating files:
+## References
 
-```text
-这是新建独立程序，还是在现有项目中增加功能？如果是现有项目，请提供项目路径或目标文件。
-```
+| Current task | Must read | Do not read by default |
+|---|---|---|
+| `READ_ONLY` explanation, review, or diagnosis | [`references/fast-path.md`](references/fast-path.md), `READ_ONLY` section | [`references/structural-change.md`](references/structural-change.md) |
+| `NORMAL_CHANGE` bug or focused feature | [`references/fast-path.md`](references/fast-path.md), then relevant [`references/verification-and-safety.md`](references/verification-and-safety.md) sections | Structural migration procedure |
+| `NORMAL_CHANGE` target is a large file | `fast-path.md` large-file section and required verification sections | Structural change unless separately authorized |
+| `STRUCTURAL_CHANGE` or imported-project cleanup | [`references/structural-change.md`](references/structural-change.md), [`references/verification-and-safety.md`](references/verification-and-safety.md) | Unrelated fast-path sections |
+| External, destructive, remote, production, dependency, license, secret, or CI concern | Relevant [`references/verification-and-safety.md`](references/verification-and-safety.md) section | Unrelated migration templates |
+| Need the detailed explanation of this V2 skill migration | [`references/v2-migration-notes.md`](references/v2-migration-notes.md) | It is explanatory only; do not load it as an execution prerequisite |
 
-### Stage 1: Control Plane
+All required references are one hop from this file and are independently usable. `references/v2-migration-notes.md` documents this package migration; it is not an execution prerequisite.
 
-1. Read applicable `AGENTS.md` files on the target-to-root path.
-2. Read `ai-context/INDEX.md` when present. Follow its task map to at most one relevant architecture topic and one Bug topic; read `FUNCTION_INDEX.md` only for symbol lookup. Otherwise locate the matching section in legacy architecture/Bug records before considering a full read. Treat records as navigation, not a source-file checklist.
-3. Inspect only shallow package, build, test, startup, and version-control metadata.
+## Immutable Rules
 
-Exclude dependencies, vendor code, build output, caches, generated files, binaries, media, secrets, and unrelated sibling projects. If the root or anchor remains unknown, request the smallest missing fact.
+- Establish `project_root`, `target_anchor`, scope, exclusions, authorization, and existing user changes before editing.
+- Paths and attachments locate evidence only. Explanations and reviews remain read-only unless the user requests a change.
+- Follow user instructions, applicable `AGENTS.md`, build constraints, public contracts, and project conventions.
+- Preserve uncommitted user modifications. Do not reset, revert, overwrite, make an automatic branch, copy a full-project backup, or install/upgrade dependencies without explicit need and authorization.
+- A normal bug fix remains a normal change even when its file is large. Record the structural risk; do not force an unrelated split or add a refactor marker/document.
+- Split only when responsibilities, interfaces, independent verification, and reduced read scope support it and facade chains, duplication, ABI, framework, or timing constraints do not veto it.
+- Each business decision has one canonical specification and owner. Alternate CPU/CLA, SIMD/scalar, real/simulated, hardware-platform, or reference/optimized implementations need an explicit common interface, unique selection/configuration source, and consistency verification.
+- Completion claims must distinguish `PASS`, `FAIL`, `NOT_RUN`, `NOT_AVAILABLE`, and `BLOCKED_BY_EXISTING_FAILURE` and include evidence.
 
-### Stage 2: Target Path
+## Short Workflow
 
-Search from an exact anchor. Read the target, the required one-hop project-owned caller or callee, configuration/data used by that path, and the smallest relevant test or reproduction. Default to 50 search hits, 12 candidate files, and one dependency hop; narrow before expanding. Reserve full-project scans for explicit audits or inventories.
+1. Determine the path from the user's intent; if write scope is unclear, remain read-only and ask for the smallest clarification.
+2. Confirm the root and anchor from the request, read applicable project rules and shallow metadata, and preserve the dirty worktree.
+3. Read the target, one project-owned dependency/caller as needed, relevant configuration, and the smallest test or reproduction. Expand only on evidence.
+4. For `READ_ONLY`, diagnose or report without source, test, record, file-move, branch, or index writes.
+5. For `NORMAL_CHANGE`, make the smallest compatible edit, add/update the minimum regression test, and verify at the risk-matched levels.
+6. For `STRUCTURAL_CHANGE`, read the structural reference, establish a baseline and approved scope, create a responsibility migration table, migrate one complete responsibility at a time, remove the old implementation, and compare before/after evidence.
+7. Apply the external-action gate separately. Report behavior, structure, environment, and unrun checks without conflating them.
 
-## Maintenance Loop
+## Structural Completion
 
-1. Check project rules and the working tree. Preserve unrelated user changes.
-2. Establish current behavior, expected behavior, and a focused reproduction or test boundary.
-3. State a testable hypothesis when the cause is not already proven.
-4. Make the narrowest change that preserves public behavior, comments, naming, and compatibility outside the request.
-5. Add or update the smallest meaningful regression test.
-6. Run focused tests and applicable syntax, type, format, build, or startup checks. Broaden verification only when shared contracts changed.
-7. Record a confirmed fix in the matching `ai-context/bugs/` topic and its index, or the project's existing Bug history. Update an architecture topic or `FUNCTION_INDEX.md` only when responsibilities, interfaces, dependencies, or lookup paths changed.
+Use only these statuses for approved structural work:
 
-Read `references/maintenance-workflow.md` before scope expansion, imported-project organization, moves or renames, dependency/schema/public-contract changes, destructive actions, or external actions. Complete its approval, baseline, and recovery gates before editing. Use `references/project-record-templates.md` only when the project has no record format of its own.
+- `Scaffolded`: directories or facades exist, but ownership has not moved.
+- `Partially extracted`: named responsibilities have canonical new owners, while listed legacy responsibilities remain.
+- `Completed for approved scope`: every approved responsibility has one owner, consumers and tests follow it, old copies are removed, and comparison evidence supports the claim.
 
-## AI Context Architecture Gate
+A passing test proves behavior for that test, not maintainability. A facade, rename, or new directory alone is not structural completion.
 
-Apply this gate whenever the user asks to make a project easier for AI to maintain, reduce context or tokens, split large files, organize an imported project, or create directory/file indexes.
-
-The target architecture is deliberately granular:
-
-- many small, cohesive hand-written source files;
-- one responsibility and one primary reason to change per file;
-- a short index in every maintained source directory describing each child file;
-- a task-to-file map that lets a future agent select files before reading implementation;
-- explicit interfaces so a task normally needs its target file, one direct dependency, one test, and one focused architecture/Bug note only.
-
-### Hard Context Budgets
-
-Use these default budgets unless the repository has stricter rules:
-
-- target 100-300 lines per hand-written implementation file;
-- 400 lines is the normal maximum for a hand-written source file;
-- 200 lines is the normal maximum for an entry point, facade, compatibility module, directory index, or context note;
-- a normal maintenance task must require reading at most 800 implementation lines across its target path before editing.
-
-A hand-written source file over 400 lines is a failed organization result until it is split or the user explicitly approves a named exception. Files above 800 lines are never acceptable as routine maintenance boundaries. Do not use `legacy`, `compat`, `facade`, comments, regions, or classes inside one file to bypass the file budget.
-
-Generated code, vendored code, immutable protocol/schema snapshots, and declarative data may exceed the budget only when isolated in clearly named directories and excluded from normal maintenance routes. Never place hand-written business logic in those exceptions.
-
-### Required Directory Indexes
-
-Every first-party directory containing hand-written source that is created, moved, or reorganized in the approved scope must contain a concise `INDEX.md`, `README.md`, or project-standard equivalent with:
+## Completion Report
 
 ```text
-File | Responsibility | Public interface | Direct dependencies | Read when
+路径：READ_ONLY / NORMAL_CHANGE / STRUCTURAL_CHANGE / EXTERNAL_ACTION gate
+根目录与锚点：...
+授权范围：...
+修改：文件/符号 -> 原因；只读时明确“无文件修改”
+验证：检查项 -> required/available/ran/result/evidence
+结构状态：不适用 / Scaffolded / Partially extracted / Completed for approved scope
+记录：更新或明确无需更新的项目记录
+未完成与风险：...
 ```
-
-The project context root must include a task map such as:
-
-```text
-Task or symptom | First file to read | Optional one-hop dependency | Focused test | Architecture/Bug note
-```
-
-Indexes route reading; they must not duplicate implementation details. Keep each entry concrete enough that a future agent can choose one small file without scanning the package.
-
-### Context Verification
-
-Before claiming organization complete:
-
-1. list line counts for all affected hand-written source and context files;
-2. fail the gate for every unapproved file above its budget;
-3. detect duplicate top-level definitions with the language AST/symbol tool when available, then inspect same-name or highly similar implementations and copied constants across the migration boundary;
-4. sample at least three likely maintenance tasks and name the exact minimal read set for each;
-5. total the implementation lines in each sample read set and split further whenever it exceeds the 800-line context limit;
-6. verify directory indexes and the task map point to files that exist and own the described behavior.
-
-A test suite passing does not waive this gate. The purpose is to reduce future input tokens, so an unchanged giant implementation file is a failed result even when wrapped by perfect compatibility facades.
-
-## Structural Refactor Gate
-
-Apply this gate whenever maintainability, modularization, extraction, migration, project organization, or a large-file split is part of the requested result.
-
-### Establish A Structural Baseline
-
-Before editing, record enough evidence to compare the result:
-
-- line counts for affected first-party files;
-- top-level functions/classes and the responsibilities they represent;
-- direct consumers and public entry points;
-- duplicate definitions or copied implementations across the proposed boundary;
-- existing tests and compatibility behavior, including monkeypatch/import identity when relevant.
-
-Line counts are acceptance evidence for AI-context organization. Apply the hard budgets in the AI Context Architecture Gate; do not treat them as optional signals. For a focused Bug fix outside an approved organization scope, an existing oversized file is recorded as risk rather than forcing an unrelated refactor. Once organization or low-token maintenance is the requested outcome, generated/declarative isolation is the only size exception; hand-written source must meet the 400/200/800 budgets before completion.
-
-### Define Real Ownership
-
-For every extraction, write a small migration table before editing:
-
-```text
-Responsibility | Old owner | Canonical new owner | Consumers | Compatibility path | Removal proof
-```
-
-An extraction is real only when:
-
-1. the new module owns the implementation;
-2. the old implementation is removed, not left earlier in the file and shadowed by a later import;
-3. consumers use the new owner directly or through one justified compatibility boundary;
-4. tests cover the canonical owner and the compatibility contract;
-5. documentation describes the actual runtime path rather than the intended future path.
-
-Renaming a large file to `legacy_*`, moving it under a package, or adding facade-to-facade aliases does not reduce its responsibilities and must not be reported as completed modularization.
-
-### Keep Compatibility Layers Thin
-
-A compatibility module should contain imports, aliases, small argument/result adaptation, and deprecation guidance only. It must not become a second business implementation.
-
-- Prefer one compatibility hop. Explain any additional hop.
-- Check that monkeypatches and module identity still reach the canonical implementation when existing tests rely on them.
-- Treat a compatibility file approaching 200 hand-written lines, defining domain classes, or containing substantial branching/I/O as evidence that the extraction is incomplete.
-- Do not copy code into a new module and leave the same implementation active or shadowed in the old module.
-
-### Classify Progress Honestly
-
-Use one of these statuses in updates and completion reports:
-
-- `Scaffolded`: directories/facades exist, but responsibilities have not moved.
-- `Partially extracted`: named responsibilities have one canonical new owner, while listed legacy responsibilities remain.
-- `Completed for approved scope`: every responsibility named in the approved scope has one canonical owner, old copies are removed, consumers and tests follow the intended boundary, and comparison evidence supports the maintainability claim.
-
-Never use "整理完成", "重构完成", or equivalent when only scaffolding or a partial extraction was delivered. If risk or time requires staging, stop at a verified phase boundary and state exactly what remains.
-
-## Completion
-
-Finish a focused maintenance task only when the requested behavior has a truthful verification status and required records are updated or explicitly unnecessary.
-
-For structural work, rerun the baseline and context-budget comparison and report:
-
-```text
-状态：Scaffolded / Partially extracted / Completed for approved scope
-文件预算：最大手写源码文件、所有超 400 行文件及处理结果
-读取预算：三个典型任务 -> 精确最小读取文件 -> 实现总行数
-目录导航：每个受影响目录的索引及任务到文件路由
-基线对比：职责数量、重复实现、兼容层变化
-规范实现：每项迁移职责现在唯一归属哪个模块
-遗留：仍未满足预算的文件；存在任何未批准超限时不得标记完成
-验证：行为测试、导入/启动检查、结构与索引检查结果
-记录：架构与 Bug/迁移记录位置
-风险：未运行路径和环境限制
-```
-
-A passing behavior test proves compatibility, not maintainability. Structural completion additionally requires ownership, duplication, directory routing, and context-budget evidence.

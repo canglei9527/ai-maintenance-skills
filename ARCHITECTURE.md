@@ -4,7 +4,7 @@
 
 `ai-maintenance-skills` 是一组可安装的 AI 软件工程 Skills，用于把项目维护流程固定为“局部理解、最小修改、可验证、可追溯”。它不是某个应用的业务代码，也不要求使用特定编程语言或框架。
 
-技术路线：标准 `skills/` 目录中的 Markdown Skill 指令 + Claude/Codex 插件元数据 + `npx skills` 安装入口 + `ai-context/` 按需加载的参考模板 + Node.js 内置模块静态验证和回归测试 + Markdown 评估提示。手工安装时可把仓库 `skills/` 复制到目标项目的 `.agents/skills/`；仓库本身不依赖 npm 运行时包或构建系统。
+技术路线：标准 `skills/` 目录中的 Markdown Skill 指令 + Claude/Codex 插件元数据 + `npx skills` 安装入口 + Skill 自身 `references/` 的按需加载 + Node.js 内置模块静态验证和回归测试 + Markdown 评估提示。手工安装时可把仓库 `skills/` 复制到目标项目的 `.agents/skills/`；仓库本身不依赖 npm 运行时包或构建系统。
 
 ## 目录和职责
 
@@ -14,11 +14,14 @@
 | `.claude-plugin/plugin.json` | Claude 插件元数据、能力和 Skill 路径 |
 | `.codex-plugin/plugin.json` | Codex 插件元数据、能力和 Skill 路径 |
 | `docs/installation.md` | 一条命令、插件、手工后备安装及更新卸载说明 |
-| `skills/ai-project-maintainer/SKILL.md` | 已有项目维护的触发、边界门、最小修改和验证闭环 |
-| `skills/ai-project-maintainer/references/maintenance-workflow.md` | 扩域、导入整理、高风险变更和验证分级的按需参考 |
-| `skills/ai-project-maintainer/references/project-record-templates.md` | 架构、函数索引和 Bug 历史的自包含格式 |
-| `skills/ai-project-bootstrapper/SKILL.md` | 新项目的边界门、独立目录、接口设计、实现和验证闭环 |
-| `skills/ai-project-bootstrapper/references/project-docs-template.md` | 新项目 `AGENTS.md`、`ai-context/` 文档和填写规则 |
+| `skills/ai-project-maintainer/SKILL.md` | 已有项目的 READ_ONLY、NORMAL_CHANGE、STRUCTURAL_CHANGE 和外部动作分流 |
+| `skills/ai-project-maintainer/references/fast-path.md` | 只读分析、普通修改、最小读取和大文件 Bug 修复路径 |
+| `skills/ai-project-maintainer/references/structural-change.md` | 已授权结构变更的基线、迁移表、兼容与完成状态 |
+| `skills/ai-project-maintainer/references/verification-and-safety.md` | 授权、秘密、依赖、验证证据和实时项目安全边界 |
+| `skills/ai-project-bootstrapper/SKILL.md` | 新项目分流、MICRO/STANDARD/DURABLE 档位和最短创建闭环 |
+| `skills/ai-project-bootstrapper/references/workflow.md` | 三档新项目的最小工作流和当前记录门槛 |
+| `skills/ai-project-bootstrapper/references/navigation-and-budgets.md` | 导航价值、审查阈值、严格治理门和唯一所有权 |
+| `skills/ai-project-bootstrapper/references/verification-and-exceptions.md` | 验证状态、具名例外和 TMS320/CCS 实时约束 |
 | `examples/minimal-project/` | 与语言无关的项目文档示例，不包含真实业务代码 |
 | `evals/prompts.md` | 触发和行为评估用的真实提示 |
 | `evals/rubric.md` | 评估结果的通过标准和常见失败模式 |
@@ -52,25 +55,22 @@
        -> `skills/`
             -> 用户维护请求
                  -> ai-project-maintainer
-                      -> 项目 `AGENTS.md` / `ai-context/` 索引
-                      -> 目标函数及一跳项目自有依赖
-                      -> 最小测试与验证
-                      -> Bug 历史、架构和函数索引记录
+                      -> READ_ONLY / NORMAL_CHANGE / STRUCTURAL_CHANGE
+                      -> 项目规则与目标锚点
+                      -> 最小读取、修改和风险匹配验证
+                      -> 仅在有导航或历史价值时更新记录
 
 导入已有项目
   -> 浅层项目地图与基线能力检查
-  -> 询问是否整理
-  -> （同意）整理前基线 -> 分批结构整理 -> 整理后回归测试
-  -> 架构说明与 Bug 历史
+  -> 保持 READ_ONLY，或取得明确结构授权
+  -> （获授权）整理前基线 -> 分批完整职责迁移 -> 整理后回归验证
 
 用户新建项目请求
   -> ai-project-bootstrapper
-       -> 需求与父工作区元数据检查
-       -> 独立项目根目录
-       -> 根 `AGENTS.md` 和 `ai-context/` 索引
-       -> 模块职责和接口设计
-       -> 代码、测试、项目文档
-       -> 启动和验证命令
+       -> MICRO / STANDARD / DURABLE 档位
+       -> 独立项目根目录与最小垂直切片
+       -> 仅按需建立导航和记录
+       -> 代码、测试和分层验证
 ```
 
 两个 Skill 可以先后使用：bootstrapper 负责建立边界，maintainer 负责后续局部维护。维护 Skill 不强制 bootstrapper 生成的文件名；它会识别项目的等价文档并遵循现有约定。
@@ -97,14 +97,14 @@ release.mjs
 
 - 输入：已有项目中的维护请求，以及可选的文件、函数、复现步骤、错误和期望行为。
 - 导入场景：先做浅层项目地图并询问是否整理；未获明确同意不移动文件；同意后执行整理前基线、分批迁移和整理后回归验证。
-- 输出：最小代码或文档变更、验证结果、根因说明、记录更新和未验证风险。
-- 重要约束：不猜测缺失上下文，不宣称未验证的修复，不破坏用户未提交修改。
+- 输出：最小代码或文档变更、验证结果、根因说明，以及仅在有导航或历史价值时更新的记录；结构任务还需报告批准范围、职责迁移、旧实现删除和完成状态。
+- 重要约束：不猜测缺失上下文，不宣称未验证的修复，不破坏用户未提交修改；普通大文件 Bug 不因行数被迫重构。
 
 ### `ai-project-bootstrapper`
 
 - 输入：项目目标、核心功能、技术偏好、运行环境和验收标准。
-- 输出：目录结构、模块接口、实现、最小测试、项目文档和启动/验证说明。
-- 重要约束：先选择或创建独立项目根目录；源码、测试、配置、文档和资产都放在该目录内，不散落到父级工作区。
+- 输出：按 `MICRO`、`STANDARD` 或 `DURABLE` 档位建立的独立项目、最小垂直切片、必要文档/记录、测试和启动/验证说明。
+- 重要约束：先选择或创建独立项目根目录；源码、测试、配置、文档和资产都放在该目录内，不散落到父级工作区；不为 MICRO 自动生成完整治理树。
 
 ## 后续维护最小上下文
 

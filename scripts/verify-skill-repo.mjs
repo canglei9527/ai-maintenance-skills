@@ -32,10 +32,14 @@ const required = [
   'examples/minimal-project/BUG_HISTORY.md',
   'examples/minimal-project/AI修Bug提问模板.md',
   'skills/ai-project-maintainer/SKILL.md',
-  'skills/ai-project-maintainer/references/maintenance-workflow.md',
-  'skills/ai-project-maintainer/references/project-record-templates.md',
+  'skills/ai-project-maintainer/references/fast-path.md',
+  'skills/ai-project-maintainer/references/structural-change.md',
+  'skills/ai-project-maintainer/references/verification-and-safety.md',
+  'skills/ai-project-maintainer/references/v2-migration-notes.md',
   'skills/ai-project-bootstrapper/SKILL.md',
-  'skills/ai-project-bootstrapper/references/project-docs-template.md',
+  'skills/ai-project-bootstrapper/references/workflow.md',
+  'skills/ai-project-bootstrapper/references/navigation-and-budgets.md',
+  'skills/ai-project-bootstrapper/references/verification-and-exceptions.md',
   'scripts/skill-frontmatter.mjs',
   'scripts/skill-frontmatter.test.mjs',
   'scripts/release.mjs',
@@ -65,7 +69,7 @@ for (const name of skillNames) {
     check(document.body.length <= 14000, `${name}: SKILL.md body exceeds 14000 characters`);
     check(text.split(/\r?\n/).length <= 200, `${name}: SKILL.md exceeds 200 lines`);
 
-    const pointers = [...text.matchAll(/`((?:references\/|\.\.\/)[^`]+\.md)`/g)].map((match) => match[1]);
+    const pointers = [...text.matchAll(/\]\((references\/[^)]+)\)/g)].map((match) => match[1]);
     for (const pointer of pointers) {
       check(!pointer.startsWith('../'), `${name}: cross-skill reference is not self-contained (${pointer})`);
       check(existsSync(resolve(skillRoot, pointer)), `${name}: missing reference ${pointer}`);
@@ -112,21 +116,28 @@ check(installation.includes('npx skills add . --list'), 'local discovery verific
 
 const maintainer = skillDocuments.get('ai-project-maintainer')?.text ?? '';
 const bootstrapper = skillDocuments.get('ai-project-bootstrapper')?.text ?? '';
-const workflow = readFileSync(join(root, 'skills', 'ai-project-maintainer', 'references', 'maintenance-workflow.md'), 'utf8');
-const template = readFileSync(join(root, 'skills', 'ai-project-bootstrapper', 'references', 'project-docs-template.md'), 'utf8');
+const fastPath = readFileSync(join(root, 'skills', 'ai-project-maintainer', 'references', 'fast-path.md'), 'utf8');
+const structuralChange = readFileSync(join(root, 'skills', 'ai-project-maintainer', 'references', 'structural-change.md'), 'utf8');
+const maintainerSafety = readFileSync(join(root, 'skills', 'ai-project-maintainer', 'references', 'verification-and-safety.md'), 'utf8');
+const bootstrapWorkflow = readFileSync(join(root, 'skills', 'ai-project-bootstrapper', 'references', 'workflow.md'), 'utf8');
+const navigation = readFileSync(join(root, 'skills', 'ai-project-bootstrapper', 'references', 'navigation-and-budgets.md'), 'utf8');
+const bootstrapExceptions = readFileSync(join(root, 'skills', 'ai-project-bootstrapper', 'references', 'verification-and-exceptions.md'), 'utf8');
 const evals = readFileSync(join(root, 'evals', 'prompts.md'), 'utf8');
 
-check(maintainer.includes('project evidence') && maintainer.includes('target_anchor'), 'maintainer routing boundary missing');
-check(maintainer.includes('50 search hits') && maintainer.includes('12 candidate files') && maintainer.includes('one dependency hop'), 'maintainer search limits missing');
-check(maintainer.includes('ai-context/INDEX.md') && maintainer.includes('architecture topic') && maintainer.includes('ai-context/bugs/'), 'maintainer topic-index workflow missing');
-check(maintainer.includes('references/maintenance-workflow.md') && maintainer.includes('approval, baseline, and recovery gates'), 'maintainer conditional workflow pointer missing');
-check(workflow.includes('导入项目整理') && workflow.includes('没有明确同意就不整理') && workflow.includes('整理前基线'), 'imported-project workflow missing');
-check(bootstrapper.includes('dedicated project root') && bootstrapper.includes('no existing-project evidence'), 'bootstrapper routing/root boundary missing');
-check(bootstrapper.includes('ai-context/INDEX.md') && bootstrapper.includes('architecture/*.md') && bootstrapper.includes('bugs/INDEX.md') && bootstrapper.includes('operations/verification.md'), 'bootstrapper lightweight context indexes missing');
-check(bootstrapper.includes('references/project-docs-template.md') && !bootstrapper.includes('../ai-project-maintainer'), 'bootstrapper self-contained template pointer missing');
-check(template.includes('ai-context/') && template.includes('FUNCTION_INDEX.md'), 'bootstrapper project records missing');
+check(maintainer.includes('READ_ONLY') && maintainer.includes('NORMAL_CHANGE') && maintainer.includes('STRUCTURAL_CHANGE'), 'maintainer operation paths missing');
+check(maintainer.includes('EXTERNAL_ACTION') && maintainer.includes('does not authorize writing'), 'maintainer authorization boundary missing');
+check(maintainer.includes('fast-path.md') && maintainer.includes('structural-change.md') && maintainer.includes('verification-and-safety.md'), 'maintainer direct reference routing missing');
+check(fastPath.includes('50 search hits') && fastPath.includes('12 candidate files') && fastPath.includes('one dependency hop'), 'maintainer search limits missing');
+check(fastPath.includes('A 900-line target does not require a prior refactor'), 'large-file normal-change rule missing');
+check(structuralChange.includes('Migration Table') && structuralChange.includes('old implementation is deleted'), 'structural migration ownership rule missing');
+check(maintainerSafety.includes('Do not choose a license') && maintainerSafety.includes('NOT_RUN'), 'maintainer safety and verification status rules missing');
+check(bootstrapper.includes('new or empty project directory') && bootstrapper.includes('existing implementation must be changed'), 'bootstrapper routing/root boundary missing');
+check(bootstrapper.includes('MICRO') && bootstrapper.includes('STANDARD') && bootstrapper.includes('DURABLE'), 'bootstrapper tier routing missing');
+check(bootstrapper.includes('workflow.md') && bootstrapper.includes('navigation-and-budgets.md') && bootstrapper.includes('verification-and-exceptions.md'), 'bootstrapper direct reference routing missing');
+check(bootstrapWorkflow.includes('Do not create `AGENTS.md`') && bootstrapWorkflow.includes('Keep a requested single-file tool single-file'), 'MICRO workflow guard missing');
+check(navigation.includes('review thresholds') && navigation.includes('Strict budgets are acceptance gates'), 'budget review and strict-gate distinction missing');
+check(bootstrapExceptions.includes('TMS320, CCS') && bootstrapExceptions.includes('NOT_AVAILABLE'), 'bootstrapper exception and real-time verification rules missing');
 check(evals.includes('独立程序需求的分流') && evals.includes('现有项目证据的维护分流') && evals.includes('意图不明确时只问一次'), 'routing evaluation prompts missing');
-check((evals.match(/是否先读取项目规则和最小直接上下文。/g) ?? []).length === 1, 'evaluation checklist is duplicated');
 
 const forbiddenDirectories = new Set(['.zcode', 'node_modules', 'dist', 'build']);
 const walk = (directory) => {

@@ -19,14 +19,14 @@
 
 ### 核心原则
 
-1. 先确认项目根目录和目标锚点，再读取项目规则与上下文索引。
-2. `ARCHITECTURE.md` 和 `FUNCTION_INDEX.md` 是定位索引，不是逐文件读取清单。
-3. 只读取目标函数、直接一跳的项目自有依赖、实际使用的配置/数据结构和最小测试；上下文不足时明确询问，不猜测。
-4. 默认排除依赖、vendor、缓存、生成物、二进制、媒体和秘密文件，不递归展开完整调用图或依赖图。
-5. 默认搜索最多 50 个命中、打开 12 个候选文件并只追踪一跳；只有证据充分时才逐层扩大范围。
-6. 默认只做最小修改，保护注释、公共接口、兼容入口和用户未提交的工作。
-7. 每次修复运行与风险匹配的最小验证；验证失败时不能宣称完成。
-8. 将根因、改动和验证结果追加到 Bug 历史；接口或职责变化时更新架构说明。
+1. 先确认项目根目录、用户意图和写入授权，再读取项目规则与目标锚点。
+2. `READ_ONLY` 只读；`NORMAL_CHANGE` 做最小兼容修改；`STRUCTURAL_CHANGE` 只在明确授权或批准范围内迁移完整职责。
+3. `ai-project-bootstrapper` 按 `MICRO`、`STANDARD`、`DURABLE` 选择创建档位；路径、spec 或素材不改变“实现尚不存在”这一新建判断。
+4. 默认只读取目标、直接项目自有依赖、实际配置/数据结构和最小测试；搜索和依赖扩展应由证据驱动。
+5. 默认只做最小修改，保护注释、公共接口、兼容入口和用户未提交的工作；普通 Bug 不因文件大而强制先重构。
+6. 按职责和减少读取范围判断拆分，不把 400/200/800 数值当作所有任务的无条件失败门。
+7. 索引、架构说明、函数索引和 Bug 记录只在有当前导航或历史价值时创建或更新。
+8. 每次验证都报告 `PASS`、`FAIL`、`NOT_RUN`、`NOT_AVAILABLE` 或 `BLOCKED_BY_EXISTING_FAILURE`，不能把未运行的硬件或行为验证写成通过。
 
 ### 安装后怎么用
 
@@ -48,10 +48,12 @@
 
 ### 任务分流
 
-AI 会先判断这是新建独立程序，还是修改已有项目：
+AI 会先判断用户要创建独立实现，还是处理已有项目：
 
-- 用户描述服务、路由器、后台程序、守护进程、CLI、自动化工具或完整应用，且没有提供现有项目路径、文件、函数、报错、测试或调用栈时，使用 `ai-project-bootstrapper`。
-- 用户提供现有项目路径、目标文件/函数、报错、失败测试或调用路径时，使用 `ai-project-maintainer`。
+- 没有现有实现证据，用户要求新建服务、路由器、后台程序、守护进程、CLI、自动化工具或完整应用时，使用 `ai-project-bootstrapper`。即使提供目标路径、spec 或资产，只要目标实现尚不存在，仍走 bootstrapper。
+- 提供现有项目路径、文件、函数、报错、失败测试、调用路径，或要求解释/审查已有代码时，使用 `ai-project-maintainer`。
+- 已有 monorepo 中新增 package 仍属于 maintainer；“看看结构”或模糊的审计请求默认为 `READ_ONLY`。
+- 只有明确删除、推送、发布、部署或远端修改目标时，才进入独立的外部动作授权门。
 - 两者无法判断时，只询问一次，不扫描当前工作区、不启动子代理、不创建文件。
 
 
@@ -119,30 +121,15 @@ Copy-Item -Recurse -Force C:\path\to\ai-maintenance-skills\skills .agents\
 选择不整理时，项目结构保持不变，只执行普通维护任务。
 
 
-使用 `ai-project-bootstrapper` 创建新程序时，AI 会先确定一个独立的项目根目录，并在其中建立分阶段上下文目录，例如：
+### 创建档位
 
-```text
-workspace/book-source-search/
-├── AGENTS.md
-├── ai-context/
-│   ├── ARCHITECTURE.md
-│   ├── FUNCTION_INDEX.md
-│   └── BUG_HISTORY.md
-├── src/
-├── tests/
-├── config/
-└── scripts/
-```
+新建项目不会默认生成完整治理树：
 
-根目录的 `AGENTS.md` 是客户端自动发现的读取边界；`ai-context/` 中的架构、函数索引和 Bug 历史只用于定位上下文。源码、测试、配置、文档和资产都会放在这个项目目录内，不会直接散落到当前工作区根目录，也不会和其他项目源码混在一起。只有你明确指定一个已有空目录作为目标时，AI 才会直接在该目录初始化。
+- `MICRO`：一次性脚本、教学实验、快速原型或明确要求的单文件工具。保持小而完整，提供输入错误处理、运行方式和最小验证。
+- `STANDARD`：普通 CLI、桌面工具、Web 应用、服务和自动化工具。建立明确入口、集中配置、模块职责、README/启动说明和最小测试或等价验证。
+- `DURABLE`：只有长期 AI 维护、多人或多 AI 协作、多入口、多工作流，或安全、硬件、财务、数据一致性要求较高时启用。此时才按需建立任务地图、架构主题、操作验证和严格结构证据。
 
-Skill 推荐新项目使用以下文件，但不会强迫已有项目改名：
-
-- `AGENTS.md`：项目特有的 AI 读取边界和维护规则。
-- `ai-context/ARCHITECTURE.md`：目录、职责、接口、调用关系和维护所需的最小上下文索引。
-- `ai-context/FUNCTION_INDEX.md`：函数/类到源文件、一跳依赖和最小测试的定位索引。
-- `ai-context/BUG_HISTORY.md`：创建记录和追加式 Bug 修复记录。
-- `AI修Bug提问模板.md`：可选的详细问题交接模板，不是每次使用 Skill 的必填内容。
+`MICRO` 不自动创建 `AGENTS.md`、`ai-context/`、`FUNCTION_INDEX.md`、Bug 目录、架构空壳或运维空壳。记录必须对应已经实现的行为或真实导航价值；不要为了未来可能的需求预先堆叠文档。
 
 ### 验证
 
@@ -154,7 +141,7 @@ node scripts/verify-skill-repo.mjs
 git diff --check
 ```
 
-`evals/` 提供九组人工评估提示，覆盖已有项目 Bug、已知函数修复、导入整理、任务分流和从零创建项目。静态脚本不能替代在实际 AI 客户端中的触发评估，因此发布说明会区分自动验证和人工评估。
+`evals/` 提供 V2 路由与行为评估提示，覆盖新建项目档位、已有项目维护路径、只读边界、普通大文件 Bug、结构迁移、生成代码例外和实时验证限制。静态脚本不能替代在实际 AI 客户端中的触发评估，因此发布说明会区分自动验证和人工评估。
 
 ### 发布
 
@@ -191,11 +178,18 @@ A reusable pair of AI software-engineering skills:
 - `ai-project-maintainer` for local bug fixes, regressions, module extraction, and focused refactoring in existing projects.
 - `ai-project-bootstrapper` for designing and creating a new project or module with explicit responsibilities, interfaces, tests, and records.
 
-The workflow is deliberately stack-agnostic. It favors the smallest relevant context, protects existing work, verifies changes, and records root causes instead of guessing.
+The workflow is deliberately stack-agnostic. It favors the smallest relevant context, protects existing work, verifies changes, and records only navigation or historical information that has current value.
+
+### Project Routing And Tiers
+
+- Use `ai-project-bootstrapper` when the requested implementation is new, including when a path, specification, or assets are supplied but no implementation exists.
+- Use `ai-project-maintainer` for existing source, tests, routes, symbols, failures, reviews, explanations, fixes, extensions, and approved restructuring. An existing monorepo receiving a package remains maintenance work.
+- `READ_ONLY` explains or reviews without file writes. `NORMAL_CHANGE` makes the smallest compatible change. `STRUCTURAL_CHANGE` requires approved scope, a baseline, a responsibility migration table, canonical ownership, old implementation deletion, and evidence. Deletion, publishing, deployment, and remote changes have a separate authorization gate.
+- Bootstrapper chooses `MICRO`, `STANDARD`, or `DURABLE`. `MICRO` does not create a full governance tree; `STANDARD` adds only useful project structure; `DURABLE` enables long-term records and strict structural evidence.
+- The 400/200/800 values are review thresholds by default, not automatic failures. They become strict only for durable creation, structural work, or an explicit context/file-governance request.
+- Verification states are `PASS`, `FAIL`, `NOT_RUN`, `NOT_AVAILABLE`, and `BLOCKED_BY_EXISTING_FAILURE`. Hardware, real-time, and unexercised behavior must be reported separately.
 
 ### Install
-
-Recommended one-command installation:
 
 ```bash
 npx skills add https://github.com/canglei9527/ai-maintenance-skills
