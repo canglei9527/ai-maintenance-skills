@@ -24,7 +24,7 @@ Use this path for a Bug fix, focused feature, configuration adjustment, behavior
 
 ## Maintainability Checkpoint
 
-A large target does not automatically require a prior refactor. Complete a focused fix in place when that is the smallest compatible change, add the focused regression test, and avoid unrelated extraction without structural authorization.
+A 900-line target does not require a prior refactor. Complete a focused fix in place when that is the smallest compatible change, add the focused regression test, and avoid unrelated extraction without structural authorization.
 
 Before completing any change to a hand-written file over 400 lines, an entry/UI/controller/facade over 200 lines, or a file showing accumulating patch history in the available Git evidence, inspect the changed boundary for these signals:
 
