@@ -22,9 +22,21 @@ Use this path for a Bug fix, focused feature, configuration adjustment, behavior
 5. Add or update the minimum meaningful regression test. Update a Bug record only for a confirmed defect when the project has such a record convention; update architecture or route records only when a responsibility, interface, dependency, first entry, or directory actually changed.
 6. Run focused tests, then syntax/type/format/build/startup checks required by the changed boundary. Report behavior, structure, environment, and unrun checks separately.
 
-## Large-File Bug Fixes
+## Maintainability Checkpoint
 
-A 900-line target does not require a prior refactor. Fix the requested boundary in place when that is the smallest compatible change, add the focused regression test, and report the file-size or ownership risk. Do not add `AI-REFACTOR-PENDING`, an empty refactor plan, or unrelated extracted modules. A small extraction is allowed only when the changed logic itself is a complete responsibility, has a clear interface, consumers are known, compatibility is testable, the task stays bounded, and the user request includes structural intent.
+A large target does not automatically require a prior refactor. Complete a focused fix in place when that is the smallest compatible change, add the focused regression test, and avoid unrelated extraction without structural authorization.
+
+Before completing any change to a hand-written file over 400 lines, an entry/UI/controller/facade over 200 lines, or a file showing accumulating patch history in the available Git evidence, inspect the changed boundary for these signals:
+
+- more than one independent reason to change or more than one user workflow owned by the file;
+- UI construction, state transitions, process or persistence I/O, parsing, configuration, and localization mixed in one class or module;
+- the same feature requiring coordinated edits to controls, state, callbacks, strings, and tests in the same owner;
+- top-level definitions, public entrances, or direct dependencies that form independently testable groups;
+- repeated recent commits or current changes extending the same oversized owner.
+
+If none of these signals is supported, report the file as large but cohesive and name the evidence. If one or more signals is supported, report `ACCUMULATING_STRUCTURAL_DEBT` and include a concrete responsibility map: current owner, candidate canonical owner, interface, consumers, independent verification, and expected read-scope reduction. This checkpoint is advisory during a focused fix: finish the requested behavior, but do not silently reduce the finding to “file is large.” Ask for structural authorization only when migration was not already requested.
+
+When the user asks to make the project easier to maintain, stop patch accumulation, resolve a God Class, or fix the structural problem itself, that language is structural intent. Route to `STRUCTURAL_CHANGE`; do not answer it with another focused patch plus a vague future-refactor note.
 
 ## Reading And Search Limits
 

@@ -2,7 +2,7 @@
 
 ## Authorization Gate
 
-Use this path only when the user explicitly requests refactoring, splitting, migration, modularization, imported-project cleanup, reduced AI context, file-size governance, or a concrete structural scope approved after a read-only audit. “Make it easier to maintain” or “look at the structure” alone is not permission to move files.
+Use this path when the user explicitly requests refactoring, splitting, migration, modularization, imported-project cleanup, reduced AI context, file-size governance, resolution of a God Class or accumulating patches, making an existing project easier to maintain, or a concrete structural scope approved after an audit. “Look at the structure” alone remains read-only; “make it easier to maintain” authorizes structure changes inside the named project and compatibility boundary, but destructive or external actions still need their own gate.
 
 Imported-project cleanup is existing-project maintenance. Before moving or renaming files, ask for explicit agreement that imports, build paths, startup paths, and compatibility behavior may change. Silence or “先看看” is not agreement.
 
@@ -16,6 +16,8 @@ Record enough evidence to compare before and after:
 - existing tests, build/type/link/start commands and known failures;
 - public/import identities, monkeypatch behavior, ABI, generated sources, linker sections, and timing constraints when relevant;
 - duplicate definitions or copied implementations at the proposed boundary.
+
+For an accumulating-patch or God Class request, also identify which feature changes currently require coordinated edits across construction, state, callbacks, strings, I/O, and tests. Convert those edit clusters into candidate responsibilities; line count alone is not the migration plan.
 
 Do not create a branch, full-project backup, or external artifact automatically. Those are separate authorization decisions in `verification-and-safety.md`.
 

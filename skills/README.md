@@ -1,31 +1,37 @@
 # Project Skills
 
-This directory contains portable project skills. Each skill is self-contained: its `SKILL.md` routes the request, and it links directly to only the reference files needed for that route.
+This directory contains portable copies of the user-level project skills.
 
 ## Included Skills
 
-- `ai-project-bootstrapper`: creates a new standalone project or initializes a new/empty directory. It chooses `MICRO`, `STANDARD`, or `DURABLE` rather than generating the same governance tree for every request.
-- `ai-project-maintainer`: explains, reviews, diagnoses, fixes, extends, or restructures an existing project. It chooses `READ_ONLY`, `NORMAL_CHANGE`, or `STRUCTURAL_CHANGE`; a path or attachment does not itself authorize writing.
+- `ai-project-maintainer`: maintains existing projects and verifies that structural refactors move ownership, remove old implementations, and keep compatibility layers thin.
+- `ai-project-bootstrapper`: creates new standalone projects with explicit module ownership, composition-only entry points, and checks for oversized or duplicated first-party code.
 
 ## Install
 
-Copy either skill directory, or both, to the user-level location:
+Copy each skill directory to the user-level skill location:
 
 ```text
 ~/.agents/skills/ai-project-maintainer/
 ~/.agents/skills/ai-project-bootstrapper/
 ```
 
-The `name` in each `SKILL.md` must match its directory name. Do not copy references from one skill into the other: all execution references are local to their owning skill.
+The `name` in each `SKILL.md` must continue to match its directory name.
 
-## V2 Behavior
+## Maintainability Gates
 
-- A requested new CLI or service remains bootstrapper work even when the user supplies a target path, `spec.md`, or assets; an existing monorepo receiving a package remains maintainer work.
-- `MICRO` supports a requested one-file tool without `AGENTS.md`, `ai-context/`, Bug folders, architecture stubs, or function indexes. `STANDARD` adds navigation only when it helps. `DURABLE` enables long-term maintenance records and strict structure evidence.
-- `READ_ONLY` explains, diagnoses, or reviews without source/test/record/index writes. `NORMAL_CHANGE` makes the smallest compatible repair and does not force a refactor because a target is large. `STRUCTURAL_CHANGE` requires approved scope, a baseline, a migration table, real ownership transfer, old-implementation deletion, and before/after evidence.
-- The 400-line implementation, 200-line entry/index, and roughly 800-line maintenance-path values are default review thresholds. They become strict gates only for durable creation, structural work, or an explicit context/file-governance request; named exceptions require evidence.
-- Navigation records are optional and factual. Create a task map, directory index, function index, architecture note, or Bug record only when it has current routing or historical value.
-- Generated, vendor, declarative, framework, ABI, real-time, and TMS320/CCS code is inspected by its actual ownership, timing, linker, data-sharing, and verification constraints, never by directory name or line count alone.
-- Verification reports `PASS`, `FAIL`, `NOT_RUN`, `NOT_AVAILABLE`, or `BLOCKED_BY_EXISTING_FAILURE` with evidence. Compilation does not prove unexercised workflow, hardware, or real-time behavior.
+Both skills optimize projects for selective AI reading:
 
-See `EVALS.md` for the V2 routing and behavior cases.
+- hand-written implementations target 100-300 lines and may not exceed 400 lines;
+- entries, facades, compatibility modules, indexes, and context notes may not exceed 200 lines;
+- every maintained first-party source or focused-test directory, at any depth, includes a file-responsibility index;
+- the project includes a task-to-file map so an agent chooses files before reading code;
+- recursion stays inside an explicitly confirmed project root and stops at nested project markers unless included explicitly;
+- `node scripts/verify-maintainability.mjs --project-root <path>` provides executable structure evidence;
+- a normal maintenance path may read at most 800 implementation lines: target, one direct dependency, and one focused test;
+- behavior tests prove compatibility or functionality, not low-context maintainability;
+- each responsibility has one canonical implementation, and copied/shadowed implementations fail inspection;
+- partial extraction must be reported as partial instead of completed restructuring;
+- generated, vendored, or declarative oversized files must be isolated from routine maintenance routes.
+- focused fixes to oversized or repeatedly patched owners run a maintainability checkpoint; mixed independent responsibilities are reported as `ACCUMULATING_STRUCTURAL_DEBT` with a concrete extraction map.
+- explicit requests to stop patch accumulation, resolve a God Class, or make an existing project easier to maintain route to structural change rather than another narrow patch.

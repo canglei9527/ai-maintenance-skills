@@ -1,6 +1,6 @@
 ---
 name: ai-project-maintainer
-description: "Explain, diagnose, review, fix, extend, or restructure an existing software project when the request concerns existing source, tests, build configuration, symbols, routes, failures, or repository behavior. Select a read-only, normal-change, or structural-change path from the user's intent. Do not infer write authorization merely from the presence of a path, file, or attachment."
+description: "Explain, diagnose, review, fix, extend, or restructure an existing software project when the request concerns existing source, tests, build configuration, symbols, routes, failures, repository behavior, accumulating patches, oversized modules, God Classes, or maintainability. Select a read-only, normal-change, or structural-change path from the user's intent, and surface evidence-backed structural debt before another focused patch compounds it. Do not infer write authorization merely from the presence of a path, file, or attachment."
 ---
 
 # AI Project Maintainer
@@ -13,7 +13,7 @@ Maintain an existing project with evidence proportional to the requested outcome
 |---|---|---|
 | Explain code, review behavior, diagnose a failure, find a symbol, read logs, or report status without asking for a fix | `READ_ONLY` | None |
 | Fix a bug, add a focused feature, adjust configuration, change existing behavior, or update a local regression test | `NORMAL_CHANGE` | Only the named compatible scope |
-| Explicitly refactor, split, migrate, modularize, organize an imported project, reduce AI context, or implement an approved structural scope | `STRUCTURAL_CHANGE` | Only the approved structural scope |
+| Explicitly refactor, split, migrate, modularize, resolve a God Class or accumulating-patch problem, make an existing project easier to maintain, reduce AI context, or implement an approved structural scope | `STRUCTURAL_CHANGE` | Only the approved structural scope |
 | Delete, push, publish, deploy, alter production/remote state, send data, or create/execute remotely-triggering CI | `EXTERNAL_ACTION` gate | Separate confirmation for the exact action |
 
 “Help me see how the structure is” is `READ_ONLY`; it does not authorize moving files. An existing monorepo receiving a new package is maintainer work because an existing repository boundary and workspace contract change. A new or empty independent project belongs to `ai-project-bootstrapper`.
@@ -24,7 +24,7 @@ Maintain an existing project with evidence proportional to the requested outcome
 |---|---|---|
 | `READ_ONLY` explanation, review, or diagnosis | [`references/fast-path.md`](references/fast-path.md), `READ_ONLY` section | [`references/structural-change.md`](references/structural-change.md) |
 | `NORMAL_CHANGE` bug or focused feature | [`references/fast-path.md`](references/fast-path.md), then relevant [`references/verification-and-safety.md`](references/verification-and-safety.md) sections | Structural migration procedure |
-| `NORMAL_CHANGE` target is a large file | `fast-path.md` large-file section and required verification sections | Structural change unless separately authorized |
+| `NORMAL_CHANGE` target is a large or repeatedly patched file | `fast-path.md` maintainability checkpoint and required verification sections | Structural migration procedure unless separately authorized |
 | `STRUCTURAL_CHANGE` or imported-project cleanup | [`references/structural-change.md`](references/structural-change.md), [`references/verification-and-safety.md`](references/verification-and-safety.md) | Unrelated fast-path sections |
 | External, destructive, remote, production, dependency, license, secret, or CI concern | Relevant [`references/verification-and-safety.md`](references/verification-and-safety.md) section | Unrelated migration templates |
 | Need the detailed explanation of this V2 skill migration | [`references/v2-migration-notes.md`](references/v2-migration-notes.md) | It is explanatory only; do not load it as an execution prerequisite |
@@ -38,6 +38,7 @@ All required references are one hop from this file and are independently usable.
 - Follow user instructions, applicable `AGENTS.md`, build constraints, public contracts, and project conventions.
 - Preserve uncommitted user modifications. Do not reset, revert, overwrite, make an automatic branch, copy a full-project backup, or install/upgrade dependencies without explicit need and authorization.
 - A normal bug fix remains a normal change even when its file is large. Record the structural risk; do not force an unrelated split or add a refactor marker/document.
+- A focused patch does not erase structural evidence. At the maintainability checkpoint, distinguish a cohesive large file from accumulating responsibilities and give a concrete extraction map when the evidence supports one.
 - Split only when responsibilities, interfaces, independent verification, and reduced read scope support it and facade chains, duplication, ABI, framework, or timing constraints do not veto it.
 - Each business decision has one canonical specification and owner. Alternate CPU/CLA, SIMD/scalar, real/simulated, hardware-platform, or reference/optimized implementations need an explicit common interface, unique selection/configuration source, and consistency verification.
 - Completion claims must distinguish `PASS`, `FAIL`, `NOT_RUN`, `NOT_AVAILABLE`, and `BLOCKED_BY_EXISTING_FAILURE` and include evidence.
@@ -48,7 +49,7 @@ All required references are one hop from this file and are independently usable.
 2. Confirm the root and anchor from the request, read applicable project rules and shallow metadata, and preserve the dirty worktree.
 3. Read the target, one project-owned dependency/caller as needed, relevant configuration, and the smallest test or reproduction. Expand only on evidence.
 4. For `READ_ONLY`, diagnose or report without source, test, record, file-move, branch, or index writes.
-5. For `NORMAL_CHANGE`, make the smallest compatible edit, add/update the minimum regression test, and verify at the risk-matched levels.
+5. For `NORMAL_CHANGE`, make the smallest compatible edit, add/update the minimum regression test, verify at the risk-matched levels, and run the maintainability checkpoint before completion.
 6. For `STRUCTURAL_CHANGE`, read the structural reference, establish a baseline and approved scope, create a responsibility migration table, migrate one complete responsibility at a time, remove the old implementation, and compare before/after evidence.
 7. Apply the external-action gate separately. Report behavior, structure, environment, and unrun checks without conflating them.
 
