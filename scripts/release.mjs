@@ -11,6 +11,7 @@ import {
   DEFAULT_RETRIES,
   DEFAULT_RETRY_DELAY_MS,
   RELEASE_FILES,
+  REQUIRED_REPOSITORY,
   TAG_PREFIX,
   VERIFICATION_COMMANDS
 } from './release-config.mjs';
@@ -59,7 +60,16 @@ Options: --yes --resume --repo owner/name --branch main --remote origin --retrie
 function githubRepository(remoteUrl) {
   const match = remoteUrl.match(/github\.com[/:]([^/]+\/[^/.]+)(?:\.git)?$/);
   if (!match) throw new Error(`Cannot derive GitHub repository from remote URL: ${remoteUrl}`);
-  return match[1];
+  const repo = match[1];
+  if (repo !== REQUIRED_REPOSITORY) {
+    throw new Error(
+      `仓库校验失败！\n` +
+      `  当前 remote: ${repo}\n` +
+      `  要求发布到: ${REQUIRED_REPOSITORY}\n` +
+      `请在正确的仓库目录下运行此脚本。`
+    );
+  }
+  return repo;
 }
 
 async function releaseNotes(options) {
