@@ -1,73 +1,63 @@
-# Navigation And Budgets
+# 导航与预算
 
-## Contents
+## 导航有成本门槛
 
-- Tier-specific navigation records
-- Default review thresholds and strict gates
-- Split decision order
-- Canonical ownership and allowed alternate implementations
-- Exceptions and project boundaries
+`STANDARD` 项目有多个源文件或维护入口时创建根任务图，`DURABLE` 始终创建。任务图记录已存在的稳定工作流，例如配置变更、核心业务规则、输入解析、外部适配器、测试和启动失败。
 
-## Navigation Has A Cost Gate
+仅在减少真实导航成本时才创建目录索引：多个独立职责、多个公共入口、频繁变更的文件、不明确的文件名，或根路由无法选定第一个文件。目录的文件数或行数是审查提示，不是自动索引门槛。`MICRO` 不需要任何形式。
 
-Create a root task map when a `STANDARD` project has multiple source files or maintenance entry points, and always for `DURABLE`. The map records stable workflows that already exist, for example configuration changes, core business rules, input parsing, external adapters, tests, and startup failures.
-
-Create a directory index only when it reduces real navigation cost: multiple independent responsibilities, multiple public entrances, frequently changed files, unclear filenames, or a root route that cannot select the first file. A directory's file count or line count is a prompt for review, not an automatic index gate. `MICRO` does not require either form.
-
-An index should be short and factual:
+索引应简短且基于事实：
 
 ```text
-File | Responsibility | Public interface | Direct dependency | Read when
+文件 | 职责 | 公共接口 | 直接依赖 | 何时读取
 ```
 
-A task route should point to an actual first file, optional one-hop project-owned dependency, smallest focused test, and relevant current architecture/Bug note. Do not store precise source line counts in long-lived indexes; calculate them during verification.
+任务路由应指向实际的第一个文件、可选的一跳项目自有依赖、最小聚焦测试，以及相关的当前架构/Bug 注释。不在长期索引中保存精确源码行数，在验证时计算。
 
-## Default Thresholds
+## 默认阈值
 
-Use these as review thresholds for ordinary work, not as automatic failure or mandatory splitting:
+对普通工作使用以下 review thresholds，而非自动失败或强制拆分：
 
-- hand-written implementation source over 400 lines: review responsibility boundaries;
-- entry point, facade, compatibility module, or index over 200 lines: review composition and ownership boundaries;
-- a typical maintenance path over about 800 implementation lines: review navigation or boundaries.
+- 超过 400 行的手写实现源文件：审查职责边界；
+- 超过 200 行的入口、facade、兼容模块或索引：审查组合和所有权边界；
+- 约 800 行实现行的典型维护路径：审查导航或边界。
 
-A threshold review asks whether the file has multiple independent change reasons, whether a clear interface exists, and whether a smaller read set would result. It may conclude that no split is appropriate.
+阈值审查询问文件是否有多个独立的变更原因、是否存在清晰接口，以及是否会产生更小的读取集。审查可能得出不需要拆分的结论。
 
-Strict budgets are acceptance gates only for `DURABLE` creation, `STRUCTURAL_CHANGE`, an explicit AI-context optimization request, or an explicit file-size governance request. A strict gate still permits a named, evidence-backed exception. A normal Bug fix in a large existing file remains a normal change: fix the Bug, add the focused regression test, and report the file-size risk without unrelated restructuring.
+Strict budgets are acceptance gates 仅适用于 `DURABLE` 创建、`STRUCTURAL_CHANGE`、明确的 AI 上下文优化请求或明确的文件大小治理请求。严格门仍允许有命名证据支持的例外。大文件中的普通 Bug 修复仍是普通变更：修复 Bug，添加聚焦回归测试，报告文件大小风险，不进行无关重构。
 
-## Split Decision Order
+## 拆分决策顺序
 
-A weak or time-limited agent must answer these questions in order:
+必须按顺序回答以下问题：
 
-1. Does the file contain multiple independent reasons to change?
-2. Can those responsibilities have clear, stable interfaces?
-3. Can they be tested or verified independently?
-4. Will the split reduce the implementation that must be read for a normal task?
-5. Would it add a facade chain, circular dependency, duplicated types, or repeated business rules?
-6. Is there a framework, ABI, real-time, linker, or memory-layout constraint?
+1. 文件是否包含多个独立的变更原因？
+2. 这些职责能否有清晰、稳定的接口？
+3. 它们能否独立测试或验证？
+4. 拆分是否会减少普通任务必须读取的实现量？
+5. 是否会增加 facade 链、循环依赖、重复类型或重复业务规则？
+6. 是否存在框架、ABI、链接器或内存布局约束？
 
-Split only when the first four support it and the last two do not provide contrary evidence. Function length, branching, nesting, complexity, fan-in/fan-out, public-interface count, and test boundaries are supporting signals only. Do not make a fixed nesting depth, complexity score, same-name function, same-name constant, path, extension, or annotation an automatic failure or exemption.
+仅在前四项支持且后两项无相反证据时才拆分。函数长度、分支、嵌套、复杂度、扇入/扇出、公共接口数和测试边界仅为支持性信号。不得将固定的嵌套深度、复杂度分数、同名函数、同名常量、路径、扩展名或注解作为自动失败或豁免条件。
 
-## Canonical Rules And Implementations
+## 规范规则与实现
 
-Every business decision has one normative source. Multiple implementations are allowed for CPU/CLA, SIMD/scalar, real/simulated, hardware adapters, or reference/optimized paths only when:
+每个业务决策有唯一的规范来源。仅在以下条件全部满足时，才允许 CPU/CLA、SIMD/标量、真实/模拟、硬件适配器或参考/优化路径的多实现：
 
-- a common interface is explicit;
-- selection logic and configuration defaults have one source;
-- each implementation has a distinct ownership reason;
-- consistency tests, reference comparisons, or an equivalent verification method exist.
+- 公共接口明确；
+- 选择逻辑和配置默认值有唯一来源；
+- 每个实现有独特的所有权原因；
+- 存在一致性测试、参考比较或等效验证方法。
 
-Do not copy a rule into multiple modules, leave an old implementation active behind a new import, stack facades, or maintain the same default/validation/schema/URL decision in several places.
+不得将规则复制到多个模块、在新导入后保留旧实现、堆叠 facade，或在多处维护相同的默认/验证/schema/URL 决策。
 
-## Project Boundaries
+## 项目边界
 
-Recursion is limited to the confirmed project root. Exclude `.git`, dependencies, vendor, build output, caches, generated files, binaries, media, secrets, and credentials at every depth. Stop at a nested directory with its own package/build marker unless the user explicitly includes it. A directory name such as `models`, `generated`, or `main` is not evidence of a pure-data or composition-only exception.
+递归限于确认的项目根目录。在每个深度排除 `.git`、依赖、vendor、构建输出、缓存、生成文件、二进制文件、媒体、密钥和凭证。除非用户明确包含，否则在有自己的包/构建标记的嵌套目录处停止。`models`、`generated` 或 `main` 等目录名不是纯数据或仅组合的例外证据。
 
-## Optional Records
+## 可选记录
 
-`FUNCTION_INDEX.md` is not a default deliverable. Consider it only when symbol search is unreliable, dynamic registration hides public entrances, the project has many public entrances, or the user asks for it; prefer `rg`, language-server symbols, compiler information, or generated symbol tables.
+`FUNCTION_INDEX.md` 不是默认交付物。仅在符号搜索不可靠、动态注册隐藏了公共入口、项目有很多公共入口，或用户请求时才考虑；优先使用 `rg`、语言服务器符号、编译器信息或生成的符号表。
 
-Do not create an empty Bug directory. Record a Bug only for a confirmed high-impact, recurring, security, data-consistency, cross-module, or project-required defect. Update task routes only when a stable task type, first entry, responsibility, public interface, or directory changes, or when an existing route becomes false.
+不创建空 Bug 目录。仅为已确认的高影响、重复出现、安全、数据一致性、跨模块或项目要求的缺陷记录 Bug。仅在稳定任务类型、第一入口、职责、公共接口或目录变更，或现有路由变为错误时更新任务路由。
 
-## Review Evidence
-
-For strict structural work, record the relevant file path, metric, sole responsibility, reason not to split, what splitting would break, public interface, verification method, and a condition for re-review for each named exception. The exception is evidence, not a way to hide unrelated business logic.
+对于严格结构工作，为每个命名例外记录相关文件路径、超限指标、唯一职责、不拆分原因、拆分会破坏什么、公共接口、验证方式和重新审查条件。例外是证据，不是隐藏无关业务逻辑的方式。

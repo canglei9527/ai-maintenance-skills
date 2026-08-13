@@ -136,7 +136,7 @@ check(bootstrapper.includes('MICRO') && bootstrapper.includes('STANDARD') && boo
 check(bootstrapper.includes('workflow.md') && bootstrapper.includes('navigation-and-budgets.md') && bootstrapper.includes('verification-and-exceptions.md'), 'bootstrapper direct reference routing missing');
 check(bootstrapWorkflow.includes('Do not create `AGENTS.md`') && bootstrapWorkflow.includes('Keep a requested single-file tool single-file'), 'MICRO workflow guard missing');
 check(navigation.includes('review thresholds') && navigation.includes('Strict budgets are acceptance gates'), 'budget review and strict-gate distinction missing');
-check(bootstrapExceptions.includes('TMS320, CCS') && bootstrapExceptions.includes('NOT_AVAILABLE'), 'bootstrapper exception and real-time verification rules missing');
+check(bootstrapExceptions.includes('NOT_AVAILABLE'), 'bootstrapper exception and real-time verification rules missing');
 check(evals.includes('独立程序需求的分流') && evals.includes('现有项目证据的维护分流') && evals.includes('意图不明确时只问一次'), 'routing evaluation prompts missing');
 
 const forbiddenDirectories = new Set(['.zcode', 'node_modules', 'dist', 'build']);

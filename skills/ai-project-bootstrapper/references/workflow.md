@@ -1,52 +1,48 @@
-# Bootstrap Workflow
+# 初始化工作流
 
-This reference describes the smallest workflow for creating a new independent project. Select only the tier named in `SKILL.md`; do not load durable governance for a `MICRO` script.
+此参考描述创建新独立项目的最小工作流。仅选择 `SKILL.md` 中命名的档位；不要为 `MICRO` 脚本加载持久化治理。
 
 ## MICRO
 
-Use `MICRO` only when the user asks for a one-off script, teaching experiment, or quick prototype without a service lifecycle, complex persistence, public multi-module interfaces, safety-critical behavior, hardware timing, or long-term AI-maintenance requirements.
+仅在用户请求一次性脚本、教学实验或快速原型时使用 `MICRO`，无服务生命周期、复杂持久化、公共多模块接口、安全关键行为、硬件时序，也无长期 AI 维护需求。
 
-1. Confirm the target is new or empty and define its root.
-2. Implement the requested behavior in the smallest cohesive form, including input errors and a usable invocation.
-3. Run the smallest available syntax, smoke, or example check.
-4. Report what ran and what was not verified.
+1. 确认目标是新建或空目录并定义其根目录。
+2. 以最小内聚形式实现请求的行为，包含输入错误处理和可用调用方式。
+3. 运行最小可用的语法、冒烟或示例检查。
+4. 报告运行了什么，什么未被验证。
 
-Keep a requested single-file tool single-file. Do not create `AGENTS.md`, `ai-context/`, `FUNCTION_INDEX.md`, `architecture/`, `bugs/`, `operations/`, or per-directory indexes merely because this reference exists.
+Keep a requested single-file tool single-file. Do not create `AGENTS.md`、`ai-context/`、`FUNCTION_INDEX.md`、`architecture/`、`bugs/`、`operations/` 或每目录索引，仅因为此参考文件存在。
 
 ## STANDARD
 
-Use `STANDARD` by default for an ordinary independent CLI, desktop tool, web application, service, automation tool, or multi-file data program.
+默认对普通独立 CLI、桌面工具、Web 应用、服务、自动化工具或多文件数据程序使用 `STANDARD`。
 
-1. Capture the current workflow, inputs, outputs, runtime, deployment boundary, and acceptance checks.
-2. Confirm a dedicated project root. Read supplied specifications or assets as requirements, not as evidence of an existing implementation.
-3. Define a small module table before coding:
+1. 获取当前工作流、输入、输出、运行时、部署边界和验收检查。
+2. 确认专用项目根目录。将提供的规格或资产作为需求读取，而非已有实现的证据。
+3. 编码前定义小型模块表：
 
    ```text
-   Responsibility | Canonical owner | Public interface | Dependencies | Test boundary
+   职责 | 规范所有者 | 公共接口 | 依赖 | 测试边界
    ```
 
-4. Build one end-to-end slice with a clear entry point, centralized configuration, explicit error behavior, and focused tests or an equivalent verification.
-5. Add a README or project-standard start document. Add a short root task map only when multiple source files or stable maintenance entry points make it useful.
-6. Run the fastest relevant checks and report unavailable external checks separately.
+4. 构建一个具有清晰入口、集中配置、明确错误行为和聚焦测试或等效验证的端到端切片。
+5. 添加 README 或项目标准启动文档；仅在多个源文件或稳定维护入口有价值时才添加简短的根任务图。
+6. 运行最快的相关检查，并分开报告不可用的外部检查。
 
-Do not create empty architecture or Bug topics, speculative future routes, a full document tree, or abstraction layers without a current ownership or test boundary.
+不得创建空的架构或 Bug 主题、推测性的未来路由、完整文档树，或没有当前所有权或测试边界的抽象层。
 
 ## DURABLE
 
-Use `DURABLE` only when the request or project constraints explicitly require long-term AI maintenance, multi-person or multi-agent ownership, multiple stable workflows/entry points, or high safety, hardware, financial, or data-consistency assurance.
+仅在请求或项目约束明确需要长期 AI 维护、多人或多 AI 协作、多个稳定工作流/入口，或高安全、硬件、财务或数据一致性保证时使用 `DURABLE`。
 
-1. Establish root rules and a short task-to-file map for workflows that already exist.
-2. Add `ai-context/INDEX.md`, focused architecture topics, or `operations/verification.md` only when each gives a real navigation or verification entry point.
-3. Sample at least three likely maintenance tasks using exact minimal read sets and the navigation rules in `navigation-and-budgets.md`.
-4. Run behavior verification plus the structure and exception checks in `verification-and-exceptions.md`.
-5. Record only confirmed high-impact, recurring, security, consistency, or project-required Bugs. Do not create empty Bug folders or future architecture topics.
+1. 为已存在的工作流建立根规则和简短的任务到文件映射。
+2. 仅当每项都提供真实的导航或验证入口时，才添加 `ai-context/INDEX.md`、聚焦架构主题或 `operations/verification.md`。
+3. 使用 `navigation-and-budgets.md` 中的导航规则对至少三个可能的维护任务进行精确最小读取集抽样。
+4. 运行行为验证以及 `verification-and-exceptions.md` 中的结构和例外检查。
+5. 仅记录已确认的高影响、重复出现、安全、一致性或项目要求的 Bug；不创建空 Bug 文件夹或未来架构主题。
 
-## Boundary And Ownership
+## 边界与所有权
 
-Treat a populated target as existing work. Do not overwrite it or silently adopt it; ask whether it is the intended project and what scope is authorized. Exclude sibling projects, dependencies, vendor code, build output, caches, generated files, binaries, media, secrets, and credentials. Nested project markers are separate boundaries unless explicitly included.
+将有内容的目标视为已有工作。不得覆盖或静默采用；询问这是否是预期项目以及授权了哪些范围。排除兄弟项目、依赖、vendor 代码、构建输出、缓存、生成文件、二进制文件、媒体、密钥和凭证。嵌套项目标记是独立边界，除非明确包含。
 
-Every business rule has one canonical specification and implementation owner. A new project may expose a direct canonical module; it should not invent compatibility wrappers or `legacy_*` modules. See `navigation-and-budgets.md` for ownership and route decisions.
-
-## Current Records Only
-
-Write records only for delivered behavior and current invariants. A root task map names a task's first file and optional one-hop dependency. Architecture topics describe existing responsibilities and contracts. Bug records describe confirmed defects. Git history remains the record of individual edits; do not duplicate it in indexes.
+每条业务规则有唯一的规范规格和实现所有者。新项目可以暴露直接的规范模块，不应创建兼容包装器或 `legacy_*` 模块。所有权和路由决策见 `navigation-and-budgets.md`。

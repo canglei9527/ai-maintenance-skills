@@ -1,34 +1,34 @@
-# Verification And Exceptions
+# 验证与例外
 
-## Verification Contract
+## 验证契约
 
-Use the fastest-failing, local-to-external order while honoring project commands:
+遵循项目命令，使用最快失败、由本地到外部的顺序：
 
-1. YAML, configuration, file structure, and parsing;
-2. formatting, syntax, type, compilation, and linking;
-3. focused unit tests;
-4. related integration tests;
-5. startup, CLI, browser, device, or target-board checks;
-6. structure, navigation, and duplicate-owner checks.
+1. YAML、配置、文件结构和解析；
+2. 格式、语法、类型、编译和链接；
+3. 聚焦单元测试；
+4. 相关集成测试；
+5. 启动、CLI、浏览器、设备或目标板检查；
+6. 结构、导航和重复所有者检查。
 
-Report every meaningful check with all fields:
+报告每个有意义的检查项，所有字段必填：
 
 ```text
 检查项：...
-required：yes/no
-available：yes/no
-ran：yes/no
-result：PASS / FAIL / NOT_RUN / NOT_AVAILABLE / BLOCKED_BY_EXISTING_FAILURE
-evidence：命令、输出摘要、设备状态或明确原因
+必要：yes/no
+可用：yes/no
+已运行：yes/no
+结果：PASS / FAIL / NOT_RUN / NOT_AVAILABLE / BLOCKED_BY_EXISTING_FAILURE
+证据：命令、输出摘要、设备状态或明确原因
 ```
 
-A build passing proves only the build. It does not prove a workflow, browser, device, target-board, real-time, or production behavior that was not exercised. Do not install a missing validator or system dependency just to change `NOT_AVAILABLE`.
+构建通过仅证明构建。不能证明未被执行的工作流、浏览器、设备、目标板、实时或生产行为。不要为了将 `NOT_AVAILABLE` 改为其他状态而安装缺失的验证器或系统依赖。
 
-For `DURABLE` or strict structural work, run the structure check before and after the approved change. Include line-count review, route existence, directory indexes with real navigation value, canonical-owner review, and three sample maintenance read sets. Keep structure evidence separate from behavior evidence.
+对于 `DURABLE` 或严格结构工作，在批准的变更前后运行结构检查。包括行数审查、路由存在性、具有真实导航价值的目录索引、规范所有者审查，以及三个抽样维护读取集。将结构证据与行为证据分开。
 
-## Named Exceptions
+## 命名例外
 
-An exception is allowed only after inspecting the actual file and recording:
+仅在检查实际文件后才允许例外，并记录：
 
 ```text
 文件路径：...
@@ -41,35 +41,8 @@ An exception is allowed only after inspecting the actual file and recording:
 重新审查条件：...
 ```
 
-Typical candidates include generated code, vendor code, immutable protocol snapshots, pure declarations, large mapping tables, cohesive parsers, cohesive state machines, framework-required Models/Routers, ISR code, CLA Tasks, interrupt vectors, linker command files, SysConfig output, and code with ABI, memory-section, or timing requirements. A path, extension, directory name, annotation, or class name alone never grants an exception. Models with business branches, JSON with business decisions, or generated directories containing hand-written code must be inspected normally.
+典型候选包括：生成代码、vendor 代码、不可变协议快照、纯声明、大型映射表、内聚解析器、内聚状态机、框架要求的 Models/Routers，以及有 ABI、内存节或时序要求的代码。路径、扩展名、目录名、注解或类名单独不授予例外。含有业务分支的 Models、含业务决策的 JSON，或包含手写代码的生成目录，必须正常检查。
 
-## TMS320, CCS, And Real-Time Firmware
+## 外部与敏感边界
 
-Do not split a control ISR, ADC sampling/PWM update chain, CLA Task, protection logic, startup code, interrupt vector, linker-section code, or an algorithm that must be inlined merely to reduce line count.
-
-Before modifying or splitting such code, confirm when applicable:
-
-- interrupt source and ISR period;
-- ADC SOC/EOC relationship;
-- EPWM trigger timing;
-- CLA/CPU data ownership and shared or Message RAM;
-- `#pragma CODE_SECTION`, `#pragma DATA_SECTION`, and linker `.cmd` placement;
-- compiler optimization and inlining;
-- worst-case execution time and protection priority.
-
-Classify verification separately:
-
-- syntax or static analysis;
-- compile;
-- link;
-- simulation;
-- target-board download;
-- real-time waveform;
-- ISR execution time;
-- protection-trigger timing.
-
-If hardware or timing checks did not run, say so. Never turn “compiled” into “control behavior verified.”
-
-## External And Sensitive Boundaries
-
-Do not read or output secrets, credentials, tokens, private keys, cookies, or `.env` contents. Do not automatically add dependencies, select a license, create CI that can trigger remote execution, delete compatibility paths, push, publish, deploy, modify production, send data, or change a remote repository. README and ignore files may follow project conventions; `LICENSE` requires an existing choice or explicit user choice. Generated or vendor code is read only when the target or concrete runtime evidence points there, and normally is modified through its source generator instead.
+不得读取或输出密钥、凭证、令牌、私钥、Cookie 或 `.env` 内容。不自动添加依赖、选择许可证、创建可触发远端执行的 CI、删除兼容路径、推送、发布、部署、修改生产、发送数据或变更远端仓库。README 和忽略文件可遵循项目约定；`LICENSE` 需要已有的选择或用户明确指定。生成或 vendor 代码仅在目标或具体运行时证据指向时才读取，通常通过其源生成器修改。

@@ -1,59 +1,45 @@
-# Fast Path
+# 快速路径
 
-## READ_ONLY
+## 只读路径
 
-Use this path for explanations, reviews, diagnosis, symbol lookup, log reading, and status reports when the user did not request an edit.
+用于解释、审查、诊断、符号查找、日志读取和状态报告（用户未请求编辑）。
 
-1. Establish `project_root`, `target_anchor`, scope, exclusions, and applicable `AGENTS.md` without scanning the parent workspace.
-2. Read shallow package/build/test/startup metadata and Git status. Read `ai-context/INDEX.md` as navigation; follow at most one relevant architecture topic and one Bug topic. Read a function index only for symbol lookup.
-3. Read the target evidence: the named file or exact symbol/error, the smallest relevant configuration, one project-owned caller/callee when needed, and the smallest test or reproduction.
-4. State the evidence, likely cause, alternatives, and unverified boundaries. Do not modify source, add tests, write Bug or architecture records, move files, create a branch, update indexes, or create a backup.
+1. 确认 `project_root`、`target_anchor`、范围、排除项和适用的 `AGENTS.md`，不扫描父工作空间。
+2. 读取浅层包/构建/测试/启动元数据和 Git 状态；将 `ai-context/INDEX.md` 用于导航，最多跟踪一个相关架构主题和一个 Bug 主题；符号查找时才读函数索引。
+3. 读取目标证据：命名的文件或精确符号/错误、最小相关配置、按需读取一个项目自有调用方/被调方，以及最小测试或复现。
+4. 陈述证据、可能原因、替代方案和未验证边界。不得修改源码、添加测试、写 Bug 或架构记录、移动文件、创建分支、更新索引或创建备份。
 
-“Review this structure” without an explicit move/refactor request remains read-only. A path or uploaded text is evidence, not write authorization.
+"审查这个结构"在没有明确移动/重构请求时保持只读。路径或上传文本是证据，不是写入授权。
 
-## NORMAL_CHANGE
+## 普通变更路径
 
-Use this path for a Bug fix, focused feature, configuration adjustment, behavior change, or local test update that does not require moving ownership.
+用于 Bug 修复、聚焦功能、配置调整、行为变更或本地测试更新（不需要移动所有权）。
 
-1. Record the root, anchor, scope, user changes, current behavior, expected behavior, reproduction, and a testable hypothesis.
-2. Read only the target, one project-owned dependency/caller as needed, used configuration/data, and the smallest relevant test. Default to at most 50 search hits, 12 candidate files, and one dependency hop.
-3. Expand one layer only when an exact symbol has multiple real callers, a boundary crosses package/process/service/database/browser, configuration has a proven override, a shared contract changes, or tests/startup identify an outside cause. Record the reason and new boundary.
-4. Make the smallest compatible edit. Preserve public behavior, useful comments, naming, project conventions, and unrelated dirty changes. Do not format or rename unrelated code, upgrade dependencies, or turn the task into structural work.
-5. Add or update the minimum meaningful regression test. Update a Bug record only for a confirmed defect when the project has such a record convention; update architecture or route records only when a responsibility, interface, dependency, first entry, or directory actually changed.
-6. Run focused tests, then syntax/type/format/build/startup checks required by the changed boundary. Report behavior, structure, environment, and unrun checks separately.
+1. 记录根目录、锚点、范围、用户改动、当前行为、期望行为、复现和可测试假设。
+2. 仅读取目标、按需读取一个项目自有依赖/调用方、使用的配置/数据和最小相关测试。默认上限：50 search hits、12 candidate files、one dependency hop。
+3. 仅在以下情况扩展一层：精确符号有多个真实调用方、边界跨包/进程/服务/数据库/浏览器、配置有已证实的覆盖、共享契约变更，或测试/启动发现外部原因。记录理由和新边界。
+4. 做最小兼容修改。保留公共行为、有用注释、命名、项目约定和无关的脏改动；不格式化或重命名无关代码，不升级依赖，不把任务转为结构工作。
+5. 添加或更新最小有意义的回归测试。仅在项目有此约定时为已确认缺陷更新 Bug 记录；仅在职责、接口、依赖、第一入口或目录实际变更时更新架构或路由记录。
+6. 先运行聚焦测试，再运行变更边界所需的语法/类型/格式/构建/启动检查。分开报告行为、结构、环境和未运行检查。
 
-## Maintainability Checkpoint
+## 维护性检查点
 
-A 900-line target does not require a prior refactor. Complete a focused fix in place when that is the smallest compatible change, add the focused regression test, and avoid unrelated extraction without structural authorization.
+A 900-line target does not require a prior refactor。在最小兼容修改就地完成聚焦修复，添加聚焦回归测试，不在无结构授权时提取无关内容。
 
-Before completing any change to a hand-written file over 400 lines, an entry/UI/controller/facade over 200 lines, or a file showing accumulating patch history in the available Git evidence, inspect the changed boundary for these signals:
+在完成对超过 400 行手写文件、超过 200 行入口/UI/控制器/facade，或在可用 Git 证据中显示累积补丁历史的文件的任何变更前，检查变更边界是否出现以下信号：
 
-- more than one independent reason to change or more than one user workflow owned by the file;
-- UI construction, state transitions, process or persistence I/O, parsing, configuration, and localization mixed in one class or module;
-- the same feature requiring coordinated edits to controls, state, callbacks, strings, and tests in the same owner;
-- top-level definitions, public entrances, or direct dependencies that form independently testable groups;
-- repeated recent commits or current changes extending the same oversized owner.
+- 文件有多个独立的变更原因或多个用户工作流；
+- UI 构建、状态转换、进程或持久化 I/O、解析、配置、本地化混在一个类或模块中；
+- 同一功能在同一所有者中需要协同编辑控件、状态、回调、字符串和测试；
+- 顶层定义、公共入口或直接依赖形成可独立测试的分组；
+- 最近重复的提交或当前改动在同一个超大所有者上扩展。
 
-If none of these signals is supported, report the file as large but cohesive and name the evidence. If one or more signals is supported, report `ACCUMULATING_STRUCTURAL_DEBT` and include a concrete responsibility map: current owner, candidate canonical owner, interface, consumers, independent verification, and expected read-scope reduction. This checkpoint is advisory during a focused fix: finish the requested behavior, but do not silently reduce the finding to “file is large.” Ask for structural authorization only when migration was not already requested.
+若无信号被支持，报告文件为大但内聚并说明证据。若有一个或多个信号被支持，报告 `ACCUMULATING_STRUCTURAL_DEBT` 并附上具体职责图：当前所有者、候选规范所有者、接口、消费者、独立验证和预期读取范围缩减。此检查点在聚焦修复期间为建议性质：完成请求的行为，但不得将发现静默降级为"文件较大"。仅在迁移未被请求时才询问结构授权。
 
-When the user asks to make the project easier to maintain, stop patch accumulation, resolve a God Class, or fix the structural problem itself, that language is structural intent. Route to `STRUCTURAL_CHANGE`; do not answer it with another focused patch plus a vague future-refactor note.
+当用户要求让项目更易维护、停止补丁堆积、解决 God Class 或修复结构问题本身时，该语言是结构意图，路由到 `STRUCTURAL_CHANGE`，不得用另一个聚焦补丁加模糊的未来重构注释来回答。
 
-## Reading And Search Limits
+## 搜索与读取限制
 
-Search from the exact path, function, class, route, command, configuration key, event, error text, failing test, or stack location. Exclude `.git`, dependencies, vendor, build output, caches, generated files, binaries, media, secrets, and unrelated sibling projects at every depth. Stop at nested project markers unless explicitly included.
+从精确路径、函数、类、路由、命令、配置键、事件、错误文本、失败测试或堆栈位置开始搜索。在每个深度排除 `.git`、依赖、vendor、构建输出、缓存、生成文件、二进制文件、媒体、密钥和无关兄弟项目。除非明确包含，否则在嵌套项目标记处停止。
 
-Default limits are review aids: 50 search hits, 12 candidate files, one project-owned dependency hop, and a focused read path. Do not turn them into an automatic failure or use a full scan for a normal change. Expand only on evidence; full scans are for explicit audits, inventories, dependency checks, or structural work.
-
-## Completion Evidence
-
-Use this compact report for the fast path:
-
-```text
-路径：READ_ONLY / NORMAL_CHANGE
-根目录与锚点：...
-证据或假设：...
-修改：...；READ_ONLY 时为“无文件修改”
-验证：检查项 -> required/available/ran/result/evidence
-记录：更新、未更新及原因
-风险：未覆盖边界或现有失败
-```
+默认限制是审查辅助手段：50 个搜索命中、12 个候选文件、一跳项目自有依赖和聚焦读取路径。不得将其作为普通变更的自动失败条件，也不得对普通变更使用全面扫描。仅凭证据扩展；全面扫描用于明确审计、清单、依赖检查或结构工作。

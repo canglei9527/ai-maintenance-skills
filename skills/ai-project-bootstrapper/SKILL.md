@@ -4,74 +4,67 @@ version: "0.4.3"
 description: "Create a new standalone software project or initialize a new or empty project directory. Use when the user asks to build a new application, service, CLI, worker, daemon, automation tool, or similar independent codebase, even when an output path, specification, or assets are supplied. Do not use for modifying an existing codebase or merely explaining or reviewing an artifact."
 ---
 
-# AI Project Bootstrapper
+# AI 项目初始化器
 
-Create the first working slice of a new independent codebase. A path, specification, image, or other attachment locates input; it does not turn an unimplemented target into an existing project. If source, tests, build configuration, or repository behavior already exist at the target, route changes to `ai-project-maintainer`.
+创建新独立代码库的第一个可运行切片。路径、规格、图片或其他附件是输入定位，不把未实现目标转化为已有项目。若目标已有源码、测试、构建配置或仓库行为，改为路由到 `ai-project-maintainer`。
 
-## Route First
+## 路由优先
 
-| Situation | Route |
+| 情境 | 路由 |
 |---|---|
-| Empty or new directory for an independent CLI, app, service, worker, daemon, or automation tool | Bootstrapper |
-| `spec.md`, assets, or an output path describe a project whose implementation does not exist | Bootstrapper; inspect the supplied inputs as requirements |
-| Existing repository, monorepo, package, source, tests, symbol, route, failure, or build behavior must change | Maintainer |
-| Explain, review, or diagnose an existing artifact without a requested edit | Maintainer `READ_ONLY` |
+| 空目录或新目录，用于独立 CLI、应用、服务、Worker、守护进程或自动化工具 | 初始化器 |
+| `spec.md`、资产或输出路径描述了尚不存在实现的项目 | 初始化器；将供给输入作为需求检查 |
+| 现有仓库、monorepo、包、源码、测试、符号、路由、失败或构建行为必须变更 | 维护者 |
+| 解释、审查或诊断现有产物而不请求编辑 | 维护者 `READ_ONLY` |
 
-Confirm the user wants a new implementation, identify one dedicated `project_root`, and inspect only the minimum target metadata before creating files. Do not infer that a path grants permission to modify an existing codebase.
+确认用户需要新实现，确定唯一 `project_root`，创建文件前只检查最小目标元数据。不能从路径推断修改现有代码库的权限。
 
-## Project Tier
+## 项目档位
 
-Choose one tier from the request and constraints:
-
-| Tier | Use when | Required shape |
+| 档位 | 适用场景 | 必要形态 |
 |---|---|---|
-| `MICRO` | A one-off script, teaching experiment, or quick prototype with no service lifecycle, complex persistence, public multi-module interface, safety-critical behavior, hardware timing, or request for long-term AI maintenance | Deliver the behavior, input-error handling, run instructions, and the smallest available verification. Keep it single-file when requested. Do not create governance trees. |
-| `STANDARD` | The default for ordinary CLIs, desktop tools, web apps, services, automations, and multi-file independent applications | Provide a clear entry point, centralized configuration, cohesive module boundaries, a README or project-standard start document, and focused tests or an equivalent verification. Add navigation only when it has real value. |
-| `DURABLE` | Explicit long-term AI maintenance, multi-person or multi-agent ownership, multiple stable workflows or entry points, or high safety/hardware/financial/data-consistency requirements | Add only necessary root rules, task routing, architecture or operations records, read-budget sampling, and structural checks. Never create empty Bug records or speculative topics. |
+| `MICRO` | 一次性脚本、教学实验或快速原型，无服务生命周期、复杂持久化、公共多模块接口、安全关键行为、硬件时序，也无长期 AI 维护需求 | 交付行为、输入错误处理和运行说明；单文件时保持单文件；不创建治理树 |
+| `STANDARD` | 默认档位，适用于普通 CLI、桌面工具、Web 应用、服务、自动化和多文件独立应用 | 清晰入口、集中配置、内聚模块边界、README 或项目标准启动文档，以及聚焦测试或等效验证 |
+| `DURABLE` | 明确要求长期 AI 维护、多人或多 AI 协作、多个稳定工作流/入口，或高安全/硬件/财务/数据一致性要求 | 仅添加必要的根规则、任务路由、架构或操作记录、读取预算抽样和结构检查；不创建空 Bug 记录或推测性主题 |
 
-Read the references selectively:
+按需选择性读取参考文件：
 
-| Task | Must read | Do not read by default |
+| 任务 | 必须读取 | 默认不读取 |
 |---|---|---|
-| `MICRO` new tool | [`references/workflow.md`](references/workflow.md), `MICRO` section | Durable navigation and audit sections |
-| `STANDARD` new project | [`references/workflow.md`](references/workflow.md), then relevant sections of [`references/navigation-and-budgets.md`](references/navigation-and-budgets.md) | Unrelated exception sections |
-| `DURABLE` new project | [`references/workflow.md`](references/workflow.md), [`references/navigation-and-budgets.md`](references/navigation-and-budgets.md), [`references/verification-and-exceptions.md`](references/verification-and-exceptions.md) | None of these three when their scope applies |
-| Embedded or real-time project | All three references, including the real-time section | None |
+| `MICRO` 新工具 | [`references/workflow.md`](references/workflow.md) `MICRO` 章节 | 持久化导航和审计章节 |
+| `STANDARD` 新项目 | [`references/workflow.md`](references/workflow.md)，然后 [`references/navigation-and-budgets.md`](references/navigation-and-budgets.md) 相关章节 | 无关异常章节 |
+| `DURABLE` 新项目 | [`references/workflow.md`](references/workflow.md)、[`references/navigation-and-budgets.md`](references/navigation-and-budgets.md)、[`references/verification-and-exceptions.md`](references/verification-and-exceptions.md) | 无 |
 
-Each reference is directly linked here; no reference requires another reference as a mandatory intermediary.
+每个参考文件从本文件一跳直达，无需中间文件作为前置条件。
 
-## Immutable Rules
+## 不可变规则
 
-- Classify user intent and authorization before reading broadly or writing.
-- Keep the confirmed root, target anchors, exclusions, project rules, public interfaces, and language/framework conventions explicit.
-- Preserve user changes; never roll them back or overwrite them. Do not read or output secrets.
-- Prefer cohesive boundaries and small selective read paths, but split for ownership and independent verification, not to satisfy a line-count quota.
-- Each business decision has one canonical specification and owner. Multiple implementations are acceptable only behind an explicit common interface, unique selection/configuration source, and consistency verification.
-- Do not create wrappers, indexes, architecture notes, Bug records, or future workflows without a current navigation or maintenance purpose.
-- External, destructive, remote, production, licensing, dependency, and CI actions require the authorization described in the applicable reference.
+- 广泛读取或写入前，先分类用户意图和授权。
+- 保持确认的根目录、目标锚点、排除项、项目规则、公共接口和语言/框架约定明确。
+- 保留用户改动；不回退或覆盖；不读取或输出密钥。
+- 优先内聚边界和小型选择性读取路径，但应为所有权和独立验证而拆分，而非为行数配额。
+- 每个业务决策有且仅有一个规范规格和所有者。
+- 外部、破坏性、远端、生产、许可证、依赖和 CI 操作需要参考文件中描述的授权。
 
-## Short Workflow
+## 简短工作流
 
-1. Capture the requested behavior, constraints, runtime, inputs, outputs, and acceptance checks.
-2. Confirm a dedicated root and whether it is new/empty; stop and route to maintainer if existing implementation must be changed.
-3. Select `MICRO`, `STANDARD`, or `DURABLE` and read only its references above.
-4. Define the smallest end-to-end slice, module ownership, configuration source, interfaces, error behavior, and focused verification.
-5. Implement only the approved current workflow. Add records and navigation only when the selected tier requires them.
-6. Run the fastest relevant checks, then broader checks required by the project boundary. Report evidence and unsupported checks separately.
-7. For `DURABLE` or an explicitly requested context-optimization task, perform the reference-defined structure and read-path checks before claiming completion.
+1. 获取请求的行为、约束、运行时、输入、输出和验收检查。
+2. 确认专用根目录是否新建/空；若需变更现有实现则停止并路由到维护者（existing implementation must be changed）。
+3. 选择 `MICRO`、`STANDARD` 或 `DURABLE`，仅读取其对应参考。
+4. 定义最小端到端切片、模块所有权、配置来源、接口、错误行为和聚焦验证。
+5. 仅实现已批准的当前工作流；仅在所选档位需要时添加记录和导航。
+6. 运行最快的相关检查，然后运行项目边界要求的更广泛检查；分开报告证据和不支持的检查。
 
-## Completion Report
-
-State the following, with evidence:
+## 完成报告
 
 ```text
 项目根目录：...
 档位：MICRO / STANDARD / DURABLE
 当前工作流：...
 模块边界：职责 -> 唯一规范来源/实现 -> 公共接口
-导航记录：创建了什么，为什么有导航价值；未创建什么，为什么不需要
-验证：检查项 -> required/available/ran/result/evidence
+导航记录：创建了什么及原因；未创建什么及原因
+验证：检查项 -> 必要/可用/已运行/结果/证据
 未完成与风险：...
 ```
 
-`PASS` means the named check ran and passed. Never describe a skipped, unavailable, hardware-unconnected, or existing-failure check as proof of behavior.
+`PASS` 表示该检查已运行且通过。不得将跳过、不可用、硬件未连接或已有失败描述为行为证明。

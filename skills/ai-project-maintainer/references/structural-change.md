@@ -1,76 +1,70 @@
-# Structural Change
+# 结构变更
 
-## Authorization Gate
+## 授权门
 
-Use this path when the user explicitly requests refactoring, splitting, migration, modularization, imported-project cleanup, reduced AI context, file-size governance, resolution of a God Class or accumulating patches, making an existing project easier to maintain, or a concrete structural scope approved after an audit. “Look at the structure” alone remains read-only; “make it easier to maintain” authorizes structure changes inside the named project and compatibility boundary, but destructive or external actions still need their own gate.
+当用户明确请求重构、拆分、迁移、模块化、导入项目整理、减少 AI 上下文、文件大小治理、解决 God Class 或累积补丁、让现有项目更易维护，或在审计后批准了具体结构范围时，使用此路径。"看看结构"单独保持只读；"让它更易维护"授权在命名项目和兼容边界内进行结构变更，但破坏性或外部操作仍需各自的授权门。
 
-Imported-project cleanup is existing-project maintenance. Before moving or renaming files, ask for explicit agreement that imports, build paths, startup paths, and compatibility behavior may change. Silence or “先看看” is not agreement.
+导入项目整理是现有项目维护。移动或重命名文件前，须明确确认导入、构建路径、启动路径和兼容行为可以变更。沉默或"先看看"不是确认。
 
-## Baseline Before Editing
+## 编辑前建立基线
 
-Record enough evidence to compare before and after:
+记录足够的证据用于前后对比：
 
-- Git status and user uncommitted changes;
-- project root, approved scope, exclusions, and out-of-scope risks;
-- affected files, line counts, top-level functions/classes, responsibilities, public entries, and direct consumers;
-- existing tests, build/type/link/start commands and known failures;
-- public/import identities, monkeypatch behavior, ABI, generated sources, linker sections, and timing constraints when relevant;
-- duplicate definitions or copied implementations at the proposed boundary.
+- Git 状态和用户未提交的改动；
+- 项目根目录、批准范围、排除项和范围外风险；
+- 受影响文件的行数、顶层函数/类、职责、公共入口、直接消费者，以及现有测试和构建/类型/链接/启动命令；
+- 在建议边界处的重复定义或复制实现，以及相关 ABI/生成源/链接器约束（适用时）。
 
-For an accumulating-patch or God Class request, also identify which feature changes currently require coordinated edits across construction, state, callbacks, strings, I/O, and tests. Convert those edit clusters into candidate responsibilities; line count alone is not the migration plan.
+对于累积补丁或 God Class 请求，还需确定哪些功能变更目前需要跨构建、状态、回调、字符串、I/O 和测试进行协同编辑，将这些编辑集群转化为候选职责；行数本身不是迁移计划。
 
-Do not create a branch, full-project backup, or external artifact automatically. Those are separate authorization decisions in `verification-and-safety.md`.
+不自动创建分支、全项目备份或外部产物，这些是 `verification-and-safety.md` 中的单独授权决策。
 
 ## Migration Table
 
-Before each approved migration batch, write:
+在每个批准的迁移批次前填写：
 
 ```text
 职责 | 旧所有者 | 新规范所有者 | 消费者 | 兼容路径 | 旧实现删除证据 | 验证
 ```
 
-A new module is canonical only when it owns the implementation, consumers use it directly or through at most one justified thin compatibility boundary, tests cover both the canonical path and compatibility contract, and the old implementation is deleted. A renamed file, facade-to-facade chain, copied implementation with a later import, or directory scaffold is not extraction.
+新模块成为规范的条件：拥有实现、消费者直接使用或通过最多一个合理的薄兼容边界使用、测试覆盖规范路径和兼容契约，且 old implementation is deleted。重命名文件、facade 链、带后续导入的复制实现或目录脚手架均不是提取。
 
-## Batch Procedure
+## 批次流程
 
-Migrate one complete responsibility at a time:
+每次迁移一个完整职责：
 
-1. define the approved responsibility and its interface;
-2. implement the new owner or move the real implementation;
-3. update every confirmed consumer, import, build route, startup route, and focused test;
-4. retain only the necessary one-hop compatibility entry, containing aliases or small argument/result adaptation;
-5. delete the old implementation and record proof;
-6. run target behavior, import/link/startup checks and compare against the baseline;
-7. inspect duplicate owners, route truth, and relevant indexes before the next batch.
+1. 定义批准的职责及其接口；
+2. 实现新所有者或移动真实实现；
+3. 更新每个已确认的消费者、导入、构建路由、启动路由和聚焦测试；
+4. 仅保留必要的一跳兼容入口，包含别名或小型参数/结果适配；
+5. 删除旧实现并记录证明；
+6. 运行目标行为、导入/链接/启动检查，与基线对比；
+7. 在下一批次前检查重复所有者、路由真相和相关索引。
 
-Do not keep a second business implementation in a compatibility module. A compatibility file approaching 200 hand-written lines, defining domain classes, or containing substantial branching/I/O is evidence the migration is incomplete.
+不得在兼容模块中保留第二份业务实现。接近 200 行手写代码、定义领域类或包含大量分支/I/O 的兼容文件是迁移不完整的证据。
 
-## Navigation And Budgets
+## 导航与预算
 
-Create or update a task route only when a stable task type, first entry, responsibility, public interface, directory structure, or existing route changes. Create a directory index only where it reduces navigation cost, including affected nested source or focused-test directories. Do not preserve exact source line counts as long-lived index data.
+仅当稳定任务类型、第一入口、职责、公共接口、目录结构或现有路由变更时才创建或更新任务路由。仅在减少导航成本时才创建目录索引。不在长期索引中保存精确源码行数。
 
-Default size thresholds are review signals. Strict acceptance gates apply here because this is structural work: a hand-written source file over 400 lines, an entry/facade/compatibility/index file over 200 lines, or a typical task read path over about 800 implementation lines requires a decision. Split only when independent responsibilities, clear interfaces, independent verification, and reduced read scope support it; ABI, framework, real-time, linker, memory, or generated-source constraints can justify a named exception.
+默认大小阈值是审查信号。此处为结构工作，严格验收门适用：超过 400 行的手写源文件、超过 200 行的入口/facade/兼容/索引文件，或约 800 行实现行的典型任务读取路径，需要做决策。仅当独立职责、清晰接口、独立验证和减少读取范围都支持时才拆分；ABI、框架、链接器、内存或生成源约束可以支持命名例外。
 
-## Large-File Normal Fix Boundary
+## 导入项目整理
 
-When the user asks only for a Bug fix in a large file, stay on `NORMAL_CHANGE`. Do not first restructure the file. Report the structural risk. Enter this path only if the user separately approves the structural scope or the request itself includes structural work.
+对于已批准的导入项目整理：
 
-## Imported Project Closure
+1. 展示根目录、范围、迁移批次、兼容计划和风险；
+2. 在每个批次前后运行相同的基线检查；
+3. 仅在导入、构建、启动、测试和项目记录反映新的当前结构时才更新它们；
+4. 对至少三条常见维护路由抽样并统计其实际实现读取量；
+5. 诚实分类结果，批次失败时在已验证的阶段边界停止。
 
-For an approved imported-project cleanup:
+## 诚实状态
 
-1. show the root, scope, migration batches, compatibility plan, and risks;
-2. run the same baseline checks before and after each batch;
-3. update imports, build, start, tests, and project records only when they reflect the new current structure;
-4. sample at least three common maintenance routes and total their actual implementation reads;
-5. classify the result honestly and stop at a verified phase boundary if a batch fails.
+只使用以下状态之一：
 
-## Honest Status
+- `Scaffolded`：目录或 facade 存在，但所有权未移动；
+- `Partially extracted`：命名职责有新的规范所有者，同时列出的遗留职责仍然存在；
+- `Completed for approved scope`：所有批准的职责有唯一所有者，旧副本已删除，消费者/测试跟随边界，前后证据支持声明。
 
-Use exactly one status:
-
-- `Scaffolded`: directories or facades exist but ownership has not moved;
-- `Partially extracted`: named responsibilities have new canonical owners while listed legacy responsibilities remain;
-- `Completed for approved scope`: all approved responsibilities have one owner, old copies are removed, consumers/tests follow the boundary, and before/after evidence supports the claim.
-
-Out-of-scope large files or risks may remain after `Completed for approved scope`, but must be listed as scope-outside risk. Never call a facade-only or partial result “refactoring complete.”
+`Completed for approved scope` 后可能仍有范围外的大文件或风险，但必须列为范围外风险。不得将仅有 facade 或部分结果称为"重构完成"。

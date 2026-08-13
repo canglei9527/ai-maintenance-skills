@@ -4,74 +4,59 @@ version: "0.4.3"
 description: "Explain, diagnose, review, fix, extend, or restructure an existing software project when the request concerns existing source, tests, build configuration, symbols, routes, failures, repository behavior, accumulating patches, oversized modules, God Classes, or maintainability. Select a read-only, normal-change, or structural-change path from the user's intent, and surface evidence-backed structural debt before another focused patch compounds it. Do not infer write authorization merely from the presence of a path, file, or attachment."
 ---
 
-# AI Project Maintainer
+# AI 项目维护者
 
-Maintain an existing project with evidence proportional to the requested outcome. A path, file, symbol, log, or attachment identifies a target; it does not authorize writing. First select the operation path, then read only the context needed for that path.
+按请求结果比例提供证据，维护现有项目。路径、文件、符号、日志或附件只用于定位，不授权写入。先选路径，再读取该路径所需的最小上下文。
 
-## Route First
+## 路由优先
 
-| User intent or situation | Path | Default write permission |
+| 用户意图或情境 | 路径 | 默认写权限 |
 |---|---|---|
-| Explain code, review behavior, diagnose a failure, find a symbol, read logs, or report status without asking for a fix | `READ_ONLY` | None |
-| Fix a bug, add a focused feature, adjust configuration, change existing behavior, or update a local regression test | `NORMAL_CHANGE` | Only the named compatible scope |
-| Explicitly refactor, split, migrate, modularize, resolve a God Class or accumulating-patch problem, make an existing project easier to maintain, reduce AI context, or implement an approved structural scope | `STRUCTURAL_CHANGE` | Only the approved structural scope |
-| Delete, push, publish, deploy, alter production/remote state, send data, or create/execute remotely-triggering CI | `EXTERNAL_ACTION` gate | Separate confirmation for the exact action |
+| 解释代码、审查行为、诊断失败、查找符号、读取日志或报告状态，未要求修改 | `READ_ONLY` | 无 |
+| 修复 Bug、添加聚焦功能、调整配置、变更现有行为或更新本地回归测试 | `NORMAL_CHANGE` | 仅命名的兼容范围 |
+| 明确要求重构、拆分、迁移、模块化、解决 God Class 或累积补丁问题、让项目更易维护、减少 AI 上下文，或实施已批准的结构范围 | `STRUCTURAL_CHANGE` | 仅已批准的结构范围 |
+| 删除、推送、发布、部署、变更生产/远端状态、发送数据，或创建/执行可触发远端工作的 CI | `EXTERNAL_ACTION` 门 | 对具体操作单独确认 |
 
-“Help me see how the structure is” is `READ_ONLY`; it does not authorize moving files. An existing monorepo receiving a new package is maintainer work because an existing repository boundary and workspace contract change. A new or empty independent project belongs to `ai-project-bootstrapper`.
+"帮我看看结构"是 `READ_ONLY`，不授权移动文件。向现有 monorepo 添加新包属于维护者工作。新建或空目录独立项目属于 `ai-project-bootstrapper`。
 
-## References
+## 参考文件
 
-| Current task | Must read | Do not read by default |
+| 当前任务 | 必须读取 | 默认不读取 |
 |---|---|---|
-| `READ_ONLY` explanation, review, or diagnosis | [`references/fast-path.md`](references/fast-path.md), `READ_ONLY` section | [`references/structural-change.md`](references/structural-change.md) |
-| `NORMAL_CHANGE` bug or focused feature | [`references/fast-path.md`](references/fast-path.md), then relevant [`references/verification-and-safety.md`](references/verification-and-safety.md) sections | Structural migration procedure |
-| `NORMAL_CHANGE` target is a large or repeatedly patched file | `fast-path.md` maintainability checkpoint and required verification sections | Structural migration procedure unless separately authorized |
-| `STRUCTURAL_CHANGE` or imported-project cleanup | [`references/structural-change.md`](references/structural-change.md), [`references/verification-and-safety.md`](references/verification-and-safety.md) | Unrelated fast-path sections |
-| External, destructive, remote, production, dependency, license, secret, or CI concern | Relevant [`references/verification-and-safety.md`](references/verification-and-safety.md) section | Unrelated migration templates |
-| Need the detailed explanation of this V2 skill migration | [`references/v2-migration-notes.md`](references/v2-migration-notes.md) | It is explanatory only; do not load it as an execution prerequisite |
+| `READ_ONLY` 解释、审查或诊断 | [`references/fast-path.md`](references/fast-path.md) `READ_ONLY` 章节 | [`references/structural-change.md`](references/structural-change.md) |
+| `NORMAL_CHANGE` Bug 或聚焦功能 | [`references/fast-path.md`](references/fast-path.md)，然后 [`references/verification-and-safety.md`](references/verification-and-safety.md) 相关章节 | 结构迁移流程 |
+| `NORMAL_CHANGE` 目标是大文件或反复补丁文件 | `fast-path.md` 维护性检查点和必要验证章节 | 结构迁移流程（除非单独授权） |
+| `STRUCTURAL_CHANGE` 或导入项目整理 | [`references/structural-change.md`](references/structural-change.md)、[`references/verification-and-safety.md`](references/verification-and-safety.md) | 无关的快速路径章节 |
+| 外部、破坏性、远端、生产、依赖、许可证、密钥或 CI 问题 | [`references/verification-and-safety.md`](references/verification-and-safety.md) 相关章节 | 无关的迁移模板 |
 
-All required references are one hop from this file and are independently usable. `references/v2-migration-notes.md` documents this package migration; it is not an execution prerequisite.
+所有必要参考文件均从本文件一跳可达，且可独立使用。
 
-## Immutable Rules
+## 不可变规则
 
-- Establish `project_root`, `target_anchor`, scope, exclusions, authorization, and existing user changes before editing.
-- Paths and attachments locate evidence only. Explanations and reviews remain read-only unless the user requests a change.
-- Follow user instructions, applicable `AGENTS.md`, build constraints, public contracts, and project conventions.
-- Preserve uncommitted user modifications. Do not reset, revert, overwrite, make an automatic branch, copy a full-project backup, or install/upgrade dependencies without explicit need and authorization.
-- A normal bug fix remains a normal change even when its file is large. Record the structural risk; do not force an unrelated split or add a refactor marker/document.
-- A focused patch does not erase structural evidence. At the maintainability checkpoint, distinguish a cohesive large file from accumulating responsibilities and give a concrete extraction map when the evidence supports one.
-- Split only when responsibilities, interfaces, independent verification, and reduced read scope support it and facade chains, duplication, ABI, framework, or timing constraints do not veto it.
-- Each business decision has one canonical specification and owner. Alternate CPU/CLA, SIMD/scalar, real/simulated, hardware-platform, or reference/optimized implementations need an explicit common interface, unique selection/configuration source, and consistency verification.
-- Completion claims must distinguish `PASS`, `FAIL`, `NOT_RUN`, `NOT_AVAILABLE`, and `BLOCKED_BY_EXISTING_FAILURE` and include evidence.
+- 编辑前确认 `project_root`、`target_anchor`、范围、排除项、授权和用户现有改动。
+- 路径和附件只用于定位证据；解释和审查保持只读，除非用户明确请求变更（does not authorize writing）。
+- 遵循用户指令、适用的 `AGENTS.md`、构建约束、公共契约和项目约定。
+- 保留用户未提交的改动；不得重置、回退、覆盖、自动创建分支或全项目备份，也不得在未明确授权时安装/升级依赖。
+- 完成声明必须区分 `PASS`、`FAIL`、`NOT_RUN`、`NOT_AVAILABLE`、`BLOCKED_BY_EXISTING_FAILURE` 并附证据。
 
-## Short Workflow
+## 简短工作流
 
-1. Determine the path from the user's intent; if write scope is unclear, remain read-only and ask for the smallest clarification.
-2. Confirm the root and anchor from the request, read applicable project rules and shallow metadata, and preserve the dirty worktree.
-3. Read the target, one project-owned dependency/caller as needed, relevant configuration, and the smallest test or reproduction. Expand only on evidence.
-4. For `READ_ONLY`, diagnose or report without source, test, record, file-move, branch, or index writes.
-5. For `NORMAL_CHANGE`, make the smallest compatible edit, add/update the minimum regression test, verify at the risk-matched levels, and run the maintainability checkpoint before completion.
-6. For `STRUCTURAL_CHANGE`, read the structural reference, establish a baseline and approved scope, create a responsibility migration table, migrate one complete responsibility at a time, remove the old implementation, and compare before/after evidence.
-7. Apply the external-action gate separately. Report behavior, structure, environment, and unrun checks without conflating them.
+1. 从用户意图判断路径；写入范围不明确时保持只读并询问最小澄清。
+2. 从请求确认根目录和锚点，读取适用的项目规则和浅层元数据，保留脏工作树。
+3. 读取目标、按需读取一个项目自有依赖/调用方、相关配置，以及最小测试或复现。仅凭证据扩展。
+4. `READ_ONLY`：诊断或报告，不写源码、测试、记录、移文件、创分支或更新索引。
+5. `NORMAL_CHANGE`：做最小兼容修改，添加/更新最小回归测试，按风险级别验证，完成前运行维护性检查点。
+6. `STRUCTURAL_CHANGE`：读取结构参考，建立基线和已批准范围，创建职责迁移表，每次迁移一个完整职责，删除旧实现，对比前后证据。
+7. 外部操作门单独应用；分开报告行为、结构、环境和未运行检查。
 
-## Structural Completion
-
-Use only these statuses for approved structural work:
-
-- `Scaffolded`: directories or facades exist, but ownership has not moved.
-- `Partially extracted`: named responsibilities have canonical new owners, while listed legacy responsibilities remain.
-- `Completed for approved scope`: every approved responsibility has one owner, consumers and tests follow it, old copies are removed, and comparison evidence supports the claim.
-
-A passing test proves behavior for that test, not maintainability. A facade, rename, or new directory alone is not structural completion.
-
-## Completion Report
+## 完成报告
 
 ```text
 路径：READ_ONLY / NORMAL_CHANGE / STRUCTURAL_CHANGE / EXTERNAL_ACTION gate
 根目录与锚点：...
 授权范围：...
-修改：文件/符号 -> 原因；只读时明确“无文件修改”
-验证：检查项 -> required/available/ran/result/evidence
+修改：文件/符号 -> 原因；只读时明确"无文件修改"
+验证：检查项 -> 必要/可用/已运行/结果/证据
 结构状态：不适用 / Scaffolded / Partially extracted / Completed for approved scope
 记录：更新或明确无需更新的项目记录
 未完成与风险：...

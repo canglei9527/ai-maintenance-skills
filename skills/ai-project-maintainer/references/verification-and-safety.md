@@ -1,71 +1,57 @@
-# Verification And Safety
+# 验证与安全
 
-## Authorization And Scope
+## 授权与范围
 
-A path or attachment never grants write authority. Explain/review/diagnose tasks are read-only. Before editing, confirm the project root, target anchor, approved scope, exclusions, user dirty-worktree changes, and any external boundary.
+路径或附件不授予写入权限。解释/审查/诊断任务保持只读。编辑前确认项目根目录、目标锚点、批准范围、排除项、用户脏工作树改动和任何外部边界。
 
-Always ask separately before deleting, pushing, publishing, deploying, changing production, sending data, changing a remote repository, or creating/executing CI that may trigger remote work. Do not automatically create a branch or a full-project backup. Do not roll back user changes. Do not output secrets or inspect credential contents.
+删除、推送、发布、部署、变更生产、发送数据、变更远端仓库，或创建/执行可能触发远端工作的 CI 前，须单独询问。不自动创建分支或全项目备份。不回退用户改动。不输出密钥或检查凭证内容。
 
-Do not automatically add or upgrade dependencies. If a dependency is necessary, state its version, license, lockfile, and supply-chain impact and obtain the required authorization. Do not choose a license for a public project unless an existing project choice or the user specifies it. README and ignore files may follow project conventions; `CONTRIBUTING` and CI are conditional on project need or explicit instruction.
+不自动添加或升级依赖。若确实需要依赖，说明其版本、许可证、锁文件和供应链影响并获得授权。Do not choose a license for a public project unless an existing project choice or the user specifies it. README 和忽略文件可遵循项目约定；`CONTRIBUTING` 和 CI 视项目需要或明确指令而定。
 
-Generated and vendor code is normally excluded. Read it only when the target or runtime evidence points to an exact file; modify it only after confirming whether the generator/source snapshot should be changed instead.
+生成代码和 vendor 代码通常被排除。仅当目标或运行时证据指向某个精确文件时才读取；修改前须确认是否应改变生成器/源快照。
 
-## Comment And Record Integrity
+## 注释与记录完整性
 
-Keep unaffected comments that remain correct. If a comment conflicts with the current code, manual, or verification evidence, correct it rather than preserving a known false statement. Do not add a generic AI-refactor marker or empty future plan.
+保留仍然正确的未受影响注释。若注释与当前代码、手册或验证证据冲突，应纠正而非保留已知的错误陈述。不添加通用的 AI 重构标记或空的未来计划。
 
-Update a Bug record only for a confirmed defect and only at the project's established location. Update architecture or task routes when current responsibilities, invariants, public interfaces, direct dependencies, first entries, or directory boundaries change. Do not add a route for every ordinary Bug.
+仅为已确认缺陷在项目已建立的位置更新 Bug 记录。当当前职责、不变量、公共接口、直接依赖、第一入口或目录边界变更时，更新架构或任务路由。不为每个普通 Bug 添加路由。
 
-## Verification Order
+## 验证顺序
 
-Use the fastest-failing, local-to-external order and honor existing project commands:
+使用最快失败、由本地到外部的顺序，并遵循已有项目命令：
 
-1. YAML, configuration, parsing, and file structure;
-2. format, syntax, type, compile, and link checks;
-3. focused unit/regression tests;
-4. related integration tests;
-5. import, startup, CLI, browser, device, or target-board checks;
-6. structure, duplicate-owner, index, and route checks.
+1. YAML、配置、解析和文件结构；
+2. 格式、语法、类型、编译和链接检查；
+3. 聚焦单元/回归测试；
+4. 相关集成测试；
+5. 导入、启动、CLI、浏览器、设备或目标板检查；
+6. 结构、重复所有者、索引和路由检查。
 
-For structural work, run comparable structure checks before and after each approved migration batch. Separate behavior evidence from maintainability evidence. A build passing does not prove a user workflow, external integration, target hardware, real-time timing, or production state.
+对于结构工作，在每个批准的迁移批次前后运行可比的结构检查。将行为证据与可维护性证据分开。构建通过不能证明用户工作流、外部集成、目标硬件、实时时序或生产状态。
 
-Report each check as:
+报告每个检查项：
 
 ```text
 检查项：...
-required：yes/no
-available：yes/no
-ran：yes/no
-result：PASS / FAIL / NOT_RUN / NOT_AVAILABLE / BLOCKED_BY_EXISTING_FAILURE
-evidence：命令、输出摘要、前置条件或失败原因
+必要：yes/no
+可用：yes/no
+已运行：yes/no
+结果：PASS / FAIL / NOT_RUN / NOT_AVAILABLE / BLOCKED_BY_EXISTING_FAILURE
+证据：命令、输出摘要、前置条件或失败原因
 ```
 
-Never relabel `NOT_RUN`, `NOT_AVAILABLE`, or an existing failure as `PASS`. When a test fails, preserve the meaningful output and distinguish a pre-existing failure, a change-induced failure, and an environment limitation only when evidence supports that distinction.
+不得将 `NOT_RUN`、`NOT_AVAILABLE` 或已有失败重新标记为 `PASS`。测试失败时，保留有意义的输出，仅在证据支持时才区分预先存在的失败、变更引起的失败和环境限制。
 
-## Structural Evidence
+## 结构证据
 
-For approved structural changes, the final evidence must cover:
+对于已批准的结构变更，最终证据必须涵盖：
 
-- before/after affected file and line-count baseline;
-- public entries and direct consumers;
-- migration table and old-implementation deletion proof;
-- compatibility path and import identity where relevant;
-- focused behavior tests plus import/build/link/startup checks;
-- duplicate implementation review using AST/symbol tools when available and targeted manual review otherwise;
-- affected directory indexes and task routes;
-- three representative maintenance read sets and their implementation-line totals;
-- named exceptions with their evidence and re-review condition.
-
-## Real-Time Verification
-
-For TMS320/CCS or other embedded real-time work, do not infer safe restructuring from line count. Before modifying or splitting a control ISR, ADC/PWM chain, CLA Task, protection logic, startup code, interrupt vector, linker-section code, or required-inline algorithm, confirm when applicable:
-
-- interrupt source and ISR period;
-- ADC SOC/EOC relationship;
-- EPWM trigger timing;
-- CLA/CPU data ownership and shared or Message RAM;
-- `#pragma CODE_SECTION`, `#pragma DATA_SECTION`, and linker `.cmd` placement;
-- compiler optimization and inlining;
-- worst-case execution time and protection priority.
-
-Classify syntax/static analysis, compile, link, simulation, target-board download, waveform, ISR execution time, and protection-trigger timing separately. If hardware or timing was not exercised, report it as `NOT_RUN` or `NOT_AVAILABLE`; compilation is not control-behavior verification.
+- 受影响文件的前后行数基线；
+- 公共入口和直接消费者；
+- 迁移表和旧实现删除证明；
+- 兼容路径和导入身份（适用时）；
+- 聚焦行为测试及导入/构建/链接/启动检查；
+- 使用 AST/符号工具（可用时）或针对性人工审查进行的重复实现审查；
+- 受影响的目录索引和任务路由；
+- 三个代表性维护读取集及其实现行数合计；
+- 命名例外及其证据和重新审查条件。
