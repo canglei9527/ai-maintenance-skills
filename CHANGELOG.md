@@ -2,12 +2,24 @@
 
 ## 0.4.3 - 2026-08-13
 
+**基础设施**
+
 - 测试代码与源代码分离：将 `scripts/release.test.mjs` 和 `scripts/skill-frontmatter.test.mjs` 移入 `scripts/tests/` 子目录，源码与测试不再混放。
 - frontmatter 解析器新增可选 `version` 字段：SKILL.md 中可声明 `version: "x.y.z"`，方便使用者识别已安装的 skill 版本。
 - 同步更新 `scripts/verify-skill-repo.mjs` 中的必要文件路径清单和版本号。
 - 同步更新 `.github/workflows/verify.yml` 测试命令路径。
-- 同步更新 `scripts/INDEX.md` 文件索引。
+- 新增 Windows 一键发布脚本 `release.bat`，含防误发布到错误仓库的前置校验。
 
+**Token 优化（约节省 15–18%，无行为变化）**
+
+- 删除 `verification-and-safety.md` 中 `Real-Time Verification` 章节（约 20 行，TMS320/CCS 实时固件专用，当前用户不需要）。
+- 删除 `verification-and-exceptions.md` 中 `TMS320, CCS, And Real-Time Firmware` 整章（约 25 行，同上）。
+- 删除 `fast-path.md` 末尾 `Completion Evidence` 代码块（12 行，与 SKILL.md 完成报告完全重复）。
+- 删除 `structural-change.md` 中 `Large-File Normal Fix Boundary` 章节（5 行，已被 fast-path.md 维护性检查点覆盖）。
+- 删除 `workflow.md` 中 `Current Records Only` 章节（7 行，与 SKILL.md Immutable Rules 重复）。
+- 删除 `navigation-and-budgets.md` 顶部 `Contents` 目录章节（8 行，AI 不需要目录）。
+- 将所有章节标题和规则散文从中英混写统一为中文；保留所有英文代码标识符（`PASS`、`FAIL`、`NOT_RUN` 等）和仓库验证器要求的 anchor 字符串不变。
+- 压缩 Bootstrapper SKILL.md 各档位长描述，去除与 references 文件重复的规则条目。
 
 
 - 新增累积性结构债务检测：普通修复不再把结构问题压成“文件较大”一笔带过。

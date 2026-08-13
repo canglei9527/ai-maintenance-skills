@@ -1,217 +1,401 @@
 # AI Maintenance Skills
 
-可复用的 AI 软件工程 Skills：让项目维护遵循“先理解局部上下文，再做最小修改；修改后验证，并留下可追溯记录”。
+> 让 AI 代码助手像资深工程师一样工作：先理解再动手，改最少的代码，改完验证，留下可追溯的证据。
 
-[English](#english) | [中文](#中文)
+[为什么需要这个项目](#一为什么需要这个项目) · [核心原理](#二核心设计原理) · [Skill 详解](#三两个-skill-详解) · [安装](#五安装) · [版本历史](#版本历史) · [English](#english-quick-start)
 
-## 中文
+---
 
-### 这是什么
+## 一、为什么需要这个项目
 
-这个仓库提供两个可安装的 Skill：
+### AI 代码助手的默认行为问题
 
-- `ai-project-maintainer`：维护已有项目，适用于修 Bug、修改函数、排查回归、导入项目检查、经用户同意后的结构整理、模块抽离和小范围重构。
-- `ai-project-bootstrapper`：创建新项目或新模块，适用于先设计职责、接口、目录和最小测试，再开始写代码。
+没有任何约束时，AI 代码助手在处理软件工程任务时有几个典型的"坏习惯"：
 
-仓库中的标准源路径是 `skills/ai-project-maintainer/SKILL.md` 和 `skills/ai-project-bootstrapper/SKILL.md`。两个 Skill 都是自包含的，可以一起安装，也可以单独安装。
+**读太多、改太多。** 收到"修一个 Bug"的请求，AI 会扫描整个项目，顺手重构不相关的文件，改命名规范，升级依赖。Bug 修了，但新引入了三个问题。
 
-它们不绑定 Python、JavaScript、React、Flask 或任何具体框架。项目可以使用自己的规则文件；Skill 只要求先读取并遵循它们。
+**不区分"看"和"改"的权限。** 用户说"帮我看看这个结构"，AI 就开始移动文件、重命名函数、创建架构文档。路径和附件在 AI 眼里等于"可以写入"的授权——这是错误的推断。
 
-### 核心原则
+**完成声明不诚实。** AI 喜欢报告"通过"，但实际上测试没有跑，硬件没有连接，行为只是"看起来没问题"。你无法判断工作是否真正完成。
 
-1. 先确认项目根目录、用户意图和写入授权，再读取项目规则与目标锚点。
-2. `READ_ONLY` 只读；`NORMAL_CHANGE` 做最小兼容修改；`STRUCTURAL_CHANGE` 只在明确授权或批准范围内迁移完整职责。
-3. `ai-project-bootstrapper` 按 `MICRO`、`STANDARD`、`DURABLE` 选择创建档位；路径、spec 或素材不改变“实现尚不存在”这一新建判断。
-4. 默认只读取目标、直接项目自有依赖、实际配置/数据结构和最小测试；搜索和依赖扩展应由证据驱动。
-5. 默认只做最小修改，保护注释、公共接口、兼容入口和用户未提交的工作；普通 Bug 不因文件大而强制先重构。
-6. 按职责和减少读取范围判断拆分，不把 400/200/800 数值当作所有任务的无条件失败门。
-7. 索引、架构说明、函数索引和 Bug 记录只在有当前导航或历史价值时创建或更新。
-8. 每次验证都报告 `PASS`、`FAIL`、`NOT_RUN`、`NOT_AVAILABLE` 或 `BLOCKED_BY_EXISTING_FAILURE`，不能把未运行的硬件或行为验证写成通过。
+**创建没用的文档。** 一旦被要求创建项目，AI 默认生成完整治理树：`AGENTS.md`、`FUNCTION_INDEX.md`、`ai-context/`、架构文档、Bug 历史……即使你只是想要一个 50 行的单文件脚本。
 
-### 安装后怎么用
+**遇到大文件就强制重构。** 目标文件有 500 行？AI 的第一反应是"先重构它"。但修一个 Bug 不需要先重构——强制重构反而引入更多风险。
 
-安装后不需要每次复制提示词，也不需要手动指定 Skill 名称。直接用自然语言描述任务即可，AI 应自动判断属于“维护已有项目”还是“创建新项目”，并按对应 Skill 执行局部读取、最小修改、验证和记录。
+### 这个项目的解决方案
 
-例如，直接说：
+`ai-maintenance-skills` 提供两个可安装的 Skill，把以上问题变成 AI 的工作约束：
 
-```text
-搜索结果把漫画显示到了小说筛选页，请修复并验证。
+| Skill | 职责 |
+|---|---|
+| `ai-project-maintainer` | 维护已有项目：先判断路径（只读/普通修改/结构变更），读取最小上下文，做最小修改，验证后报告真实状态 |
+| `ai-project-bootstrapper` | 新建项目：确认项目根目录和复杂度档位，创建刚好够用的结构，不预先堆叠未来可能用到的文档 |
+
+两个 Skill 不绑定任何编程语言、框架或平台，也不依赖 npm 运行时包。安装后直接用自然语言描述任务，AI 自动选择对应的 Skill 和路径。
+
+---
+
+## 二、核心设计原理
+
+### 原理 1：写入权限独立于定位证据
+
+用户提供了文件路径 ≠ AI 可以修改那里的内容。每种操作都有独立的授权门：
+
+| 路径 | 触发条件 | 默认写权限 |
+|---|---|---|
+| `READ_ONLY` | 解释、审查、诊断、查找符号、读取日志 | **无** |
+| `NORMAL_CHANGE` | 修 Bug、加聚焦功能、调整配置 | 仅命名的兼容范围 |
+| `STRUCTURAL_CHANGE` | 重构、拆分、迁移、解决 God Class | 仅已批准的结构范围 |
+| `EXTERNAL_ACTION` | 删除、推送、发布、部署 | 每个操作单独确认 |
+
+"帮我看看结构"是 `READ_ONLY`，不授权移动任何文件。
+
+### 原理 2：按需加载上下文，不扫描全局
+
+AI 读取的每一行都消耗上下文窗口。规定的默认读取上限：
+
+- **50 个搜索命中、12 个候选文件、一跳依赖**
+- 只在有明确证据时扩展读取范围，且必须记录扩展理由
+- 大文件（>400 行）不等于需要重构——内聚的大文件只是大，不是坏
+
+### 原理 3：完成报告必须区分五种验证状态
+
+```
+PASS                         ← 已运行且通过
+FAIL                         ← 已运行且失败
+NOT_RUN                      ← 存在但本次未运行
+NOT_AVAILABLE                ← 需要的环境/硬件不存在
+BLOCKED_BY_EXISTING_FAILURE  ← 依赖的前置检查已失败
 ```
 
-或者：
+禁止把 `NOT_RUN` 报告为 `PASS`。每项验证分开报告，让完成声明可被追溯复验。
 
-```text
-从零创建一个 Python + Flask 的书源搜索服务。
+### 原理 4：结构债务要说出来，不能静默压缩
+
+修复超过 400 行文件时，AI 必须检查变更边界是否出现结构债务信号：
+
+- 文件有多个独立的变更原因或多个用户工作流
+- UI、状态转换、持久化 I/O、解析、配置混在一个类或模块中
+- 最近重复的提交或当前改动在同一个超大所有者上扩展
+
+发现信号时，必须报告 `ACCUMULATING_STRUCTURAL_DEBT` 并给出具体责任图（当前所有者、候选规范所有者、接口、消费者、预期读取范围缩减）。"发现结构问题"是 AI 的义务，"重构"需要用户明确授权——两者分开。
+
+### 原理 5：新项目按复杂度选档位
+
+```
+MICRO    单文件脚本 / 教学实验 / 快速原型
+         必要：行为 + 错误处理 + 运行说明
+         不创建：AGENTS.md、架构文档、Bug 记录、函数索引
+
+STANDARD CLI / Web 应用 / 服务 / 自动化工具（默认档位）
+         必要：入口 + 配置 + 模块边界 + README + 最小测试
+         不创建：不必要的导航层级
+
+DURABLE  长期 AI 维护 / 多人协作 / 高安全财务数据要求
+         必要：任务路由 + 架构主题 + 操作验证 + 结构证据
+         不创建：空文档树（所有记录对应已实现的行为）
 ```
 
-上面只是示意，不是固定格式。`AI修Bug提问模板.md` 仅用于问题复杂、需要交接给其他人，或 AI 明确缺少复现步骤、目标函数、环境和验证命令时补充上下文。没有模板也可以正常使用；信息不足时，Skill 会先请求最小的必要信息，而不是要求用户粘贴整段模板。
+---
 
-### 任务分流
+## 三、两个 Skill 详解
 
-AI 会先判断用户要创建独立实现，还是处理已有项目：
+标准源路径：`skills/ai-project-maintainer/SKILL.md` 和 `skills/ai-project-bootstrapper/SKILL.md`。两个 Skill 自包含，可单独安装，也可一起安装。
 
-- 没有现有实现证据，用户要求新建服务、路由器、后台程序、守护进程、CLI、自动化工具或完整应用时，使用 `ai-project-bootstrapper`。即使提供目标路径、spec 或资产，只要目标实现尚不存在，仍走 bootstrapper。
-- 提供现有项目路径、文件、函数、报错、失败测试、调用路径，或要求解释/审查已有代码时，使用 `ai-project-maintainer`。
-- 已有 monorepo 中新增 package 仍属于 maintainer；“看看结构”或模糊的审计请求默认为 `READ_ONLY`。
-- 只有明确删除、推送、发布、部署或远端修改目标时，才进入独立的外部动作授权门。
-- 两者无法判断时，只询问一次，不扫描当前工作区、不启动子代理、不创建文件。
+### `ai-project-maintainer` — 已有项目维护者
 
+**适用场景：** 修 Bug、回归排查、代码审查、解释已有代码、导入项目整理、结构重构（需授权）、解决 God Class 和可维护性问题。
 
-#### 推荐：一条命令安装
+**工作流程：**
 
-需要 Node.js 和 `npx`：
+```
+1. 从用户意图判断路径（READ_ONLY / NORMAL_CHANGE / STRUCTURAL_CHANGE）
+2. 确认 project_root 和 target_anchor，读取项目规则，保留脏工作树
+3. 读取目标 + 最多一个直接依赖 + 相关配置 + 最小测试
+4. 按路径执行：只读报告 / 最小修改+回归测试 / 职责迁移+基线+删旧实现
+5. 维护性检查点：大文件变更前检查结构债务信号
+6. 完成报告：分开报告行为、结构、环境和未运行检查
+```
+
+**完成报告格式：**
+
+```
+路径：READ_ONLY / NORMAL_CHANGE / STRUCTURAL_CHANGE / EXTERNAL_ACTION gate
+根目录与锚点：...
+授权范围：...
+修改：文件/符号 -> 原因；只读时明确"无文件修改"
+验证：检查项 -> 必要/可用/已运行/结果/证据
+结构状态：不适用 / Scaffolded / Partially extracted / Completed for approved scope
+记录：更新或明确无需更新的项目记录
+未完成与风险：...
+```
+
+**结构变更的证据要求：** 只有完整职责真正迁移、消费者和测试跟随新所有者、旧实现被删除且证据充分时，才能报告 `Completed for approved scope`。仅搭目录、添加 facade 或保留影子实现只能报告 `Scaffolded` 或 `Partially extracted`。
+
+---
+
+### `ai-project-bootstrapper` — 新项目初始化器
+
+**适用场景：** 目标实现尚不存在时——新建独立 CLI、应用、服务、Worker、守护进程或自动化工具。即使提供了路径、spec 或资产，只要实现不存在，仍使用本 Skill。
+
+> 已有 monorepo 中新增 package、修改现有源码、解释现有代码 → 使用 `ai-project-maintainer`。
+
+**档位选择逻辑：**
+
+```
+用户要求单文件 / 一次性脚本 / 快速实验  ──> MICRO
+  无服务生命周期、无复杂持久化、无多模块接口、无长期维护需求
+
+普通应用 / 服务 / CLI / 自动化工具（无特殊要求）──> STANDARD（默认）
+  建立清晰入口、模块边界、README、最小测试
+
+长期维护 / 多人多 AI 协作 / 高安全财务数据要求 ──> DURABLE
+  添加任务路由、架构记录、操作验证（不创建空壳）
+```
+
+**完成报告格式：**
+
+```
+项目根目录：...
+档位：MICRO / STANDARD / DURABLE
+当前工作流：...
+模块边界：职责 -> 唯一规范来源/实现 -> 公共接口
+导航记录：创建了什么及原因；未创建什么及原因
+验证：检查项 -> 必要/可用/已运行/结果/证据
+未完成与风险：...
+```
+
+---
+
+## 四、任务分流机制
+
+AI 收到请求后，首先判断是"新建"还是"维护"：
+
+```
+有现有项目证据（路径、文件、函数、报错、测试、调用路径）
+  └─> ai-project-maintainer
+
+没有实现、要求新建独立程序/服务/CLI/自动化工具
+  └─> ai-project-bootstrapper
+
+已有 monorepo 中新增 package
+  └─> ai-project-maintainer（维护已有仓库）
+
+"看看结构" / 模糊审计请求
+  └─> ai-project-maintainer READ_ONLY（不移动文件）
+
+删除 / 推送 / 发布 / 部署
+  └─> EXTERNAL_ACTION 门（每个操作单独确认）
+
+意图不明确
+  └─> 只询问一次，不扫描工作区，不启动子代理，不创建文件
+```
+
+---
+
+## 五、安装
+
+### 推荐：一条命令（需要 Node.js + npx）
 
 ```bash
 npx skills add https://github.com/canglei9527/ai-maintenance-skills
 ```
 
-只安装一个 Skill 时，可以使用安装器支持的筛选选项：
+只安装一个 Skill：
 
 ```bash
 npx skills add https://github.com/canglei9527/ai-maintenance-skills --skill ai-project-maintainer
 ```
 
-单 Skill 安装不会依赖另一个 Skill 目录中的模板或参考文件。
-
-`npx skills` 是独立的安装器，具体选项以 `npx skills --help` 为准。
-
-#### Claude Code
-
-支持插件 marketplace 的版本可以使用：
+### Claude Code（支持 marketplace 的版本）
 
 ```text
 /plugin marketplace add canglei9527/ai-maintenance-skills
 /plugin install ai-maintenance-skills@ai-maintenance-skills
 ```
 
-#### Codex 和其他插件客户端
+### Codex 和其他插件客户端
 
-在客户端的 Plugins/Marketplace 中搜索 `ai-maintenance-skills`，或使用客户端支持的 GitHub 插件安装入口。仓库提供 `.codex-plugin/plugin.json` 和 `.claude-plugin/plugin.json`。如果客户端不识别插件清单，使用上面的 `npx skills` 安装器。
+在客户端的 Plugins/Marketplace 中搜索 `ai-maintenance-skills`，或使用 GitHub 插件安装入口。仓库提供 `.codex-plugin/plugin.json` 和 `.claude-plugin/plugin.json`。
 
-#### 手工后备
-
-没有 Node.js、插件管理器或安装器时，在目标项目根目录执行：
+### 手工后备（无 Node.js / 无插件管理器）
 
 ```bash
+# macOS / Linux
 mkdir -p .agents
 cp -R /path/to/ai-maintenance-skills/skills ./.agents/
-```
 
-Windows PowerShell：
-
-```powershell
+# Windows PowerShell
 New-Item -ItemType Directory -Force .agents | Out-Null
 Copy-Item -Recurse -Force C:\path\to\ai-maintenance-skills\skills .agents\
 ```
 
-更完整的项目级/用户级安装、更新、卸载和兼容性说明见 [`docs/installation.md`](docs/installation.md)。
+完整的安装、更新、卸载说明见 [`docs/installation.md`](docs/installation.md)。
 
-### 导入项目的整理规则
+---
 
-导入或接手已有项目时，AI 不会默认移动、重命名或重构文件。它会先做浅层项目检查，然后询问是否要整理成便于维护的结构。
+## 六、使用示例
 
-只有你明确同意后，AI 才会：
+安装后直接用自然语言描述任务，无需粘贴提示词或指定 Skill 名称。
 
-1. 展示目标结构、迁移文件和风险。
-2. 运行整理前测试、语法/类型检查、构建和启动基线。
-3. 在原项目根目录内分批整理，更新引用并保留兼容入口。
-4. 运行整理后的同一套测试，再做导入路径和启动检查。
-5. 比较整理前后的结果；如果产生回归，停止或恢复失败批次，并如实记录。
+**修复 Bug（触发 NORMAL_CHANGE）：**
+```
+搜索结果把漫画显示到了小说筛选页，请修复并验证。
+```
 
-选择不整理时，项目结构保持不变，只执行普通维护任务。
+**代码审查（触发 READ_ONLY）：**
+```
+帮我看看 src/router.js 的结构，有没有明显的设计问题。
+```
 
+**结构重构（触发 STRUCTURAL_CHANGE）：**
+```
+UserService 已经超过 800 行，承担了认证、权限、通知、日志四个职责，帮我拆分它。
+```
 
-### 创建档位
+**新建项目 STANDARD（触发 bootstrapper）：**
+```
+从零创建一个 Python + Flask 的书源搜索服务，需要 REST API 和 SQLite 存储。
+```
 
-新建项目不会默认生成完整治理树：
+**新建单文件工具 MICRO（触发 bootstrapper）：**
+```
+新建一个单文件 Node.js 脚本，读取 stdin JSON，过滤空字段后输出，不要拆成多文件。
+```
 
-- `MICRO`：一次性脚本、教学实验、快速原型或明确要求的单文件工具。保持小而完整，提供输入错误处理、运行方式和最小验证。
-- `STANDARD`：普通 CLI、桌面工具、Web 应用、服务和自动化工具。建立明确入口、集中配置、模块职责、README/启动说明和最小测试或等价验证。
-- `DURABLE`：只有长期 AI 维护、多人或多 AI 协作、多入口、多工作流，或安全、硬件、财务、数据一致性要求较高时启用。此时才按需建立任务地图、架构主题、操作验证和严格结构证据。
+`AI修Bug提问模板.md` 是可选的——只在问题复杂、需要跨会话交接，或 AI 明确缺少复现步骤时才使用。
 
-`MICRO` 不自动创建 `AGENTS.md`、`ai-context/`、`FUNCTION_INDEX.md`、Bug 目录、架构空壳或运维空壳。记录必须对应已经实现的行为或真实导航价值；不要为了未来可能的需求预先堆叠文档。
+---
 
-### 验证
-
-本仓库无 npm 运行时依赖。运行：
+## 七、发布流程（维护者参考）
 
 ```bash
-node --test scripts/skill-frontmatter.test.mjs
+# 默认 dry-run，不修改任何文件
+node scripts/release.mjs --version 0.5.0 --title "标题" --notes-file release-notes.md
+
+# 确认摘要后执行真实发布
+node scripts/release.mjs --version 0.5.0 --title "标题" --notes-file release-notes.md --publish
+
+# Windows 一键发布（含防误发布校验）
+release.bat
+```
+
+发布工具会自动：同步 3 份插件元数据版本、运行验证脚本、创建发布提交和 annotated tag、推送 main 与 tag、通过 `gh` CLI 创建 GitHub Release。
+
+---
+
+## 八、验证
+
+本仓库无 npm 运行时依赖，直接运行：
+
+```bash
+node --test scripts/tests/skill-frontmatter.test.mjs scripts/tests/release.test.mjs
 node scripts/verify-skill-repo.mjs
 git diff --check
 ```
 
-`evals/` 提供 V2 路由与行为评估提示，覆盖新建项目档位、已有项目维护路径、只读边界、普通大文件 Bug、结构迁移、生成代码例外和实时验证限制。静态脚本不能替代在实际 AI 客户端中的触发评估，因此发布说明会区分自动验证和人工评估。
+`evals/` 目录提供 V2 路由与行为评估提示，覆盖所有档位和操作路径。静态脚本无法替代在真实 AI 客户端中的触发评估，因此发布说明会区分自动验证和人工评估。
 
-### 发布
+---
 
-先在干净的 `main` 工作区完成并提交功能修改。使用 release CLI 做本地预检；默认 dry-run，不会修改文件、提交、推送、创建 tag 或 GitHub Release：
+## 版本历史
 
-```bash
-node scripts/release.mjs --version 0.5.0 --title "Release title" --notes-file release-notes.md
-```
+### v0.4.3 — 2026-08-13
 
-确认摘要、版本、变更记录和验证命令后，才执行真实发布：
+**基础设施改进**
+- 测试代码从 `scripts/` 迁入 `scripts/tests/` 子目录，源码与测试分离
+- SKILL.md 支持可选 `version` 字段，使用者可识别已安装的版本号
+- 新增 Windows 一键发布脚本 `release.bat`，含防误发布到错误仓库的前置校验
 
-```bash
-node scripts/release.mjs --version 0.5.0 --title "Release title" --notes-file release-notes.md --publish
-```
+**Token 优化（约节省 15–18%，无行为变化）**
+- 删除 TMS320/CCS 实时固件专用章节（当前用户不需要，约 45 行）
+- 删除 `fast-path.md` 末尾与 SKILL.md 完全重复的完成报告模板（12 行）
+- 删除 `structural-change.md` 中已被 fast-path.md 覆盖的章节（5 行）
+- 删除 `workflow.md` 中与 SKILL.md Immutable Rules 重复的章节（7 行）
+- 删除 `navigation-and-budgets.md` 顶部 AI 不需要的目录章节（8 行）
+- 所有章节标题和规则散文统一为中文，保留所有代码标识符和 anchor 字符串
 
-无人值守时增加 `--yes`。工具会同步 3 份插件元数据、验证器版本和 `CHANGELOG.md`，运行验证，创建发布提交和 annotated tag，推送 `main` 与 tag，再通过已认证的 `gh` CLI 创建 Release。网络超时或 GitHub 传播延迟时，已完成步骤不会回滚；核对后用相同参数增加 `--resume --publish --yes` 继续。不会写入或输出 token、凭据或持久状态文件。
+### v0.4.2 — 2026-08-12
 
-实现边界和最小读取路径见 [`scripts/INDEX.md`](scripts/INDEX.md)。
+- 新增累积性结构债务检测：普通修复不再把结构问题压成"文件较大"一笔带过
+- Maintainer 增加维护性检查点：大文件、入口/facade 或反复补丁历史触发信号检查
+- 命中信号时报告 `ACCUMULATING_STRUCTURAL_DEBT`，并给出具体责任图
+- 用户明确要求解决结构问题时直接进入 `STRUCTURAL_CHANGE`，不用最小补丁敷衍
+- 新增两个评估场景和规则回归测试
 
-### 仓库边界
+### v0.4.1 — 2026-08-07
 
-这是独立的 Skill 仓库，不包含任何具体应用源码、`.zcode` 会话目录、凭据或生成文件。示例只展示项目记录的结构，不代表某个真实业务项目。
+V2 完整重构，核心目标：清晰边界、按需加载、诚实验证。
 
-### 许可证
+- **分流重构：** bootstrapper 负责"实现尚不存在"的新建，maintainer 负责所有已有源码操作
+- **Bootstrapper 三档：** 引入 MICRO / STANDARD / DURABLE，每档有明确的必要形态和禁止创建清单
+- **Maintainer 四路径：** READ_ONLY / NORMAL_CHANGE / STRUCTURAL_CHANGE / EXTERNAL_ACTION，写入权限各自独立
+- **结构迁移证据：** 必须建立基线、职责迁移表、删除旧实现，才能报告 `Completed`
+- **预算策略修正：** 400/200/800 数值是审查阈值，不是所有任务的无条件失败门
+- **导航记录策略：** 只在有当前导航或历史价值时创建，不因 Skill 加载就生成空文档树
+- **验证状态统一：** PASS / FAIL / NOT_RUN / NOT_AVAILABLE / BLOCKED_BY_EXISTING_FAILURE
+- **Reference 结构：** 两个 SKILL.md 各自一跳直达对应 references，可独立安装
 
-本仓库采用 Apache License 2.0。第三方工具、模型、项目或示例被使用时，请另外检查其许可证和发布要求。
+### v0.4.0 — 2026-08-06
 
-## English
+- 强制单一职责手写文件（100–300 行）
+- 将 400/200/800 数值设为硬闸门，要求源码目录索引、根任务路由和维护路径验收
+- 增加独立评估清单、项目文档模板和维护记录模板
 
-### What it is
+### v0.3.0 — 2026-08-04
 
-A reusable pair of AI software-engineering skills:
+- 迁移到插件兼容的 `skills/` 标准目录
+- 修复非法 YAML frontmatter，恢复两个 Skill 的完整发现和安装
+- 精简 SKILL.md，将复杂规则移入 `references/` 按需加载
+- 增加无依赖 frontmatter 解析器和 Node 回归测试
 
-- `ai-project-maintainer` for local bug fixes, regressions, module extraction, and focused refactoring in existing projects.
-- `ai-project-bootstrapper` for designing and creating a new project or module with explicit responsibilities, interfaces, tests, and records.
+### v0.2.x — 2026-08-02
 
-The workflow is deliberately stack-agnostic. It favors the smallest relevant context, protects existing work, verifies changes, and records only navigation or historical information that has current value.
+- v0.2.5：两阶段读取协议，搜索和依赖扩展上限，按层级扩大的证据门槛
+- v0.2.4：任务分流门，bootstrapper 优先处理无已有实现的新建请求
+- v0.2.3：导入项目整理规则，整理前基线 + 分批整理 + 整理后回归
+- v0.2.2：新项目必须先确定独立项目根目录
+- v0.2.0–v0.2.1：Claude/Codex 插件元数据，`npx skills add` 安装入口
 
-### Project Routing And Tiers
+### v0.1.0 — 2026-08-02
 
-- Use `ai-project-bootstrapper` when the requested implementation is new, including when a path, specification, or assets are supplied but no implementation exists.
-- Use `ai-project-maintainer` for existing source, tests, routes, symbols, failures, reviews, explanations, fixes, extensions, and approved restructuring. An existing monorepo receiving a package remains maintenance work.
-- `READ_ONLY` explains or reviews without file writes. `NORMAL_CHANGE` makes the smallest compatible change. `STRUCTURAL_CHANGE` requires approved scope, a baseline, a responsibility migration table, canonical ownership, old implementation deletion, and evidence. Deletion, publishing, deployment, and remote changes have a separate authorization gate.
-- Bootstrapper chooses `MICRO`, `STANDARD`, or `DURABLE`. `MICRO` does not create a full governance tree; `STANDARD` adds only useful project structure; `DURABLE` enables long-term records and strict structural evidence.
-- The 400/200/800 values are review thresholds by default, not automatic failures. They become strict only for durable creation, structural work, or an explicit context/file-governance request.
-- Verification states are `PASS`, `FAIL`, `NOT_RUN`, `NOT_AVAILABLE`, and `BLOCKED_BY_EXISTING_FAILURE`. Hardware, real-time, and unexercised behavior must be reported separately.
+初始版本：`ai-project-maintainer` + `ai-project-bootstrapper`，架构说明，中文提问模板，示例项目文档，无依赖 Node.js 验证脚本，Apache License 2.0。
 
-### Install
+---
 
+## 许可证
+
+本仓库采用 [Apache License 2.0](LICENSE)。第三方工具、模型或示例项目请另行检查其许可证。
+
+---
+
+## English Quick Start
+
+Two installable AI engineering skills:
+
+- **`ai-project-maintainer`** — for existing projects: local reads, minimal changes, honest verification, structural debt surfacing.
+- **`ai-project-bootstrapper`** — for new projects: right-sized tier (MICRO / STANDARD / DURABLE), minimal governance, no speculative docs.
+
+**Install:**
 ```bash
 npx skills add https://github.com/canglei9527/ai-maintenance-skills
 ```
 
-For Claude Code, use the marketplace commands when supported:
+**Use:** Describe your task in natural language. The AI selects the skill and path automatically.
 
-```text
-/plugin marketplace add canglei9527/ai-maintenance-skills
-/plugin install ai-maintenance-skills@ai-maintenance-skills
-```
+**Key rules:**
+- A file path is location evidence, not write authorization.
+- Default read budget: 50 search hits, 12 candidate files, one dependency hop.
+- Verification states: `PASS` / `FAIL` / `NOT_RUN` / `NOT_AVAILABLE` / `BLOCKED_BY_EXISTING_FAILURE`. Never report skipped checks as passing.
+- Large files (>400 lines) don't require prior refactor. Structural debt is surfaced explicitly, refactoring requires user authorization.
+- MICRO projects don't get `AGENTS.md`, architecture docs, or bug history by default.
 
-Codex and other plugin clients can search for `ai-maintenance-skills` in their Plugins/Marketplace UI or use the repository URL. If a client does not recognize plugin metadata, use `npx skills` or the manual `.agents/skills` fallback described in [`docs/installation.md`](docs/installation.md).
-
-After installation, ask for a bug fix or a new project in natural language. You do not need to paste the prompt template or mention a Skill name.
-
-### Verify
-
+**Verify:**
 ```bash
-node --test scripts/skill-frontmatter.test.mjs
+node --test scripts/tests/skill-frontmatter.test.mjs scripts/tests/release.test.mjs
 node scripts/verify-skill-repo.mjs
-git diff --check
 ```
 
-See `CONTRIBUTING.md`, `ARCHITECTURE.md`, and `evals/` for maintenance and evaluation details.
+See [`CONTRIBUTING.md`](CONTRIBUTING.md) and [`ARCHITECTURE.md`](ARCHITECTURE.md) for details.
+
+
