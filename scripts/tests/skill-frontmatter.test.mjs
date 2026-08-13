@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { parseSkillDocument } from './skill-frontmatter.mjs';
+import { parseSkillDocument } from '../skill-frontmatter.mjs';
 
 const skill = (frontmatter, newline = '\n') =>
   ['---', ...frontmatter, '---', '', '# Test'].join(newline);

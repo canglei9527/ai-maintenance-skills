@@ -7,10 +7,10 @@
 | `release-version.mjs` | Validates SemVer, synchronizes version metadata, and inserts changelog sections. | metadata read/prepare/apply exports | release config, Node fs | Version or changelog changes. |
 | `release-git.mjs` | Inspects Git state and owns commit, push, tag, and retry operations. | Git inspection and mutation exports | release config, Node child process | Git preflight or retry behavior. |
 | `release-github.mjs` | Owns authenticated `gh` release lookup and publication. | GitHub auth/release exports | release Git retry helpers | GitHub Release behavior. |
-| `release.test.mjs` | Offline tests for release module behavior. | Node test suite | release version, Git, GitHub modules | Changing release behavior. |
 | `verify-skill-repo.mjs` | Read-only repository integrity verification. | `node scripts/verify-skill-repo.mjs` | frontmatter parser | Validating repository content. |
 | `skill-frontmatter.mjs` | Parses the repository's restricted Skill frontmatter. | parser export | none | Changing Skill metadata rules. |
-| `skill-frontmatter.test.mjs` | Regression tests for frontmatter parsing. | Node test suite | frontmatter parser | Changing frontmatter parser. |
+| `tests/release.test.mjs` | Offline tests for release module behavior. | Node test suite | release version, Git, GitHub modules | Changing release behavior. |
+| `tests/skill-frontmatter.test.mjs` | Regression tests for frontmatter parsing. | Node test suite | frontmatter parser | Changing frontmatter parser. |
 
 ## Release Read Paths
 

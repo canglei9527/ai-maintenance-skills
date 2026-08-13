@@ -3,9 +3,9 @@ import { mkdtemp, mkdir, readFile, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import test from 'node:test';
-import { assertGitPreflight, retry } from './release-git.mjs';
-import { publishRelease } from './release-github.mjs';
-import { compareVersions, parseVersion, prepareReleaseMetadata } from './release-version.mjs';
+import { assertGitPreflight, retry } from '../release-git.mjs';
+import { publishRelease } from '../release-github.mjs';
+import { compareVersions, parseVersion, prepareReleaseMetadata } from '../release-version.mjs';
 
 function metadata() {
   return {
