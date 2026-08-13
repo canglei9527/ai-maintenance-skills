@@ -15,7 +15,7 @@ Keep a requested single-file tool single-file. Do not create `AGENTS.md`、`ai-c
 
 ## STANDARD
 
-默认对普通独立 CLI、桌面工具、Web 应用、服务、自动化工具或多文件数据程序使用 `STANDARD`。
+仅当用户明确要求轻量项目，或项目确认不需要长期 AI 维护和多级目录导航时使用 `STANDARD`。
 
 1. 获取当前工作流、输入、输出、运行时、部署边界和验收检查。
 2. 确认专用项目根目录。将提供的规格或资产作为需求读取，而非已有实现的证据。
@@ -33,13 +33,13 @@ Keep a requested single-file tool single-file. Do not create `AGENTS.md`、`ai-c
 
 ## DURABLE
 
-仅在请求或项目约束明确需要长期 AI 维护、多人或多 AI 协作、多个稳定工作流/入口，或高安全、硬件、财务或数据一致性保证时使用 `DURABLE`。
+默认对新项目使用 `DURABLE`。仅当用户明确要求一次性/单文件工具时降为 `MICRO`，明确要求轻量且无需长期 AI 维护时降为 `STANDARD`。
 
-1. 为已存在的工作流建立根规则和简短的任务到文件映射。
-2. 仅当每项都提供真实的导航或验证入口时，才添加 `ai-context/INDEX.md`、聚焦架构主题或 `operations/verification.md`。
-3. 使用 `navigation-and-budgets.md` 中的导航规则对至少三个可能的维护任务进行精确最小读取集抽样。
-4. 运行行为验证以及 `verification-and-exceptions.md` 中的结构和例外检查。
-5. 仅记录已确认的高影响、重复出现、安全、一致性或项目要求的 Bug；不创建空 Bug 文件夹或未来架构主题。
+1. 建立根 `AGENTS.md` 和 `ai-context/INDEX.md`，将用户可见任务或故障现象映射到第一个功能目录、入口文件和聚焦测试。
+2. 超大项目按 `navigation-and-budgets.md` 创建镜像目录索引；每级索引只列直接子目录/文件，不生成全项目逐文件清单。
+3. 为新增功能定义规范所有者；独立职责没有合适所有者时创建模块，多文件稳定工作流才创建新目录，并同步最近一级索引。
+4. 对至少三个可能的维护任务抽样精确最小读取集，再运行行为验证以及 `verification-and-exceptions.md` 中的结构和例外检查。
+5. 仅在提供真实导航或验证入口时添加架构主题、`operations/verification.md` 或 Bug 记录；不创建空目录或未来主题。
 
 ## 边界与所有权
 

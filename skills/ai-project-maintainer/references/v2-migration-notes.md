@@ -28,7 +28,7 @@ The same-name installed copies under `C:\Users\23526\.agents\skills\` were inspe
 
 ## Behavioral Changes
 
-- `MICRO`, `STANDARD`, and `DURABLE` are explicit tiers. MICRO does not create a governance tree; STANDARD is the default; DURABLE is opt-in or constraint-driven.
+- `MICRO`, `STANDARD`, and `DURABLE` are explicit tiers. DURABLE is the default; MICRO is reserved for explicit one-off or single-file work, and STANDARD for explicitly lightweight projects without long-term AI maintenance needs.
 - File sizes are normally review thresholds. Strict acceptance budgets apply only to durable creation, structural change, or an explicit context/file-governance request.
 - A normal Bug fix in a large file remains allowed and does not force unrelated refactoring.
 - Structural work requires an approved scope, baseline, migration table, real ownership transfer, old-implementation deletion, compatibility evidence, and before/after verification.

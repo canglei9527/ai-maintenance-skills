@@ -38,6 +38,7 @@ description: "Explain, diagnose, review, fix, extend, or restructure an existing
 - 遵循用户指令、适用的 `AGENTS.md`、构建约束、公共契约和项目约定。
 - 保留用户未提交的改动；不得重置、回退、覆盖、自动创建分支或全项目备份，也不得在未明确授权时安装/升级依赖。
 - 完成声明必须区分 `PASS`、`FAIL`、`NOT_RUN`、`NOT_AVAILABLE`、`BLOCKED_BY_EXISTING_FAILURE` 并附证据。
+- **默认以 DURABLE 级别维护所有项目**：每次任务完成后维护 `ai-context/INDEX.md`（目录→职责映射）；发现结构债务必须报告 `ACCUMULATING_STRUCTURAL_DEBT` 而不是静默带过。
 
 ## 简短工作流
 
