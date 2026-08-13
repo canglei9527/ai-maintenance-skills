@@ -1,5 +1,6 @@
 ---
 name: ai-project-bootstrapper
+version: "0.4.3"
 description: "Create a new standalone software project or initialize a new or empty project directory. Use when the user asks to build a new application, service, CLI, worker, daemon, automation tool, or similar independent codebase, even when an output path, specification, or assets are supplied. Do not use for modifying an existing codebase or merely explaining or reviewing an artifact."
 ---
 

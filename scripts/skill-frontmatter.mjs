@@ -1,5 +1,5 @@
 const FRONTMATTER = /^---\r?\n([\s\S]*?)\r?\n---(?:\r?\n|$)/;
-const ALLOWED_KEYS = new Set(['name', 'description']);
+const ALLOWED_KEYS = new Set(['name', 'version', 'description']);
 
 export function parseSkillDocument(text) {
   if (typeof text !== 'string') throw new TypeError('Skill document must be text');
@@ -27,6 +27,17 @@ export function parseSkillDocument(text) {
       continue;
     }
 
+    if (key === 'version') {
+      const ver = rawValue.startsWith('"') && rawValue.endsWith('"')
+        ? JSON.parse(rawValue)
+        : rawValue;
+      if (!/^\d+\.\d+\.\d+$/.test(ver)) {
+        throw new Error('version must be a semver string like "1.2.3"');
+      }
+      metadata.version = ver;
+      continue;
+    }
+
     if (!rawValue.startsWith('"') || !rawValue.endsWith('"')) {
       throw new Error('description must be a JSON-quoted YAML string');
     }
@@ -44,6 +55,7 @@ export function parseSkillDocument(text) {
   }
 
   for (const key of ALLOWED_KEYS) {
+    if (key === 'version') continue; // optional field
     if (!Object.hasOwn(metadata, key)) throw new Error(`frontmatter ${key} missing`);
   }
 

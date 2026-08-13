@@ -1,5 +1,6 @@
 ---
 name: ai-project-maintainer
+version: "0.4.3"
 description: "Explain, diagnose, review, fix, extend, or restructure an existing software project when the request concerns existing source, tests, build configuration, symbols, routes, failures, repository behavior, accumulating patches, oversized modules, God Classes, or maintainability. Select a read-only, normal-change, or structural-change path from the user's intent, and surface evidence-backed structural debt before another focused patch compounds it. Do not infer write authorization merely from the presence of a path, file, or attachment."
 ---
 

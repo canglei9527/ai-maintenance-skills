@@ -4,7 +4,7 @@ import { fileURLToPath } from 'node:url';
 import { parseSkillDocument } from './skill-frontmatter.mjs';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
-const releaseVersion = '0.4.2';
+const releaseVersion = '0.4.3';
 const failures = [];
 const check = (condition, message) => {
   if (!condition) failures.push(message);
@@ -41,13 +41,13 @@ const required = [
   'skills/ai-project-bootstrapper/references/navigation-and-budgets.md',
   'skills/ai-project-bootstrapper/references/verification-and-exceptions.md',
   'scripts/skill-frontmatter.mjs',
-  'scripts/skill-frontmatter.test.mjs',
+  'scripts/tests/skill-frontmatter.test.mjs',
   'scripts/release.mjs',
   'scripts/release-config.mjs',
   'scripts/release-version.mjs',
   'scripts/release-git.mjs',
   'scripts/release-github.mjs',
-  'scripts/release.test.mjs',
+  'scripts/tests/release.test.mjs',
   'scripts/INDEX.md'
 ];
 

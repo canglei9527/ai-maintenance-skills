@@ -1,6 +1,14 @@
 # 变更记录
 
-## 0.4.2 - 2026-08-12
+## 0.4.3 - 2026-08-13
+
+- 测试代码与源代码分离：将 `scripts/release.test.mjs` 和 `scripts/skill-frontmatter.test.mjs` 移入 `scripts/tests/` 子目录，源码与测试不再混放。
+- frontmatter 解析器新增可选 `version` 字段：SKILL.md 中可声明 `version: "x.y.z"`，方便使用者识别已安装的 skill 版本。
+- 同步更新 `scripts/verify-skill-repo.mjs` 中的必要文件路径清单和版本号。
+- 同步更新 `.github/workflows/verify.yml` 测试命令路径。
+- 同步更新 `scripts/INDEX.md` 文件索引。
+
+
 
 - 新增累积性结构债务检测：普通修复不再把结构问题压成“文件较大”一笔带过。
 - Maintainer 增加维护性检查点：手写文件超过 400 行、入口/UI/控制器/facade 超过 200 行、或存在反复补丁历史时，先检查变更边界是否有多个独立变更原因、多工作流、混合职责、独立可测分组或反复扩展同一超大所有者。
