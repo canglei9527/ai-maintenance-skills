@@ -33,7 +33,7 @@ Keep a requested single-file tool single-file. Do not create `AGENTS.md`、`ai-c
 
 ## DURABLE
 
-默认对新项目使用 `DURABLE`。仅当用户明确要求一次性/单文件工具时降为 `MICRO`，明确要求轻量且无需长期 AI 维护时降为 `STANDARD`。
+按用户描述的实际需求选择档位，不自动升级。`MICRO` 用于一次性脚本和快速原型；`STANDARD` 用于普通 CLI、应用和服务（**不确定时默认 STANDARD**）；`DURABLE` 仅在用户明确提到长期 AI 维护、多人/多 AI 协作、安全关键或硬件/财务约束时使用——不因项目名称或描述复杂程度推断 DURABLE。
 
 1. 建立根 `AGENTS.md` 和 `ai-context/INDEX.md`，将用户可见任务或故障现象映射到第一个功能目录、入口文件和聚焦测试。
 2. 超大项目按 `navigation-and-budgets.md` 创建镜像目录索引；每级索引只列直接子目录/文件，不生成全项目逐文件清单。

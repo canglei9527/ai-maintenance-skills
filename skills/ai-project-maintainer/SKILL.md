@@ -38,7 +38,7 @@ description: "Explain, diagnose, review, fix, extend, or restructure an existing
 - 遵循用户指令、适用的 `AGENTS.md`、构建约束、公共契约和项目约定。
 - 保留用户未提交的改动；不得重置、回退、覆盖、自动创建分支或全项目备份，也不得在未明确授权时安装/升级依赖。
 - 完成声明必须区分 `PASS`、`FAIL`、`NOT_RUN`、`NOT_AVAILABLE`、`BLOCKED_BY_EXISTING_FAILURE` 并附证据。
-- **默认以 DURABLE 级别维护所有项目**：每次任务完成后维护 `ai-context/INDEX.md`（目录→职责映射）；发现结构债务必须报告 `ACCUMULATING_STRUCTURAL_DEBT` 而不是静默带过。
+- **按触发条件维护导航**：以下条件之一满足时，在任务末尾更新或新建 `ai-context/INDEX.md`（不中断任务主体）：(1) 本次任务新增了文件、目录、公共入口或稳定任务路由，且任务后项目源文件总数 > 1；(2) 完成了 `STRUCTURAL_CHANGE`。其余情况（`READ_ONLY`、单文件 bug 修复、仅改实现细节、MICRO 单文件脚本）不操作索引。发现明确结构债务信号时，在完成报告"未完成与风险"字段中简要附注，不中断当前任务。
 
 ## 简短工作流
 
@@ -51,6 +51,8 @@ description: "Explain, diagnose, review, fix, extend, or restructure an existing
 7. 外部操作门单独应用；分开报告行为、结构、环境和未运行检查。
 
 ## 完成报告
+
+**报告粒度与任务规模匹配**：`READ_ONLY` 简单单文件问答直接给出结论，无需完整格式；1-2 文件的 `NORMAL_CHANGE` 内联列出改动和验证结果即可；复杂变更和 `STRUCTURAL_CHANGE` 使用完整格式。
 
 ```text
 路径：READ_ONLY / NORMAL_CHANGE / STRUCTURAL_CHANGE / EXTERNAL_ACTION gate

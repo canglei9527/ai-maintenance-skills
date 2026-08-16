@@ -111,6 +111,16 @@
 - 验证结果：10 个 Node 离线测试通过；仓库验证通过；`git diff --check` 通过；隔离 fixture dry-run 保持工作区不变且未创建 `v0.5.0` tag。
 - 未验证风险：本轮不执行真实 `--publish`、远端 tag 或 GitHub Release API 调用；真实认证、权限和网络传播将在首次发布时由工具的 preflight 与重试逻辑覆盖。
 
+## 2026-08-16：DURABLE 强制默认和完成报告格式导致 AI 响应质量下降
+
+- 现象：部分 AI 使用 Skill 后回复变得机械、臃肿，或在简单问答后自动创建 `ai-context/` 目录，或遇到大文件就中断实际任务转而输出完整结构债务分析报告，或为 MICRO 脚本也建立治理目录。
+- 根因：(1) Maintainer SKILL.md"默认以 DURABLE 级别维护所有项目"规则无差别要求每次任务完成后维护 `ai-context/INDEX.md`，READ_ONLY 和单文件 bug 修复也不例外；(2) Bootstrapper workflow.md"默认对新项目使用 DURABLE"导致简单脚本也创建 AGENTS.md + ai-context/ + 路由树；(3) SKILL.md 的"必须报告 ACCUMULATING_STRUCTURAL_DEBT"措辞让 AI 在大文件 bug 修复时中断任务输出完整职责图；(4) 完成报告格式无分级，所有任务强制输出相同的8字段结构化代码块。
+- 修改文件：`skills/ai-project-maintainer/SKILL.md`、`skills/ai-project-maintainer/references/fast-path.md`、`skills/ai-project-bootstrapper/SKILL.md`、`skills/ai-project-bootstrapper/references/workflow.md`。
+- 修改方式：将 Maintainer 索引维护改为触发条件制——本次任务新增文件/目录/入口/路由（且源文件总数 > 1）或完成 STRUCTURAL_CHANGE 时才更新/新建 INDEX.md，READ_ONLY、单文件 bug 修复、仅改实现细节、MICRO 脚本不触发；ACCUMULATING_STRUCTURAL_DEBT 改为附注在完成报告"未完成与风险"字段，不中断任务；完成报告新增粒度说明（READ_ONLY 简单问答直接给结论，1-2 文件小改动内联摘要，复杂变更才用完整格式）；Bootstrapper 移除 DURABLE"默认档位"标签，不确定时默认 STANDARD，DURABLE 仅在用户明确提到长期 AI 维护/多人协作/安全关键时使用。
+- 验证方式：对 V0（原版）、V1（仅按已有 ai-context/ 触发）、V2（触发条件版）三个规则版本用 7 个 eval 场景打分，满分 14。V0：7/14；V1：9/14（新增模块、长期项目场景失分，永不自动建立索引）；V2：12/14；V2 + MICRO 豁免（项目源文件 > 1 条件）：14/14。
+- 验证结果：`node scripts/verify-skill-repo.mjs` PASS；SKILL.md 行数在 200 行预算内；4 个 eval 场景验证通过。
+- 未验证风险：未在真实 AI 客户端进行端到端前向测试；"源文件总数 > 1"的判断依赖 AI 自行估计，边界情况（恰好1个文件的项目）行为未覆盖。
+
 以后每次修复或规则缺陷都追加一条，不覆盖历史：
 
 ```markdown
