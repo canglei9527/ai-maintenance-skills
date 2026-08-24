@@ -1,5 +1,15 @@
 # Bug 历史
 
+## 2026-08-24：修正“最小改动”误用并发布 v0.4.6
+
+- 现象：用户明确指出小说精校工具“界面不够现代化”后，实施结果只增加切换动画和更换主题颜色，布局、信息架构、空间利用和交互流程基本没有变化，且新配色破坏了原有简洁感。
+- 根因：`NORMAL_CHANGE` 的“做最小兼容修改”表述没有把 Bug 修复/配置调整与设计改进/体验优化分开，容易让 AI 把“现代化界面”误判为普通小改动，用表层装饰代替真正的布局和交互设计。
+- 修改文件：`skills/ai-project-maintainer/references/fast-path.md`、`README.md`、`CHANGELOG.md`、`docs/releases/v0.4.6.md`、发布脚本相关文件。
+- 修改方式：保留 Bug 修复和配置调整的最小改动约束；新增设计改进例外，允许在保持数据格式、API 契约和核心功能行为兼容的前提下重设计 UI 布局、信息层级、空间利用、状态可见性和组件结构；明确仅换颜色或加动画不能作为现代化完成证据；发布脚本同步纳入 README、BUG_HISTORY 和逐版本发布说明。
+- 验证命令：`node --test scripts/tests/skill-frontmatter.test.mjs scripts/tests/release.test.mjs`、`node scripts/verify-skill-repo.mjs`、`git diff --check`。
+- 验证结果：10/10 Node 测试通过；`node scripts/verify-skill-repo.mjs` 通过；`git diff --check` 通过；v0.4.6 发布后还需核对远程标签、Release 正文和文档链接。
+- 未验证风险：UI 现代化本身仍需在具体应用中按主要工作流进行截图或人工交互评估；本版本只修正 Skill 的任务路由和验收边界。
+
 ## 2026-08-24：补齐 v0.4.5 版本历史和中文发布说明
 
 - 现象：GitHub 的 `v0.4.5` Release 已创建，但 README 的“版本历史”仍停在 `v0.4.3`；`CHANGELOG.md` 的 `0.4.5` 条目只有三条英文摘要，仓库没有对应的 `docs/releases/v0.4.5.md`。

@@ -4,6 +4,17 @@ import { DEFAULT_RETRIES, DEFAULT_RETRY_DELAY_MS, RELEASE_FILES } from './releas
 
 const execFile = promisify(execFileCallback);
 const RELEASE_FILES_SET = new Set(Object.values(RELEASE_FILES));
+const RELEASE_DOCUMENT_PATTERN = /^docs\/releases\/v\d+\.\d+\.\d+\.md$/;
+
+function isReleaseFile(file) {
+  const normalized = file.replaceAll('\\', '/');
+  return RELEASE_FILES_SET.has(normalized)
+    || normalized === 'README.md'
+    || normalized === 'BUG_HISTORY.md'
+    || normalized === 'scripts/release-git.mjs'
+    || normalized === 'scripts/release.mjs'
+    || RELEASE_DOCUMENT_PATTERN.test(normalized);
+}
 
 export function createRunner(cwd) {
   return async (command, args, options = {}) => {
@@ -64,7 +75,7 @@ export async function inspectGit(runner, { branch, remote, tag, checkRemote = tr
   const [behind = '0', ahead = '0'] = aheadBehind.split(/\s+/);
   return {
     clean: status === '',
-    changedFiles: status.split(/\r?\n/).filter(Boolean).map((line) => line.slice(3).trim()),
+    changedFiles: status.split(/\r?\n/).filter(Boolean).map((line) => line.slice(2).trim()),
     branch: currentBranch,
     expectedBranch: branch,
     remoteUrl,
@@ -77,7 +88,7 @@ export async function inspectGit(runner, { branch, remote, tag, checkRemote = tr
 }
 
 export function assertGitPreflight(state, { resume = false }) {
-  if (!state.clean && !(resume && state.changedFiles?.every((file) => RELEASE_FILES_SET.has(file)))) {
+  if (!state.clean && !(resume && state.changedFiles?.every(isReleaseFile))) {
     throw new Error('Working tree contains unexpected changes; commit or stash them before release');
   }
   if (state.branch !== state.expectedBranch) throw new Error(`Release must run on ${state.expectedBranch}, not ${state.branch}`);
@@ -98,8 +109,16 @@ export async function createAndPushTag(runner, remote, tag, message, retryOption
   await retry(async () => runChecked(runner, 'git', ['push', remote, tag]), retryOptions);
 }
 
-export async function commitRelease(runner, message) {
-  await runChecked(runner, 'git', ['add', '.claude-plugin', '.codex-plugin', 'scripts/verify-skill-repo.mjs', 'CHANGELOG.md']);
+export async function commitRelease(runner, message, version) {
+  const files = [
+    ...Object.values(RELEASE_FILES),
+    'README.md',
+    'BUG_HISTORY.md',
+    'scripts/release-git.mjs',
+    'scripts/release.mjs',
+    `docs/releases/v${version}.md`
+  ];
+  await runChecked(runner, 'git', ['add', ...files]);
   const staged = await runChecked(runner, 'git', ['diff', '--cached', '--name-only']);
   if (staged === '') return false;
   await runChecked(runner, 'git', ['commit', '-m', message]);

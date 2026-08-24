@@ -148,7 +148,7 @@ async function main() {
       console.log('Release cancelled; metadata changes were restored.');
       return;
     }
-    await commitRelease(runner, `release: publish v${options.version}`);
+    await commitRelease(runner, `release: publish v${options.version}`, options.version);
     await pushBranch(runner, options.remote, options.branch, options);
     await createAndPushTag(runner, options.remote, tag, `Release v${options.version}: ${options.title}`, options);
     const noteFile = await writeReleaseNotes(notes);
