@@ -1,5 +1,11 @@
 # 变更记录
 
+## 0.4.5 - 2026-08-24
+
+- Add byte-level read, command, and cumulative output budgets to ai-project-maintainer.
+- Bound large diff, remote response, and binary/compressed file handling.
+- Preserve focused navigation while preventing context growth from repeated small operations.
+
 ## 0.4.3 - 2026-08-13
 
 **基础设施**

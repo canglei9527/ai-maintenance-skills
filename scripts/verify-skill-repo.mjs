@@ -4,7 +4,7 @@ import { fileURLToPath } from 'node:url';
 import { parseSkillDocument } from './skill-frontmatter.mjs';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
-const releaseVersion = '0.4.4';
+const releaseVersion = '0.4.5';
 const failures = [];
 const check = (condition, message) => {
   if (!condition) failures.push(message);
