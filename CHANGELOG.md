@@ -26,6 +26,21 @@
 - `node scripts/verify-skill-repo.mjs`：仓库验证通过。
 - `git diff --check`：通过。
 
+## 0.4.4 - 2026-08-16
+
+### 维护行为修正
+
+- 索引维护改为触发条件制：只有新增文件、目录、公共入口或稳定任务路由，且项目源文件总数大于 1，或完成 `STRUCTURAL_CHANGE` 时，才更新或新建 `ai-context/INDEX.md`。
+- `READ_ONLY`、单文件 Bug 修复、仅改实现细节和 `MICRO` 单文件脚本不再因为默认维护等级而强制创建索引。
+- 完成报告按任务规模分级：简单单文件问答直接给结论，1–2 文件的小改动使用简短摘要，复杂变更才使用完整结构化格式。
+- `ACCUMULATING_STRUCTURAL_DEBT` 改为完成报告“未完成与风险”中的非阻断附注，不再无故中断聚焦修复流程。
+- `ai-project-bootstrapper` 的不确定默认档位从 `DURABLE` 调整为 `STANDARD`；只有长期 AI 维护、多人协作、多入口或高风险约束才使用 `DURABLE`。
+
+### 影响范围
+
+- 修改 `ai-project-maintainer` 和 `ai-project-bootstrapper` 的路由、索引维护和完成报告规则。
+- 保留结构变更的授权门和验证要求；本版本只是减少不必要的文档生成和过长报告，不降低结构变更的证据标准。
+
 ## 0.4.3 - 2026-08-13
 
 **基础设施**
