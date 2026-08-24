@@ -39,6 +39,7 @@ description: "Explain, diagnose, review, fix, extend, or restructure an existing
 - 保留用户未提交的改动；不得重置、回退、覆盖、自动创建分支或全项目备份，也不得在未明确授权时安装/升级依赖。
 - 完成声明必须区分 `PASS`、`FAIL`、`NOT_RUN`、`NOT_AVAILABLE`、`BLOCKED_BY_EXISTING_FAILURE` 并附证据。
 - **按触发条件维护导航**：以下条件之一满足时，在任务末尾更新或新建 `ai-context/INDEX.md`（不中断任务主体）：(1) 本次任务新增了文件、目录、公共入口或稳定任务路由，且任务后项目源文件总数 > 1；(2) 完成了 `STRUCTURAL_CHANGE`。其余情况（`READ_ONLY`、单文件 bug 修复、仅改实现细节、MICRO 单文件脚本）不操作索引。发现明确结构债务信号时，在完成报告"未完成与风险"字段中简要附注，不中断当前任务。
+- **输出预算门**：单次读取默认不超过 150 行 / 15 KB，单次命令输出不超过 8 KB，累计工具输出达到约 40 KB 时先总结再继续。大型/脏仓库优先使用 `git diff --stat`，避免无边界的完整 diff。详见 `references/fast-path.md` 输出预算章节。
 
 ## 简短工作流
 
