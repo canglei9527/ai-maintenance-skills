@@ -1,5 +1,16 @@
 # Bug 历史
 
+## 2026-08-24：补齐 v0.4.5 版本历史和中文发布说明
+
+- 现象：GitHub 的 `v0.4.5` Release 已创建，但 README 的“版本历史”仍停在 `v0.4.3`；`CHANGELOG.md` 的 `0.4.5` 条目只有三条英文摘要，仓库没有对应的 `docs/releases/v0.4.5.md`。
+- 根因：发布流程只更新了插件版本元数据、验证器和 CHANGELOG 顶部条目，没有把 README 版本历史和逐版本发布介绍纳入发布文件；发布 notes 也使用了临时英文摘要，没有复用中文变更说明。
+- 修改文件：`README.md`、`CHANGELOG.md`、`docs/releases/v0.4.5.md`、`BUG_HISTORY.md`。
+- 修改方式：补充 `v0.4.4` 和 `v0.4.5` 的中文版本历史；将 `0.4.5` CHANGELOG 改为背景、变更、边界和验证四部分；新增完整发布介绍；同步修改 GitHub Release 标题和正文。
+- 验证命令：`node --test scripts/tests/skill-frontmatter.test.mjs scripts/tests/release.test.mjs`、`node scripts/verify-skill-repo.mjs`、`git diff --check`。
+- 验证结果：文档结构和仓库验证通过；版本历史包含 `v0.4.5`、`v0.4.4`、`v0.4.3`；Release 正文改为中文并与代码变更一致。
+- 未验证风险：GitHub 页面可能因缓存暂时显示旧正文，需刷新 Release 页面确认；本次不改变 Skill 运行时规则。
+
+
 ## 初始记录
 
 - 创建日期：2026-08-02

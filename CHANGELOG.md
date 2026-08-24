@@ -2,9 +2,29 @@
 
 ## 0.4.5 - 2026-08-24
 
-- Add byte-level read, command, and cumulative output budgets to ai-project-maintainer.
-- Bound large diff, remote response, and binary/compressed file handling.
-- Preserve focused navigation while preventing context growth from repeated small operations.
+### 背景
+
+- 维护任务可能只读取若干小文件，却因为重复的命令输出、差异内容和远程响应持续累积，最终耗尽 AI 上下文。
+- 原有规则限制了搜索命中数、候选文件数和依赖跳数，但没有限制单次输出大小，也没有累计预算。
+
+### 变更
+
+- 在 `ai-project-maintainer/SKILL.md` 增加输出预算门：单次读取默认不超过 150 行 / 15 KB，单次命令输出默认不超过 8 KB，累计工具输出达到约 40 KB 时先总结再继续。
+- 在 `references/fast-path.md` 增加具体的读取、命令、累计输出、差异、远程响应以及二进制/压缩文件处理规则。
+- 大型或脏仓库优先使用 `git diff --stat` / `git diff --shortstat`，避免把完整工作树差异一次性载入上下文。
+- 远程 HTML/JSON 只保留有限的已解压文本片段；`.gz`、`.zip`、图片、PDF 等文件不得直接作为文本读取。
+
+### 兼容性与边界
+
+- 保留原有 50 个搜索命中、12 个候选文件和一跳依赖限制。
+- 预算达到后要求先总结和判断证据是否足够，不会把普通维护任务自动升级为全量扫描。
+- 这些规则约束 AI 的读取方式，不改变项目源代码、运行时 API 或公开安装入口。
+
+### 验证
+
+- `node --test scripts/tests/skill-frontmatter.test.mjs scripts/tests/release.test.mjs`：10/10 通过。
+- `node scripts/verify-skill-repo.mjs`：仓库验证通过。
+- `git diff --check`：通过。
 
 ## 0.4.3 - 2026-08-13
 
