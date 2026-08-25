@@ -1,5 +1,19 @@
 # 变更记录
 
+## 0.4.7 - 2026-08-25
+
+### 需求澄清门
+
+- 新建项目和新增功能前提供“开始需求问卷 / 跳过问卷 / 完全不问，直接执行”三选一。
+- 问卷按信息缺口逐题提问并说明原因，完成后总结目标、范围、约束、验收标准和暂不处理项。
+- 明确需求门与 IDE 计划模式的边界，并支持工作区内直接执行和验证。
+
+### 验证
+
+- `node --test scripts/tests/skill-frontmatter.test.mjs scripts/tests/release.test.mjs`：10/10 通过。
+- `node scripts/verify-skill-repo.mjs`：仓库验证通过。
+- `git diff --check`：通过。
+
 ## 0.4.6 - 2026-08-24
 
 ### 背景
