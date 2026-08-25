@@ -35,11 +35,13 @@ const required = [
   'skills/ai-project-maintainer/references/fast-path.md',
   'skills/ai-project-maintainer/references/structural-change.md',
   'skills/ai-project-maintainer/references/verification-and-safety.md',
+  'skills/ai-project-maintainer/references/requirements-dialogue.md',
   'skills/ai-project-maintainer/references/v2-migration-notes.md',
   'skills/ai-project-bootstrapper/SKILL.md',
   'skills/ai-project-bootstrapper/references/workflow.md',
   'skills/ai-project-bootstrapper/references/navigation-and-budgets.md',
   'skills/ai-project-bootstrapper/references/verification-and-exceptions.md',
+  'skills/ai-project-bootstrapper/references/requirements-dialogue.md',
   'scripts/skill-frontmatter.mjs',
   'scripts/tests/skill-frontmatter.test.mjs',
   'scripts/release.mjs',
@@ -119,14 +121,17 @@ const bootstrapper = skillDocuments.get('ai-project-bootstrapper')?.text ?? '';
 const fastPath = readFileSync(join(root, 'skills', 'ai-project-maintainer', 'references', 'fast-path.md'), 'utf8');
 const structuralChange = readFileSync(join(root, 'skills', 'ai-project-maintainer', 'references', 'structural-change.md'), 'utf8');
 const maintainerSafety = readFileSync(join(root, 'skills', 'ai-project-maintainer', 'references', 'verification-and-safety.md'), 'utf8');
+const maintainerRequirements = readFileSync(join(root, 'skills', 'ai-project-maintainer', 'references', 'requirements-dialogue.md'), 'utf8');
 const bootstrapWorkflow = readFileSync(join(root, 'skills', 'ai-project-bootstrapper', 'references', 'workflow.md'), 'utf8');
 const navigation = readFileSync(join(root, 'skills', 'ai-project-bootstrapper', 'references', 'navigation-and-budgets.md'), 'utf8');
 const bootstrapExceptions = readFileSync(join(root, 'skills', 'ai-project-bootstrapper', 'references', 'verification-and-exceptions.md'), 'utf8');
+const bootstrapRequirements = readFileSync(join(root, 'skills', 'ai-project-bootstrapper', 'references', 'requirements-dialogue.md'), 'utf8');
 const evals = readFileSync(join(root, 'evals', 'prompts.md'), 'utf8');
 
 check(maintainer.includes('READ_ONLY') && maintainer.includes('NORMAL_CHANGE') && maintainer.includes('STRUCTURAL_CHANGE'), 'maintainer operation paths missing');
 check(maintainer.includes('EXTERNAL_ACTION') && maintainer.includes('does not authorize writing'), 'maintainer authorization boundary missing');
 check(maintainer.includes('fast-path.md') && maintainer.includes('structural-change.md') && maintainer.includes('verification-and-safety.md'), 'maintainer direct reference routing missing');
+check(maintainer.includes('requirements-dialogue.md') && maintainerRequirements.includes('开始需求问卷') && maintainerRequirements.includes('完全不问，直接执行'), 'maintainer requirements dialogue routing missing');
 check(fastPath.includes('50 search hits') && fastPath.includes('12 candidate files') && fastPath.includes('one dependency hop'), 'maintainer search limits missing');
 check(fastPath.includes('A 900-line target does not require a prior refactor'), 'large-file normal-change rule missing');
 check(structuralChange.includes('Migration Table') && structuralChange.includes('old implementation is deleted'), 'structural migration ownership rule missing');
@@ -134,6 +139,7 @@ check(maintainerSafety.includes('Do not choose a license') && maintainerSafety.i
 check(bootstrapper.includes('new or empty project directory') && bootstrapper.includes('existing implementation must be changed'), 'bootstrapper routing/root boundary missing');
 check(bootstrapper.includes('MICRO') && bootstrapper.includes('STANDARD') && bootstrapper.includes('DURABLE'), 'bootstrapper tier routing missing');
 check(bootstrapper.includes('workflow.md') && bootstrapper.includes('navigation-and-budgets.md') && bootstrapper.includes('verification-and-exceptions.md'), 'bootstrapper direct reference routing missing');
+check(bootstrapper.includes('requirements-dialogue.md') && bootstrapRequirements.includes('跳过问卷') && bootstrapRequirements.includes('IDE 的计划模式'), 'bootstrapper requirements dialogue routing missing');
 check(bootstrapWorkflow.includes('Do not create `AGENTS.md`') && bootstrapWorkflow.includes('Keep a requested single-file tool single-file'), 'MICRO workflow guard missing');
 check(navigation.includes('review thresholds') && navigation.includes('Strict budgets are acceptance gates'), 'budget review and strict-gate distinction missing');
 check(bootstrapExceptions.includes('NOT_AVAILABLE'), 'bootstrapper exception and real-time verification rules missing');

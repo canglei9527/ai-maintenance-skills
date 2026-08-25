@@ -1,7 +1,7 @@
 ---
 name: ai-project-bootstrapper
 version: "0.4.3"
-description: "Create a new standalone software project or initialize a new or empty project directory. Use when the user asks to build a new application, service, CLI, worker, daemon, automation tool, or similar independent codebase, even when an output path, specification, or assets are supplied. Do not use for modifying an existing codebase or merely explaining or reviewing an artifact."
+description: "Create a new standalone software project or initialize a new or empty project directory. Use when the user asks to build a new application, service, CLI, worker, daemon, automation tool, or similar independent codebase, even when an output path, specification, or assets are supplied. Before implementation, offer the optional requirements dialogue with a direct-execution choice. Do not use for modifying an existing codebase or merely explaining or reviewing an artifact."
 ---
 
 # AI 项目初始化器
@@ -17,7 +17,7 @@ description: "Create a new standalone software project or initialize a new or em
 | 现有仓库、monorepo、包、源码、测试、符号、路由、失败或构建行为必须变更 | 维护者 |
 | 解释、审查或诊断现有产物而不请求编辑 | 维护者 `READ_ONLY` |
 
-确认用户需要新实现，确定唯一 `project_root`，创建文件前只检查最小目标元数据。不能从路径推断修改现有代码库的权限。
+确认用户需要新实现后、读取项目源码或创建文件前，读取 [`references/requirements-dialogue.md`](references/requirements-dialogue.md)，先显示 `开始需求问卷`、`跳过问卷` 和 `完全不问，直接执行` 三个选项。不能从路径推断修改现有代码库的权限。
 
 ## 项目档位
 
@@ -34,6 +34,7 @@ description: "Create a new standalone software project or initialize a new or em
 | `MICRO` 新工具 | [`references/workflow.md`](references/workflow.md) `MICRO` 章节 | 持久化导航和审计章节 |
 | `STANDARD` 新项目 | [`references/workflow.md`](references/workflow.md)，然后 [`references/navigation-and-budgets.md`](references/navigation-and-budgets.md) 相关章节 | 无关异常章节 |
 | `DURABLE` 新项目 | [`references/workflow.md`](references/workflow.md)、[`references/navigation-and-budgets.md`](references/navigation-and-budgets.md)、[`references/verification-and-exceptions.md`](references/verification-and-exceptions.md) | 无 |
+| 所有新项目请求 | [`references/requirements-dialogue.md`](references/requirements-dialogue.md) | 不适用于已有项目维护任务 |
 
 每个参考文件从本文件一跳直达，无需中间文件作为前置条件。
 

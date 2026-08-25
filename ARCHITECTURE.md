@@ -14,14 +14,16 @@
 | `.claude-plugin/plugin.json` | Claude 插件元数据、能力和 Skill 路径 |
 | `.codex-plugin/plugin.json` | Codex 插件元数据、能力和 Skill 路径 |
 | `docs/installation.md` | 一条命令、插件、手工后备安装及更新卸载说明 |
-| `skills/ai-project-maintainer/SKILL.md` | 已有项目的 READ_ONLY、NORMAL_CHANGE、STRUCTURAL_CHANGE 和外部动作分流 |
+| `skills/ai-project-maintainer/SKILL.md` | 已有项目的 READ_ONLY、NORMAL_CHANGE、STRUCTURAL_CHANGE、外部动作分流和新增功能需求门 |
 | `skills/ai-project-maintainer/references/fast-path.md` | 只读分析、普通修改、最小读取和大文件 Bug 修复路径 |
 | `skills/ai-project-maintainer/references/structural-change.md` | 已授权结构变更的基线、迁移表、兼容与完成状态 |
 | `skills/ai-project-maintainer/references/verification-and-safety.md` | 授权、秘密、依赖、验证证据和实时项目安全边界 |
-| `skills/ai-project-bootstrapper/SKILL.md` | 新项目分流、MICRO/STANDARD/DURABLE 档位和最短创建闭环 |
+| `skills/ai-project-maintainer/references/requirements-dialogue.md` | 新增功能的三选一需求澄清门、动态问卷、直接执行和 IDE 计划模式边界 |
+| `skills/ai-project-bootstrapper/SKILL.md` | 新项目分流、需求澄清门、MICRO/STANDARD/DURABLE 档位和最短创建闭环 |
 | `skills/ai-project-bootstrapper/references/workflow.md` | 三档新项目的最小工作流和当前记录门槛 |
 | `skills/ai-project-bootstrapper/references/navigation-and-budgets.md` | 导航价值、审查阈值、严格治理门和唯一所有权 |
 | `skills/ai-project-bootstrapper/references/verification-and-exceptions.md` | 验证状态、具名例外和 TMS320/CCS 实时约束 |
+| `skills/ai-project-bootstrapper/references/requirements-dialogue.md` | 新项目的三选一需求澄清门、动态问卷、直接执行和 IDE 计划模式边界 |
 | `examples/minimal-project/` | 与语言无关的项目文档示例，不包含真实业务代码 |
 | `evals/prompts.md` | 触发和行为评估用的真实提示 |
 | `evals/rubric.md` | 评估结果的通过标准和常见失败模式 |
@@ -47,7 +49,10 @@
 用户请求
   -> 任务分流门
        -> 有现有项目证据 -> ai-project-maintainer
+            -> 新增/扩展功能 -> 需求澄清门（三选一） -> READ_ONLY / NORMAL_CHANGE / STRUCTURAL_CHANGE
+            -> 其他维护请求 -> READ_ONLY / NORMAL_CHANGE / STRUCTURAL_CHANGE
        -> 独立程序/服务/路由器/CLI/自动化需求 -> ai-project-bootstrapper
+            -> 需求澄清门（三选一） -> MICRO / STANDARD / DURABLE
        -> 无法判断 -> 只询问一次，不扫描、不创建文件
 
 安装器/插件客户端
@@ -98,13 +103,13 @@ release.mjs
 - 输入：已有项目中的维护请求，以及可选的文件、函数、复现步骤、错误和期望行为。
 - 导入场景：先做浅层项目地图并询问是否整理；未获明确同意不移动文件；同意后执行整理前基线、分批迁移和整理后回归验证。
 - 输出：最小代码或文档变更、验证结果、根因说明，以及仅在有导航或历史价值时更新的记录；结构任务还需报告批准范围、职责迁移、旧实现删除和完成状态。
-- 重要约束：不猜测缺失上下文，不宣称未验证的修复，不破坏用户未提交修改；普通大文件 Bug 不因行数被迫重构。
+- 重要约束：不猜测缺失上下文，不宣称未验证的修复，不破坏用户未提交修改；普通大文件 Bug 不因行数被迫重构。新增功能先进入需求澄清门；问卷摘要确认是需求门，不调用或替代 IDE 计划模式。
 
 ### `ai-project-bootstrapper`
 
 - 输入：项目目标、核心功能、技术偏好、运行环境和验收标准。
 - 输出：按 `MICRO`、`STANDARD` 或 `DURABLE` 档位建立的独立项目、最小垂直切片、必要文档/记录、测试和启动/验证说明。
-- 重要约束：先选择或创建独立项目根目录；源码、测试、配置、文档和资产都放在该目录内，不散落到父级工作区；不为 MICRO 自动生成完整治理树。
+- 重要约束：先选择或创建独立项目根目录；源码、测试、配置、文档和资产都放在该目录内，不散落到父级工作区；不为 MICRO 自动生成完整治理树。新项目先进入需求澄清门；`完全不问` 允许在当前工作区内直接完成实现和验证，但不主动制造 IDE 计划审批。
 
 ## 后续维护最小上下文
 
