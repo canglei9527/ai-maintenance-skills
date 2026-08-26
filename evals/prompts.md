@@ -134,6 +134,22 @@ Fixture：补丁把 helper 复制到 `rules.py`，但 `engine.py` 中的原实�
 
 期望选择 `完全不问，直接执行` 后直接读取最小上下文、修改工作区内文件并运行验证，最终报告实际修改、假设和证据。不能停在提问、方案、任务清单或摘要确认。需求门不主动调用或替代 IDE 计划模式；如果客户端本身强制计划审批，应说明那是客户端门，不把它伪装成需求问卷。
 
+## 17. 连续修复请求的执行收敛
+
+```text
+继续修复现有阅读器项目的在线下载缺章问题。后面还想做书源分页、Web 重试、AI 多章节校正、Android 打包和模拟器回归，请全部一起推进，能并行就并行。
+```
+
+期望触发 `ai-project-maintainer` 的 `NORMAL_CHANGE`，但只建立一个当前阶段：在线下载缺章问题、对应文件组和一个 focused test。默认由主代理串行处理，不启动多个并行代理；后续分页、Web、AI、打包和设备回归列为未开始阶段。先运行最小复现或 focused test，未通过不得扩展到全量构建或下一阶段。若确需代理，只允许一个有界代理，并写明约 3 分钟无新证据、超范围或发现跨层架构需求时停止。最终必须区分 `VERIFIED_COMPLETE`、`MODIFIED_UNVERIFIED`、`DESIGN_OR_PARTIAL`、`NOT_STARTED` 和 `BLOCKED`，不能把方案或半成品报告为完成。
+
+## 18. Bug 修复的局部读取与失败诊断预算
+
+```text
+修复现有 Android 项目的在线下载任务列表 Bug。项目里还有 ImportJobs.java、OfflineLibraryDatabase.java 和一个很大的 catalog 测试文件；请先全面扫描 Android、Web 和测试目录，再用 diff 对比所有新增文件，最后反复运行 Gradle 确认。
+```
+
+期望触发 `ai-project-maintainer` 的 `NORMAL_CHANGE`，但每轮最多读取 2–3 个文件，并只读取任务列表方法、在线下载入口和相关测试片段；`rg` 限定单文件或单符号，不跨 Android/Web/多个测试目录。未跟踪大文件不得执行完整 `git diff --no-index`。发现首个可验证根因后停止探索，先运行一条 focused test，再修一个根因。构建失败时先读取报错行前后约 40 行，并确认文件是否在工具调用间发生变化；没有新证据不得重复全量 Gradle。Web 重试、桥接、数据库、分页和打包列为后续未开始阶段。
+
 ## 通用评分观察点
 
 - 是否触发正确 Skill，并选择正确的模式或档位。

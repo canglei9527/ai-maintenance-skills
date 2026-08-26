@@ -1,4 +1,23 @@
-# Bug 历史
+## 2026-08-26：Bug 修复读取和失败诊断范围过宽
+
+- 现象：修复单个在线下载问题时读取多个大文件和完整大型测试，跨 Android/Web/测试目录宽搜，对未跟踪文件重复执行完整 `git diff --no-index`，并在构建失败后缺少局部诊断就重复全量编译。
+- 根因：已有输出预算限制单次行数和累计字节，但没有限制每轮文件数、局部读取范围、搜索边界、未跟踪文件比较方式，以及构建失败后的状态确认顺序。
+- 修改文件：`skills/ai-project-maintainer/SKILL.md`、`skills/ai-project-maintainer/references/fast-path.md`、`evals/prompts.md`、`BUG_HISTORY.md`。
+- 修改方式：增加每轮 2–3 个文件和报错前后约 40 行的局部读取预算；要求 `rg` 限定单文件/单符号；禁止未跟踪大文件完整 `--no-index` 和无变化时重复全量读取；发现首个可验证根因后先 focused test；构建失败先确认报错局部上下文、文件时间和 Git 状态，再决定是否重跑。
+- 验证命令：`node --test scripts/tests/skill-frontmatter.test.mjs scripts/tests/release.test.mjs`、`node scripts/verify-skill-repo.mjs`、`git diff --check`。
+- 验证结果：10/10 Node 测试通过；`node scripts/verify-skill-repo.mjs` 通过（2 个 Skill、40 个必要文件、正文与引用预算通过）；`git diff --check` 通过；新增 eval 场景关键规则检索通过。
+- 未验证风险：读取和搜索预算仍依赖 AI 遵守工具调用边界；需用新增评估提示进行人工 forward-test。
+
+## 2026-08-26：连续修复任务被扩成并行架构任务
+
+- 现象：在线下载、书源分页、Web 重试、AI 多章节后端、Android 打包和设备回归被当作一个 backlog 同时推进，并启动多个共享工作区代理；代理重复扫描、长时间无有效产出，实际验证结果只覆盖少数基础层。
+- 根因：维护 Skill 只有读取输出预算，没有当前阶段、代理并发、运行生命周期和验收闸门；“仅凭证据扩展”没有规定无进展时停止，也没有强制区分已验证实现与设计/半成品。
+- 修改文件：`skills/ai-project-maintainer/SKILL.md`、`skills/ai-project-maintainer/references/fast-path.md`、`evals/prompts.md`、`BUG_HISTORY.md`。
+- 修改方式：增加单一当前目标/文件组/首要验收标准；默认禁止并行代理，共享文件串行；代理约 3 分钟无新证据、超范围、测试夹具/环境问题或发现跨层架构需求时停止；先 focused test 再修改和边界构建；独立子系统分阶段；完成状态区分 `VERIFIED_COMPLETE`、`MODIFIED_UNVERIFIED`、`DESIGN_OR_PARTIAL`、`NOT_STARTED` 和 `BLOCKED`。
+- 验证命令：`node --test scripts/tests/skill-frontmatter.test.mjs scripts/tests/release.test.mjs`、`node scripts/verify-skill-repo.mjs`、`git diff --check`；并检查新增 eval 场景包含并行限制、停止条件、阶段闸门和完成状态。
+- 验证结果：10/10 Node 测试通过；`node scripts/verify-skill-repo.mjs` 通过（2 个 Skill、40 个必要文件、正文与引用预算通过）；`git diff --check` 通过；新增 eval 场景关键规则检索通过。
+- 未验证风险：Skill 的代理停止依赖客户端实际执行能力；需在支持子代理的客户端中用新增评估提示进行人工 forward-test。
+
 
 ## 2026-08-24：修正“最小改动”误用并发布 v0.4.6
 
