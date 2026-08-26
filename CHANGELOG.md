@@ -1,5 +1,19 @@
 # 变更记录
 
+## 0.4.8 - 2026-08-26
+
+- ## 变更
+- 收紧 Bug 修复的单阶段执行边界，要求一个当前目标、文件组和首要验收标准。
+- 默认禁止并行代理；增加无进展、超范围和跨层架构需求的停止条件。
+- 增加每轮 2–3 个文件的局部读取预算，限制 `rg` 范围，禁止对未跟踪大文件执行完整 `git diff --no-index`。
+- 构建失败时先检查报错上下文、文件状态和并发修改，再决定是否重跑。
+- 增加 focused test 阶段闸门和 `VERIFIED_COMPLETE` 等完成状态分类。
+- ## 验证
+- `node --test scripts/tests/skill-frontmatter.test.mjs scripts/tests/release.test.mjs`：10/10 通过。
+- `node scripts/verify-skill-repo.mjs`：通过。
+- `git diff --check`：通过。
+- 新增评估场景关键规则检索通过；真实客户端 forward-test 尚未执行。
+
 ## 0.4.7 - 2026-08-25
 
 ### 需求澄清门
