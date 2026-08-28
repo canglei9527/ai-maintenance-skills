@@ -72,7 +72,7 @@ for (const name of skillNames) {
     const document = parseSkillDocument(text);
     skillDocuments.set(name, { ...document, text });
     check(document.metadata.name === name, `${name}: frontmatter name mismatch`);
-    check(document.metadata.description.length <= 600, `${name}: description exceeds 600 characters`);
+    check(document.metadata.description.length <= 1000, `${name}: description exceeds 1000 characters`);
     check(document.body.length <= 14000, `${name}: SKILL.md body exceeds 14000 characters`);
     check(text.split(/\r?\n/).length <= 200, `${name}: SKILL.md exceeds 200 lines`);
 
@@ -135,6 +135,7 @@ const bootstrapRequirements = readFileSync(join(root, 'skills', 'ai-project-boot
 const evals = readFileSync(join(root, 'evals', 'prompts.md'), 'utf8');
 
 check(maintainerDescription.includes('现有产品行为') && maintainerDescription.includes('期望行为') && maintainerDescription.includes('修复'), 'maintainer natural-language bug trigger coverage missing');
+check(maintainerDescription.includes('刷新后又出现') && maintainerDescription.includes('无需现有项目名或文件路径'), 'maintainer short Chinese bug trigger coverage missing');
 check(maintainer.includes('READ_ONLY') && maintainer.includes('NORMAL_CHANGE') && maintainer.includes('STRUCTURAL_CHANGE'), 'maintainer operation paths missing');
 check(maintainer.includes('EXTERNAL_ACTION') && maintainer.includes('does not authorize writing'), 'maintainer authorization boundary missing');
 check(maintainer.includes('fast-path.md') && maintainer.includes('structural-change.md') && maintainer.includes('verification-and-safety.md'), 'maintainer direct reference routing missing');
@@ -191,7 +192,7 @@ if (failures.length) {
 } else {
   console.log('PASS AI maintenance skills repository verification');
   console.log(`PASS ${skillNames.length} Skills with strict frontmatter and self-contained references`);
-  console.log('PASS runtime context budgets: description <= 600 chars, body <= 14000 chars, SKILL.md <= 200 lines');
+  console.log('PASS runtime context budgets: description <= 1000 chars, body <= 14000 chars, SKILL.md <= 200 lines');
   console.log(`PASS ${required.length} required repository files and plugin version ${releaseVersion}`);
   console.log('PASS references, examples, license, and repository boundaries checked');
 }

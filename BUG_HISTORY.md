@@ -1,3 +1,12 @@
+## 2026-08-27：增强维护 Skill 的中文自动触发
+
+- 现象：用户使用“刷新后取消的下载任务又出来了，修复这个 BUG”等无项目名、无文件路径的中文短句时，`ai-project-maintainer` 自动触发不稳定，容易退化为通用探索。
+- 根因：Skill frontmatter 描述虽然包含 `fix` 和一般行为回归，但缺少高频中文症状词及“无需现有项目名或文件路径”的明确触发边界；仓库验证器也没有对此做回归断言。
+- 修改文件：`skills/ai-project-maintainer/SKILL.md`、`evals/prompts.md`、`scripts/verify-skill-repo.mjs`、`BUG_HISTORY.md`。
+- 修改方式：扩展维护 Skill 的触发描述，覆盖修复、解决、排查、异常、报错、回归、刷新后又出现、取消后仍存在、功能不符合预期和修复这个 BUG；新增无路径中文 Bug/行为差异评估；将描述预算从 600 放宽到 1000 字符，并保持正文预算不变。
+- 验证命令：`node scripts/verify-skill-repo.mjs`、`node --test scripts/tests/index-health.test.mjs scripts/tests/skill-frontmatter.test.mjs scripts/tests/release.test.mjs`、`git diff --check`。
+- 验证结果：触发描述回归断言通过；完整 Node 测试 33/33 通过；Skill 仓库验证通过；空白检查通过。实际客户端自动触发仍需在重启后的新会话中用新增评估提示进行人工 forward-test。
+
 ## 2026-08-27：为人工任务索引增加轻量健康检查
 
 - 现象：`ai-context/INDEX.md` 能表达用户任务、第一入口和聚焦测试，但完全依赖人工维护；文件移动后本地路径可能静默失效，审核时间也不可见。同时，把调用者和影响范围写进 Markdown 会复制易变化的机械代码事实。
