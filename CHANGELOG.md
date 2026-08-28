@@ -1,5 +1,9 @@
 # 变更记录
 
+## 0.4.9 - 2026-08-28
+
+- Add dependency-free index health checker for ai-context/**/INDEX.md with path security validation, SHA prefix matching, review metadata freshness, quoted path parsing, extensionless file support, and directory boundary protection. Includes 23 focused regression tests and full CI integration.
+
 ## 0.4.8 - 2026-08-26
 
 - ## 变更
