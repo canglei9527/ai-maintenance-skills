@@ -7,8 +7,10 @@
 | `release-version.mjs` | Validates SemVer, synchronizes version metadata, and inserts changelog sections. | metadata read/prepare/apply exports | release config, Node fs | Version or changelog changes. |
 | `release-git.mjs` | Inspects Git state and owns commit, push, tag, and retry operations. | Git inspection and mutation exports | release config, Node child process | Git preflight or retry behavior. |
 | `release-github.mjs` | Owns authenticated `gh` release lookup and publication. | GitHub auth/release exports | release Git retry helpers | GitHub Release behavior. |
-| `verify-skill-repo.mjs` | Read-only repository integrity verification. | `node scripts/verify-skill-repo.mjs` | frontmatter parser | Validating repository content. |
+| `verify-skill-repo.mjs` | Read-only repository integrity verification. | `node scripts/verify-skill-repo.mjs` | frontmatter parser, index health | Validating repository content. |
+| `index-health.mjs` | Checks reviewed task indexes for unresolved local routes and stale review metadata without rewriting them. | `node scripts/index-health.mjs <project-root>` | Node fs, path, optional Git metadata | Validating `ai-context/**/INDEX.md`. |
 | `skill-frontmatter.mjs` | Parses the repository's restricted Skill frontmatter. | parser export | none | Changing Skill metadata rules. |
+| `tests/index-health.test.mjs` | Regression tests for index path extraction, review freshness, and legacy compatibility. | Node test suite | index health module | Changing index validation behavior. |
 | `tests/release.test.mjs` | Offline tests for release module behavior. | Node test suite | release version, Git, GitHub modules | Changing release behavior. |
 | `tests/skill-frontmatter.test.mjs` | Regression tests for frontmatter parsing. | Node test suite | frontmatter parser | Changing frontmatter parser. |
 

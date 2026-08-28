@@ -21,10 +21,13 @@
 | `skills/ai-project-maintainer/references/requirements-dialogue.md` | 新增功能的三选一需求澄清门、动态问卷、直接执行和 IDE 计划模式边界 |
 | `skills/ai-project-bootstrapper/SKILL.md` | 新项目分流、需求澄清门、MICRO/STANDARD/DURABLE 档位和最短创建闭环 |
 | `skills/ai-project-bootstrapper/references/workflow.md` | 三档新项目的最小工作流和当前记录门槛 |
-| `skills/ai-project-bootstrapper/references/navigation-and-budgets.md` | 导航价值、审查阈值、严格治理门和唯一所有权 |
+| `skills/ai-project-bootstrapper/references/navigation-and-budgets.md` | 导航价值、索引格式、新鲜度检查、审查阈值、严格治理门和唯一所有权 |
 | `skills/ai-project-bootstrapper/references/verification-and-exceptions.md` | 验证状态、具名例外和 TMS320/CCS 实时约束 |
 | `skills/ai-project-bootstrapper/references/requirements-dialogue.md` | 新项目的三选一需求澄清门、动态问卷、直接执行和 IDE 计划模式边界 |
 | `examples/minimal-project/` | 与语言无关的项目文档示例，不包含真实业务代码 |
+| `examples/minimal-project/ai-context/INDEX.md` | 最小项目的审核后任务导航示例 |
+| `scripts/index-health.mjs` | 只读检查索引本地引用、审核提交/日期新鲜度和未解析路由 |
+| `scripts/tests/index-health.test.mjs` | 索引健康检查的路径提取、真实路径边界、提交兼容、CLI 退出状态和旧索引兼容回归测试 |
 | `evals/prompts.md` | 触发和行为评估用的真实提示 |
 | `evals/rubric.md` | 评估结果的通过标准和常见失败模式 |
 | `scripts/verify-skill-repo.mjs` | 检查文件、frontmatter、引用和仓库边界 |

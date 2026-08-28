@@ -1,7 +1,7 @@
 ---
 name: ai-project-maintainer
 version: "0.4.3"
-description: "Explain, diagnose, review, fix, extend, or restructure an existing software project when the request concerns existing source, tests, build configuration, symbols, routes, failures, repository behavior, accumulating patches, oversized modules, God Classes, or maintainability. Select a read-only, normal-change, or structural-change path, and use the optional requirements dialogue before adding a new feature. Do not infer write authorization merely from a path or attachment."
+description: "Use when a request asks to explain, diagnose, review, fix, extend, or restructure an existing software project, including regressions described as current behavior versus expected behavior, 修复现有产品行为与期望行为的差异（例如功能执行了错误动作）, source, tests, build configuration, symbols, routes, failures, repository behavior, accumulating patches, oversized modules, God Classes, or maintainability. Do not infer write authorization merely from a path or attachment."
 ---
 
 # AI 项目维护者

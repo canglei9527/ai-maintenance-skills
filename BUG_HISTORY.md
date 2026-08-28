@@ -1,3 +1,22 @@
+## 2026-08-27：为人工任务索引增加轻量健康检查
+
+- 现象：`ai-context/INDEX.md` 能表达用户任务、第一入口和聚焦测试，但完全依赖人工维护；文件移动后本地路径可能静默失效，审核时间也不可见。同时，把调用者和影响范围写进 Markdown 会复制易变化的机械代码事实。
+- 根因：原索引契约没有区分”审核后的维护意图”和”动态代码关系”，也没有入口存在性、审核提交/日期或兼容状态检查。
+- 修改文件：`scripts/index-health.mjs`、`scripts/tests/index-health.test.mjs`、示例索引、maintainer/bootstrapper 导航参考、仓库/发布验证、架构、README、评估和本记录。
+- 修改方式：增加无依赖只读检查器，解析 `ai-context/**/INDEX.md` 表格中反引号包裹的本地路径；缺失、绝对、词法越界或经符号链接/目录联接逃逸项目根的路径报告 `UNRESOLVED` 并返回失败。审核提交支持合法的完整或缩写 SHA 前缀（大小写不敏感），提交变化、非法 SHA 或日期超过 90 天报告 `STALE_REVIEW` 但不阻塞；没有元数据的旧索引保持兼容。Markdown 保留任务意图、边界和权威测试命令，调用关系与影响范围交给源码工具或可选代码图工具。命令解析支持单双引号包裹的带空格路径；常见无扩展名项目文件（Dockerfile、Makefile 等）纳入路径识别白名单；`ai-context` 目录自身的真实路径边界也受验证，越界时拒绝递归和读取。
+- 验证命令：`node --test scripts/tests/index-health.test.mjs scripts/tests/skill-frontmatter.test.mjs scripts/tests/release.test.mjs`、`node scripts/verify-skill-repo.mjs`、`node scripts/index-health.mjs .`、`node scripts/index-health.mjs examples/minimal-project`、`git diff --check`。
+- 验证结果：聚焦索引测试 23/23 通过，覆盖 POSIX/Windows 绝对路径、同前缀兄弟目录、符号链接/目录联接逃逸、完整/缩写/非法 SHA（含大小写兼容）、带空格路径的单引号/双引号解析、无扩展名项目文件、`ai-context` 目录越界保护、旧索引兼容和 CLI 退出码；集成 Node 测试 33/33 通过；GitHub Actions 已运行同一测试集合；仓库验证通过；仓库根索引和最小项目索引均为 `VALID`，本地引用全部存在。
+- 未验证风险：命令解析限于单双引号和空格分隔；不支持 shell 变量展开、转义序列或嵌套引号；复杂命令语法建议使用独立反引号单元或项目自有验证器。
+
+
+- 现象：用户只描述“加入书架后应在线观看、却变成下载”并要求修复时，客户端先触发了通用的 `superpowers:using-superpowers`，没有继续选择 `ai-project-maintainer`。
+- 根因：`ai-project-maintainer` 的 frontmatter 描述只覆盖源码、测试、路由、失败等技术证据；没有明确覆盖“当前产品行为与期望行为的差异 + 修复请求”这一常见的现有项目 Bug 表达。已有评估也都提供了路径或“现有项目”措辞，未覆盖无路径的中文自然语言回归。
+- 修改文件：`skills/ai-project-maintainer/SKILL.md`、`evals/prompts.md`、`scripts/verify-skill-repo.mjs`、`BUG_HISTORY.md`。
+- 修改方式：在维护 Skill 描述中加入中文/英文的修复与行为回归触发词；新增书架在线阅读回归评估，明确应选择 `NORMAL_CHANGE`，不能停留在通用元 Skill；验证器增加触发描述静态回归断言。
+- 验证命令：`node scripts/verify-skill-repo.mjs`、`node --test scripts/tests/skill-frontmatter.test.mjs scripts/tests/release.test.mjs`、`git diff --check`。
+- 验证结果：仓库验证通过；人工复核触发边界：`using-superpowers` 属于启动级通用 Skill，不应替代具体维护 Skill，新增描述覆盖无路径的行为回归请求。
+- 未验证风险：静态仓库检查不能模拟具体客户端的竞争触发排序；仍需在安装了该版本 Skill 的真实客户端中用新增评估提示做 forward-test。
+
 ## 2026-08-26：Bug 修复读取和失败诊断范围过宽
 
 - 现象：修复单个在线下载问题时读取多个大文件和完整大型测试，跨 Android/Web/测试目录宽搜，对未跟踪文件重复执行完整 `git diff --no-index`，并在构建失败后缺少局部诊断就重复全量编译。

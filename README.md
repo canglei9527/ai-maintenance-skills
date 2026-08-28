@@ -302,10 +302,12 @@ release.bat
 本仓库无 npm 运行时依赖，直接运行：
 
 ```bash
-node --test scripts/tests/skill-frontmatter.test.mjs scripts/tests/release.test.mjs
+node --test scripts/tests/index-health.test.mjs scripts/tests/skill-frontmatter.test.mjs scripts/tests/release.test.mjs
 node scripts/verify-skill-repo.mjs
 git diff --check
 ```
+
+DURABLE 项目可以复制 `scripts/index-health.mjs`，或从本仓库运行 `node scripts/index-health.mjs <project-root>`，只读检查 `ai-context/**/INDEX.md`。`UNRESOLVED` 表示表格中的本地入口或测试路径不存在并返回失败；`STALE_REVIEW` 表示可选的审核提交已变化或审核日期超过 90 天，只提示复核，不自动重写索引。没有元数据的旧索引继续有效。动态的调用者、被调用者、继承和影响范围仍交给 `rg`、语言服务器、编译器或可选代码图工具。
 
 `evals/` 目录提供 V2 路由与行为评估提示，覆盖所有档位和操作路径。静态脚本无法替代在真实 AI 客户端中的触发评估，因此发布说明会区分自动验证和人工评估。
 
@@ -443,7 +445,7 @@ npx skills add https://github.com/canglei9527/ai-maintenance-skills
 
 **Verify:**
 ```bash
-node --test scripts/tests/skill-frontmatter.test.mjs scripts/tests/release.test.mjs
+node --test scripts/tests/index-health.test.mjs scripts/tests/skill-frontmatter.test.mjs scripts/tests/release.test.mjs
 node scripts/verify-skill-repo.mjs
 ```
 

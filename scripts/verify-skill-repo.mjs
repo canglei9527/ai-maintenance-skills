@@ -2,6 +2,7 @@ import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
 import { dirname, join, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { parseSkillDocument } from './skill-frontmatter.mjs';
+import { inspectIndex } from './index-health.mjs';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const releaseVersion = '0.4.8';
@@ -15,6 +16,7 @@ const required = [
   'AGENTS.md',
   'ARCHITECTURE.md',
   'BUG_HISTORY.md',
+  'ai-context/INDEX.md',
   'AI修Bug提问模板.md',
   'CONTRIBUTING.md',
   'CHANGELOG.md',
@@ -31,6 +33,7 @@ const required = [
   'examples/minimal-project/ARCHITECTURE.md',
   'examples/minimal-project/BUG_HISTORY.md',
   'examples/minimal-project/AI修Bug提问模板.md',
+  'examples/minimal-project/ai-context/INDEX.md',
   'skills/ai-project-maintainer/SKILL.md',
   'skills/ai-project-maintainer/references/fast-path.md',
   'skills/ai-project-maintainer/references/structural-change.md',
@@ -43,6 +46,8 @@ const required = [
   'skills/ai-project-bootstrapper/references/verification-and-exceptions.md',
   'skills/ai-project-bootstrapper/references/requirements-dialogue.md',
   'scripts/skill-frontmatter.mjs',
+  'scripts/index-health.mjs',
+  'scripts/tests/index-health.test.mjs',
   'scripts/tests/skill-frontmatter.test.mjs',
   'scripts/release.mjs',
   'scripts/release-config.mjs',
@@ -117,6 +122,7 @@ check(installation.includes('--skill ai-project-maintainer'), 'single-skill inst
 check(installation.includes('npx skills add . --list'), 'local discovery verification missing');
 
 const maintainer = skillDocuments.get('ai-project-maintainer')?.text ?? '';
+const maintainerDescription = skillDocuments.get('ai-project-maintainer')?.metadata.description ?? '';
 const bootstrapper = skillDocuments.get('ai-project-bootstrapper')?.text ?? '';
 const fastPath = readFileSync(join(root, 'skills', 'ai-project-maintainer', 'references', 'fast-path.md'), 'utf8');
 const structuralChange = readFileSync(join(root, 'skills', 'ai-project-maintainer', 'references', 'structural-change.md'), 'utf8');
@@ -128,6 +134,7 @@ const bootstrapExceptions = readFileSync(join(root, 'skills', 'ai-project-bootst
 const bootstrapRequirements = readFileSync(join(root, 'skills', 'ai-project-bootstrapper', 'references', 'requirements-dialogue.md'), 'utf8');
 const evals = readFileSync(join(root, 'evals', 'prompts.md'), 'utf8');
 
+check(maintainerDescription.includes('现有产品行为') && maintainerDescription.includes('期望行为') && maintainerDescription.includes('修复'), 'maintainer natural-language bug trigger coverage missing');
 check(maintainer.includes('READ_ONLY') && maintainer.includes('NORMAL_CHANGE') && maintainer.includes('STRUCTURAL_CHANGE'), 'maintainer operation paths missing');
 check(maintainer.includes('EXTERNAL_ACTION') && maintainer.includes('does not authorize writing'), 'maintainer authorization boundary missing');
 check(maintainer.includes('fast-path.md') && maintainer.includes('structural-change.md') && maintainer.includes('verification-and-safety.md'), 'maintainer direct reference routing missing');
@@ -144,6 +151,20 @@ check(bootstrapWorkflow.includes('Do not create `AGENTS.md`') && bootstrapWorkfl
 check(navigation.includes('review thresholds') && navigation.includes('Strict budgets are acceptance gates'), 'budget review and strict-gate distinction missing');
 check(bootstrapExceptions.includes('NOT_AVAILABLE'), 'bootstrapper exception and real-time verification rules missing');
 check(evals.includes('独立程序需求的分流') && evals.includes('现有项目证据的维护分流') && evals.includes('意图不明确时只问一次'), 'routing evaluation prompts missing');
+
+const repositoryIndexHealth = inspectIndex(root, {
+  currentDate: new Date('2026-08-27T00:00:00Z')
+});
+check(repositoryIndexHealth.indexes.length === 1, 'repository ai-context index missing');
+check(repositoryIndexHealth.formatVersion === '1', 'repository ai-context format metadata missing');
+check(!repositoryIndexHealth.statuses.includes('UNRESOLVED'), `repository index has unresolved routes: ${repositoryIndexHealth.unresolved.join(', ')}`);
+
+const exampleIndexHealth = inspectIndex(join(root, 'examples', 'minimal-project'), {
+  currentDate: new Date('2026-08-27T00:00:00Z')
+});
+check(exampleIndexHealth.indexes.length === 1, 'minimal project ai-context index missing');
+check(exampleIndexHealth.formatVersion === '1', 'minimal project ai-context format metadata missing');
+check(!exampleIndexHealth.statuses.includes('UNRESOLVED'), `minimal project index has unresolved routes: ${exampleIndexHealth.unresolved.join(', ')}`);
 
 const forbiddenDirectories = new Set(['.zcode', 'node_modules', 'dist', 'build']);
 const walk = (directory) => {
