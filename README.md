@@ -315,6 +315,16 @@ DURABLE 项目可以复制 `scripts/index-health.mjs`，或从本仓库运行 `n
 
 ## 版本历史
 
+### v0.4.12 — 2026-08-29
+
+**增强新项目自动触发与 Skill 触发确认**
+- `ai-project-bootstrapper` 新增中文创建信号：创建、新建、开发、搭建、从零开始、独立项目，以及新应用、网站、服务、接口、CLI、脚本、机器人和自动化工具等表达。
+- 新增英文创建信号：`create`、`build`、`scaffold`、`initialize`、`new project`、`from scratch` 和 `standalone` 项目表达。
+- 即使没有项目名或文件路径，只要目标实现不存在且属于独立项目，也可自动路由到 bootstrapper。
+- 已有源码、修改现有功能、修复 Bug、重构现有项目或解释/审查现有产物，继续路由到 `ai-project-maintainer`，不会误初始化新项目。
+- 两个 Skill 都增加首次工作更新的触发确认：实际加载后必须说明已触发的 Skill，并标明 bootstrapper 档位或 maintainer gate；普通回答、工具和代理不得伪称 Skill 已触发。
+- 新增中英文自然语言触发、已有项目反向排除和触发确认评估，并由仓库验证器锁定关键契约。
+
 ### v0.4.11 — 2026-08-29
 
 **增加 Bug 调查停止门和最小修改契约**
