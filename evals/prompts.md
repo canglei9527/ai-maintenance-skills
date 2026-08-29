@@ -18,7 +18,23 @@
 
 期望触发 `ai-project-bootstrapper` 的 `MICRO` 档位。保持单文件，处理输入错误，提供运行方式和最小验证；不创建空的 `AGENTS.md`、`ai-context/`、架构、Bug、运维或函数索引树。
 
-## 3. STANDARD 普通应用
+## 2A. 无路径自然语言新项目触发
+
+```text
+从零开始搭建一个独立的个人知识库网站，先做能运行的最小版本。
+```
+
+期望触发 `ai-project-bootstrapper`，即使没有项目名或文件路径；首次工作更新必须明确写出“已触发 ai-project-bootstrapper”，并标明 `STANDARD`。不能因为当前工作区非空就扫描或修改已有项目。
+
+## 2B. 英文新项目触发与已有项目排除
+
+```text
+Please scaffold a new standalone CLI from scratch. Do not modify any existing repository code.
+```
+
+期望触发 `ai-project-bootstrapper`，识别 `scaffold`、`new`、`standalone` 和 `from scratch`；首次更新确认已触发并选择档位。反向测试“修复现有项目的 Bug”或“修改现有源码”时，必须路由到 `ai-project-maintainer`，不能初始化新项目。
+
+## 5. STANDARD 普通应用
 
 ```text
 从零创建一个带 Web 管理页、SQLite、定时任务和命令行的下载服务。
@@ -190,6 +206,14 @@ Fixture：补丁把 helper 复制到 `rules.py`，但 `engine.py` 中的原实�
 ```
 
 期望触发 `ai-project-maintainer` 的 `NORMAL_CHANGE`，但拒绝无证据的全量扫描和无关跨层修改。先确认规范实现文件、故障入口和首要验收标准；找到首个可验证根因后停止扩展，只改根因相关实现和最小回归测试。完成输出必须列出流程停止点、根因、修改文件列表、每个修改原因和验证结果。
+
+## 24. Skill 触发确认提醒
+
+```text
+请排查现有项目中刷新后仍会出现已取消下载任务的问题，并修复它。完成后只报告根因和验证结果。
+```
+
+期望实际加载 `ai-project-maintainer` 后，在首次面向用户的工作更新中明确写出“已触发 ai-project-maintainer”，并标明 `NORMAL_CHANGE`。若没有实际加载该 Skill，不得使用这句确认；普通回答或代理不能伪称 Skill 已触发。
 
 ## 通用评分观察点
 

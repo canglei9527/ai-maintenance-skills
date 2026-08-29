@@ -55,6 +55,8 @@ description: "Use when the user asks to explain, diagnose, review, fix, extend, 
 
 ## 简短工作流
 
+**触发确认契约**：本 Skill 被实际加载后，必须在首次面向用户的工作更新中明确写出“已触发 ai-project-maintainer”，并同时标明当前路径：`READ_ONLY`、`NORMAL_CHANGE`、`STRUCTURAL_CHANGE` 或 `EXTERNAL_ACTION` gate。只有实际加载本 Skill 后才能使用该确认语句；普通回答、通用工具或代理工作不得伪称 Skill 已触发。
+
 1. 从用户意图判断路径；写入范围不明确时保持只读并询问最小澄清。
 2. 从请求确认根目录和锚点，读取适用的项目规则和浅层元数据，保留脏工作树。
 3. 读取目标、按需读取一个项目自有依赖/调用方、相关配置，以及最小测试或复现。仅凭证据扩展。

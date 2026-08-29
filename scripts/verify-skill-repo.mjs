@@ -142,11 +142,19 @@ check(maintainer.includes('fast-path.md') && maintainer.includes('structural-cha
 check(maintainer.includes('requirements-dialogue.md') && maintainerRequirements.includes('开始需求问卷') && maintainerRequirements.includes('完全不问，直接执行'), 'maintainer requirements dialogue routing missing');
 check(fastPath.includes('50 search hits') && fastPath.includes('12 candidate files') && fastPath.includes('one dependency hop'), 'maintainer search limits missing');
 check(maintainer.includes('规范实现文件') && maintainer.includes('流程停止点') && maintainer.includes('修改文件列表') && maintainer.includes('验证结果'), 'maintainer bounded investigation report contract missing');
+check(maintainer.includes('已触发 ai-project-maintainer') &&
+  maintainer.includes('首次面向用户的工作更新') &&
+  maintainer.includes('只有实际加载本 Skill 后才能使用该确认语句'),
+  'maintainer trigger acknowledgement rule missing');
 check(fastPath.includes('首个可验证根因后停止') && fastPath.includes('不做全量调用链扩展') && fastPath.includes('最小兼容修改'), 'maintainer bounded investigation stop gate missing');
 check(fastPath.includes('A 900-line target does not require a prior refactor'), 'large-file normal-change rule missing');
 check(structuralChange.includes('Migration Table') && structuralChange.includes('old implementation is deleted'), 'structural migration ownership rule missing');
 check(maintainerSafety.includes('Do not choose a license') && maintainerSafety.includes('NOT_RUN'), 'maintainer safety and verification status rules missing');
 check(bootstrapper.includes('new or empty project directory') && bootstrapper.includes('existing implementation must be changed'), 'bootstrapper routing/root boundary missing');
+check(bootstrapper.includes('创建') && bootstrapper.includes('从零开始') && bootstrapper.includes('独立项目') && bootstrapper.includes('无需项目名或文件路径'), 'bootstrapper natural-language trigger coverage missing');
+check(bootstrapper.includes('create') && bootstrapper.includes('build') && bootstrapper.includes('scaffold') && bootstrapper.includes('initialize'), 'bootstrapper English trigger coverage missing');
+check(bootstrapper.includes('已有源码') && bootstrapper.includes('修改现有功能') && bootstrapper.includes('修复 Bug') && bootstrapper.includes('转到 `ai-project-maintainer`'), 'bootstrapper existing-project exclusion missing');
+check(bootstrapper.includes('已触发 ai-project-bootstrapper') && bootstrapper.includes('首次面向用户的工作更新'), 'bootstrapper trigger acknowledgement rule missing');
 check(bootstrapper.includes('MICRO') && bootstrapper.includes('STANDARD') && bootstrapper.includes('DURABLE'), 'bootstrapper tier routing missing');
 check(bootstrapper.includes('workflow.md') && bootstrapper.includes('navigation-and-budgets.md') && bootstrapper.includes('verification-and-exceptions.md'), 'bootstrapper direct reference routing missing');
 check(bootstrapper.includes('requirements-dialogue.md') && bootstrapRequirements.includes('跳过问卷') && bootstrapRequirements.includes('IDE 的计划模式'), 'bootstrapper requirements dialogue routing missing');

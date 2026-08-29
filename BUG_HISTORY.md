@@ -1,3 +1,21 @@
+## 2026-08-29：增强新项目 Skill 的自然语言触发
+
+- 现象：`ai-project-bootstrapper` 虽能识别新目录、spec 和常见项目类型，但对没有项目名/路径的中文从零创建请求以及英文 `create`、`build`、`scaffold`、`initialize` 等信号缺少明确覆盖；也没有同等强度的已有项目排除和触发确认评估。
+- 根因：初始化 Skill 的 frontmatter 和正文只描述了场景类别，没有把自然语言触发词、独立项目边界、已有源码维护排除和实际加载后的用户提醒定义为可回归契约。
+- 修改文件：`skills/ai-project-bootstrapper/SKILL.md`、`evals/prompts.md`、`scripts/verify-skill-repo.mjs`、`BUG_HISTORY.md`。
+- 修改方式：扩展 frontmatter 覆盖中文创建/从零/独立项目信号和英文创建动词；正文新增无路径触发、已有源码/修复/重构转维护者的排除规则，以及首次工作更新的“已触发 ai-project-bootstrapper”与 `MICRO`/`STANDARD`/`DURABLE` 档位确认；新增中英文人工评估和静态验证断言。
+- 验证命令：`node scripts/verify-skill-repo.mjs`、`node --test scripts/tests/index-health.test.mjs scripts/tests/skill-frontmatter.test.mjs scripts/tests/release.test.mjs`、`git diff --check`。
+- 验证结果：新增 bootstrapper 触发断言先按 RED 失败，补充规则后转为 GREEN；真实客户端的竞争触发排序仍需使用新增评估提示人工 forward-test。
+
+## 2026-08-29：增加维护 Skill 触发确认提醒
+
+- 现象：用户要求确认维护 Skill 是否触发时，原有规则只约束维护路径和完成报告，没有规定首次工作更新必须明确告知用户；普通回答、工具或代理输出也缺少不可伪称的边界。
+- 根因：`ai-project-maintainer` 缺少独立的触发确认输出契约，静态仓库验证器和人工评估没有检查“实际加载后提醒 + 当前 gate”这组行为。
+- 修改文件：`skills/ai-project-maintainer/SKILL.md`、`evals/prompts.md`、`scripts/verify-skill-repo.mjs`、`BUG_HISTORY.md`。
+- 修改方式：新增触发确认契约，要求实际加载 Skill 后在首次面向用户的工作更新中写出“已触发 ai-project-maintainer”，同时标明 `READ_ONLY`、`NORMAL_CHANGE`、`STRUCTURAL_CHANGE` 或 `EXTERNAL_ACTION` gate；普通回答、通用工具和代理不得伪称 Skill 已触发。新增人工评估提示和静态断言。
+- 验证命令：`node scripts/verify-skill-repo.mjs`、`node --test scripts/tests/index-health.test.mjs scripts/tests/skill-frontmatter.test.mjs scripts/tests/release.test.mjs`、`git diff --check`。
+- 验证结果：验证器新增断言先出现预期 RED，规则补齐后应转为 GREEN；客户端首次更新中的实际触发排序仍需在支持 Skills 的新会话中人工 forward-test。
+
 ## 2026-08-29：增加维护任务调查停止门和最小修改契约
 
 - 现象：修复现有项目 Bug 时，代理可能在根因尚未确认前全量扩展调用链、反复扫描无关模块，并预先修改桥接层、数据库或生成产物；最终报告也可能没有明确流程停止点和规范实现文件。

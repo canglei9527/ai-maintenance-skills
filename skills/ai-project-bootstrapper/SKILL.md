@@ -1,12 +1,25 @@
 ---
 name: ai-project-bootstrapper
 version: "0.4.3"
-description: "Create a new standalone software project or initialize a new or empty project directory. Use when the user asks to build a new application, service, CLI, worker, daemon, automation tool, or similar independent codebase, even when an output path, specification, or assets are supplied. Before implementation, offer the optional requirements dialogue with a direct-execution choice. Do not use for modifying an existing codebase or merely explaining or reviewing an artifact."
+description: "Use when the user asks to create, build, scaffold, initialize, or develop a new standalone software project from scratch, including 创建、新建、开发、搭建、实现一个新应用/网站/服务/接口/CLI/脚本/机器人/自动化工具，或初始化新目录/空目录；即使没有项目名或文件路径，只要目标是独立项目也适用。规格、资产或输出路径可以作为输入。Do not use for modifying existing source, fixing a Bug, refactoring an existing project, or merely explaining/reviewing an artifact; route those to ai-project-maintainer."
 ---
 
 # AI 项目初始化器
 
 创建新独立代码库的第一个可运行切片。路径、规格、图片或其他附件是输入定位，不把未实现目标转化为已有项目。若目标已有源码、测试、构建配置或仓库行为，改为路由到 `ai-project-maintainer`。
+
+## 触发信号
+
+以下自然语言信号表示用户要从零创建独立项目，即使无需项目名或文件路径：
+
+- 中文：创建、新建、开发、搭建、实现一个新应用/网站/服务/接口/CLI/脚本/机器人/自动化工具、从零开始、独立项目。
+- English: create, build, scaffold, initialize, new project, from scratch, standalone application/service/CLI.
+
+这些词只在目标实现不存在或目标是新目录/空目录（new or empty project directory）时触发初始化器。已有源码、修改现有功能、修复 Bug、重构现有项目或解释/审查现有产物，必须转到 `ai-project-maintainer`；如果 existing implementation must be changed，不能初始化新项目。
+
+## 触发确认
+
+本 Skill 被实际加载后，必须在首次面向用户的工作更新中明确写出“已触发 ai-project-bootstrapper”，并同时标明当前档位：`MICRO`、`STANDARD` 或 `DURABLE`。只有实际加载本 Skill 后才能使用该确认语句；普通回答、通用工具或代理不得伪称 Skill 已触发。
 
 ## 路由优先
 
