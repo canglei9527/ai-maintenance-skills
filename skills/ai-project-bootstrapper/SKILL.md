@@ -21,6 +21,12 @@ description: "Use when the user asks to create, build, scaffold, initialize, or 
 
 本 Skill 被实际加载后，必须在首次面向用户的工作更新中明确写出“已触发 ai-project-bootstrapper”，并同时标明当前档位：`MICRO`、`STANDARD` 或 `DURABLE`。只有实际加载本 Skill 后才能使用该确认语句；普通回答、通用工具或代理不得伪称 Skill 已触发。
 
+## 文档目录约定
+
+新项目默认在项目根建立 `文档/` 目录，维护文档直接放入其中，包括 `ARCHITECTURE.md`、`BUG_HISTORY.md`、维护记录和发布说明。若项目已有 `文档/`、`docs/` 或 `documentation/` 等规范文档目录，则复用已有文档目录，不重复迁移，只整理新增或遗漏的维护文档；后续新增维护文档直接写入规范文档目录。`MICRO` 单文件工具只有在用户明确要求单文件且不需要维护文档时，才不创建该目录。
+
+新项目创建流程只整理本次创建产生的维护文档，不扫描或迁移父级工作区和其他项目；文档目录选择、入口和职责必须记录在项目架构或索引中。
+
 ## 路由优先
 
 | 情境 | 路由 |

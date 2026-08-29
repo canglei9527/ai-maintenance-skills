@@ -1,3 +1,21 @@
+## 2026-08-30：增加文档整理迁移和新项目文档目录约定
+
+- 现象：用户希望通过“整理维护文档”统一老项目的 Markdown 文档，并要求新项目后续维护文档默认归档到统一目录；原有 Skill 没有专用迁移路径，也没有引用修复、已有目录复用和幂等约束。
+- 根因：文档整理被混在普通维护和导入项目流程中，缺少明确命令触发的全量扫描边界；bootstrapper 只说明按需建立记录，没有规定默认文档目录和后续写入位置。
+- 修改文件：`skills/ai-project-maintainer/SKILL.md`、`skills/ai-project-maintainer/references/documentation-migration.md`、`skills/ai-project-maintainer/references/fast-path.md`、`skills/ai-project-bootstrapper/SKILL.md`、`skills/ai-project-bootstrapper/references/workflow.md`、`evals/prompts.md`、`scripts/verify-skill-repo.mjs`、`ARCHITECTURE.md`、`README.md`、`BUG_HISTORY.md`。
+- 修改方式：新增文档整理参考，限定“整理维护文档”等明确命令才全量扫描；老项目迁移到 `文档/`，发现 `文档/`、`docs/` 或 `documentation/` 时复用并只整理遗漏；结构化修复 Markdown、索引、配置、脚本和源码引用，迁移前后验证并保证幂等。新项目默认建立 `文档/` 存放架构、Bug、维护和发布记录，已有规范目录时复用，后续新增文档直接写入选定目录。
+- 验证命令：`node scripts/verify-skill-repo.mjs`、`node --test scripts/tests/index-health.test.mjs scripts/tests/skill-frontmatter.test.mjs scripts/tests/release.test.mjs`、`git diff --check`。
+- 验证结果：新增文档整理与默认目录断言先按 RED 失败，补齐流程后通过；真实项目迁移仍需在用户明确授权和目标项目基线下执行，当前只修改通用 Skill 规则。
+
+## 2026-08-30：新增功能强制同步架构文档
+
+- 现象：用户要求在其他程序中增加界面或新功能时，原有规则只在新增文件、公共入口、稳定路由或结构变更时更新索引，可能让新增功能落地但架构文档仍过期。
+- 根因：新增/扩展功能与普通 Bug 修复、纯样式调整共用普通变更路径，缺少“功能实现与架构记录同阶段完成”的明确门槛，也没有要求项目缺少架构文档时创建根级记录。
+- 修改文件：`skills/ai-project-maintainer/SKILL.md`、`skills/ai-project-maintainer/references/fast-path.md`、`evals/prompts.md`、`scripts/verify-skill-repo.mjs`、`BUG_HISTORY.md`。
+- 修改方式：新增功能架构记录门，覆盖新增界面、页面、组件、交互流程和用户可见功能；要求同步更新受影响目录最近一级 `ai-context/INDEX.md`，缺失时创建或补齐根 `ARCHITECTURE.md`，登记入口、职责、数据/接口边界和聚焦验证；普通 Bug 修复和纯样式调整不触发该门。新增人工评估和静态断言。
+- 验证命令：`node scripts/verify-skill-repo.mjs`、`node --test scripts/tests/index-health.test.mjs scripts/tests/skill-frontmatter.test.mjs scripts/tests/release.test.mjs`、`git diff --check`。
+- 验证结果：新增架构契约断言先按 RED 失败，补充 Skill 和评估规则后转为 GREEN；真实客户端执行仍需用新增评估提示人工 forward-test。
+
 ## 2026-08-29：增强新项目 Skill 的自然语言触发
 
 - 现象：`ai-project-bootstrapper` 虽能识别新目录、spec 和常见项目类型，但对没有项目名/路径的中文从零创建请求以及英文 `create`、`build`、`scaffold`、`initialize` 等信号缺少明确覆盖；也没有同等强度的已有项目排除和触发确认评估。

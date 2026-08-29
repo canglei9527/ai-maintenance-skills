@@ -11,7 +11,7 @@
 3. 运行最小可用的语法、冒烟或示例检查。
 4. 报告运行了什么，什么未被验证。
 
-Keep a requested single-file tool single-file. Do not create `AGENTS.md`、`ai-context/`、`FUNCTION_INDEX.md`、`architecture/`、`bugs/`、`operations/` 或每目录索引，仅因为此参考文件存在。
+Keep a requested single-file tool single-file. Do not create `AGENTS.md`、`ai-context/`、`FUNCTION_INDEX.md`、`architecture/`、`bugs/`、`operations/` 或每目录索引，仅因为此参考文件存在；若用户明确要求维护文档，则将其放入默认 `文档/` 目录。
 
 ## STANDARD
 
@@ -26,8 +26,9 @@ Keep a requested single-file tool single-file. Do not create `AGENTS.md`、`ai-c
    ```
 
 4. 构建一个具有清晰入口、集中配置、明确错误行为和聚焦测试或等效验证的端到端切片。
-5. 添加 README 或项目标准启动文档；仅在多个源文件或稳定维护入口有价值时才添加简短的根任务图。
-6. 运行最快的相关检查，并分开报告不可用的外部检查。
+5. 添加 README 或项目标准启动文档；新项目默认建立根 `文档/`，将 `ARCHITECTURE.md`、`BUG_HISTORY.md`、维护记录和发布说明放入其中；已有 `文档/`、`docs/` 或 `documentation/` 时复用，不重复迁移，只补新增或遗漏文档。
+6. 仅在多个源文件或稳定维护入口有价值时添加简短的根任务图。
+7. 运行最快的相关检查，并分开报告不可用的外部检查。
 
 不得创建空的架构或 Bug 主题、推测性的未来路由、完整文档树，或没有当前所有权或测试边界的抽象层。
 

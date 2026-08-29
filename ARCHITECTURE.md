@@ -16,6 +16,7 @@
 | `docs/installation.md` | 一条命令、插件、手工后备安装及更新卸载说明 |
 | `skills/ai-project-maintainer/SKILL.md` | 已有项目的 READ_ONLY、NORMAL_CHANGE、STRUCTURAL_CHANGE、外部动作分流和新增功能需求门 |
 | `skills/ai-project-maintainer/references/fast-path.md` | 只读分析、普通修改、最小读取和大文件 Bug 修复路径 |
+| `skills/ai-project-maintainer/references/documentation-migration.md` | 明确命令触发的全项目 Markdown 整理、目录复用、引用修复和幂等验证 |
 | `skills/ai-project-maintainer/references/structural-change.md` | 已授权结构变更的基线、迁移表、兼容与完成状态 |
 | `skills/ai-project-maintainer/references/verification-and-safety.md` | 授权、秘密、依赖、验证证据和实时项目安全边界 |
 | `skills/ai-project-maintainer/references/requirements-dialogue.md` | 新增功能的三选一需求澄清门、动态问卷、直接执行和 IDE 计划模式边界 |
@@ -106,7 +107,8 @@ release.mjs
 - 输入：已有项目中的维护请求，以及可选的文件、函数、复现步骤、错误和期望行为。
 - 导入场景：先做浅层项目地图并询问是否整理；未获明确同意不移动文件；同意后执行整理前基线、分批迁移和整理后回归验证。
 - 输出：最小代码或文档变更、验证结果、根因说明，以及仅在有导航或历史价值时更新的记录；结构任务还需报告批准范围、职责迁移、旧实现删除和完成状态。
-- 重要约束：不猜测缺失上下文，不宣称未验证的修复，不破坏用户未提交修改；普通大文件 Bug 不因行数被迫重构。新增功能先进入需求澄清门；问卷摘要确认是需求门，不调用或替代 IDE 计划模式。
+- 重要约束：不猜测缺失上下文，不宣称未验证的修复，不破坏用户未提交修改；普通大文件 Bug 不因行数被迫重构。新增功能先进入需求澄清门，并同步更新相关架构文档；问卷摘要确认是需求门，不调用或替代 IDE 计划模式。
+- 文档整理：只有明确“整理维护文档”等命令才进入全项目迁移路径；优先复用 `文档/`、`docs/` 或 `documentation/`，老项目迁移后修复引用并保证幂等，后续维护文档写入选定目录。
 
 ### `ai-project-bootstrapper`
 

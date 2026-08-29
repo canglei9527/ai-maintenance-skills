@@ -28,6 +28,7 @@ description: "Use when the user asks to explain, diagnose, review, fix, extend, 
 | `NORMAL_CHANGE` Bug 或聚焦功能 | [`references/fast-path.md`](references/fast-path.md)，然后 [`references/verification-and-safety.md`](references/verification-and-safety.md) 相关章节 | 结构迁移流程 |
 | `NORMAL_CHANGE` 目标是大文件或反复补丁文件 | `fast-path.md` 维护性检查点和必要验证章节 | 结构迁移流程（除非单独授权） |
 | `STRUCTURAL_CHANGE` 或导入项目整理 | [`references/structural-change.md`](references/structural-change.md)、[`references/verification-and-safety.md`](references/verification-and-safety.md) | 无关的快速路径章节 |
+| 明确要求“整理维护文档”、迁移 Markdown 或统一文档目录 | [`references/documentation-migration.md`](references/documentation-migration.md)、[`references/verification-and-safety.md`](references/verification-and-safety.md) | 普通 Bug 快速路径和无关源码模块 |
 | 新增或扩展功能 | [`references/requirements-dialogue.md`](references/requirements-dialogue.md)，然后按变更路径读取其他参考 | 修 Bug、解释、审查、诊断、普通配置调整和仅重构不读取此参考 |
 | 外部、破坏性、远端、生产、依赖、许可证、密钥或 CI 问题 | [`references/verification-and-safety.md`](references/verification-and-safety.md) 相关章节 | 无关的迁移模板 |
 
@@ -48,6 +49,8 @@ description: "Use when the user asks to explain, diagnose, review, fix, extend, 
 - **失败诊断门**：构建或测试失败时，先读取报错位置前后约 40 行，确认文件时间、Git 状态和工具调用之间是否有并发修改，再决定是否重跑。没有状态变化或新假设时不得重复全量编译；优先运行能验证当前假设的最小命令。不要在首个可验证根因修复前扩大到 Web、桥接、数据库、分页、打包或其他独立问题。
 - **调查停止门**：先确认规范实现文件、当前故障入口和首要验收标准；确认首个可验证根因后停止无关探索，不做全量调用链扩展，不反复扫描其他模块。只有当前证据无法验证根因，或测试明确显示问题跨越模块边界时，才按一跳依赖逐步扩展，并记录扩展理由。
 - **最小修改门**：只修改与已确认根因直接相关的实现文件和最小回归测试；不做无关重构，不预先修改桥接层、数据库、生成物或其他模块。生成文件必须通过规范源文件重新生成。
+- **功能架构记录门**：新增或扩展功能必须同步更新相关架构文档，包括新增界面或交互功能。至少更新受影响目录最近一级的 `ai-context/INDEX.md`；若项目没有可用架构文档，则创建或补齐项目根 `ARCHITECTURE.md`，并在索引中登记新的入口、职责和聚焦验证。普通 Bug 修复和纯样式调整不因本规则自动改写架构文档。
+- **文档整理触发门**：只有用户明确下达“整理维护文档”“统一文档目录”“迁移 Markdown 文档”等命令时，才进入文档整理路径并允许扫描整个项目。该路径扫描历史维护文档（包括 `BUG_HISTORY.md`、`ARCHITECTURE.md` 等），老项目迁移到统一 `文档/` 目录并修复所有引用路径；若发现已有规范文档目录，则跳过已规范文件，只整理新增或遗漏文档，不重复移动。后续新增维护文档直接写入已选规范文档目录。普通维护任务不触发全量扫描。
 
 ## 新增功能的需求澄清门
 

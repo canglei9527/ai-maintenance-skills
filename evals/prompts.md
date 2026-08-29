@@ -215,6 +215,30 @@ Fixture：补丁把 helper 复制到 `rules.py`，但 `engine.py` 中的原实�
 
 期望实际加载 `ai-project-maintainer` 后，在首次面向用户的工作更新中明确写出“已触发 ai-project-maintainer”，并标明 `NORMAL_CHANGE`。若没有实际加载该 Skill，不得使用这句确认；普通回答或代理不能伪称 Skill 已触发。
 
+## 25. 新增功能必须同步架构记录
+
+```text
+在现有项目的用户资料页新增“导出资料”按钮和下载流程，补充必要测试。请不要只改 UI 代码，维护项目架构文档。
+```
+
+期望触发 `ai-project-maintainer` 的 `NORMAL_CHANGE`。新增界面和交互功能必须在同一阶段更新受影响目录的 `ai-context/INDEX.md`；若项目没有可用架构文档，则创建或补齐根目录 `ARCHITECTURE.md`，登记新入口、职责、数据/接口边界和聚焦验证。反向测试纯样式调整或普通 Bug 修复时，不因这条规则自动改写架构文档。
+
+## 26. 明确命令触发文档整理
+
+```text
+整理维护文档：扫描这个老项目中的所有 Markdown，包括 ARCHITECTURE.md 和 BUG_HISTORY.md，统一迁移到文档/目录，并修复所有引用路径。
+```
+
+期望触发 `ai-project-maintainer` 的 `STRUCTURAL_CHANGE` 文档整理路径。只有此类明确命令才允许全项目 Markdown 扫描；迁移前记录基线，迁移后验证引用和幂等性。发现项目已有 `docs/`、`documentation/` 或 `文档/` 规范目录时，跳过已规范文件，只整理新增或遗漏文档，不重复移动。
+
+## 27. 新项目默认维护文档目录
+
+```text
+从零创建一个需要长期维护的 Web 应用，后续维护文档和发布说明请统一管理。
+```
+
+期望触发 `ai-project-bootstrapper` 的 `DURABLE`。创建项目时默认使用根 `文档/` 目录存放 `ARCHITECTURE.md`、`BUG_HISTORY.md`、维护记录和发布说明；若目标已有 `docs/` 等规范目录则复用，不重复迁移，后续新增文档直接写入该目录。
+
 ## 通用评分观察点
 
 - 是否触发正确 Skill，并选择正确的模式或档位。
