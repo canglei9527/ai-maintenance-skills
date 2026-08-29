@@ -1,5 +1,63 @@
 # 变更记录
 
+## 0.4.12 - 2026-08-29
+
+- # v0.4.12 发布介绍：增强新项目自动触发与 Skill 触发确认
+- 发布日期：2026-08-29 · 版本线：0.4.11 -> 0.4.12
+- ## 一、这次发布解决什么问题
+- `ai-project-bootstrapper` 原本能识别新目录、空目录、spec 和常见项目类型，但对没有项目名或文件路径的自然语言创建请求覆盖不足，也没有像维护 Skill 一样明确列出中文和英文触发信号。用户难以判断当前请求究竟进入了新项目初始化还是已有项目维护。
+- v0.4.12 将新项目触发词、已有项目排除边界和首次工作更新确认写成可回归契约，并保留 `ai-project-maintainer` 的触发确认规则。
+- ## 二、触发条件增强
+- `ai-project-bootstrapper` 现在识别以下新项目创建信号：
+- ### 中文信号
+- 创建、新建、开发、搭建、实现一个新应用、网站、服务、接口、CLI、脚本、机器人或自动化工具；
+- 从零开始；
+- 独立项目；
+- 即使用户没有提供项目名或文件路径，只要目标实现不存在且属于独立项目，也可以触发初始化器。
+- ### 英文信号
+- `create`、`build`、`scaffold`、`initialize`；
+- `new project`、`from scratch`；
+- `standalone application`、`standalone service`、`standalone CLI`。
+- 这些信号只影响 Skill 发现和任务路由，不代表已经授权执行外部操作或修改任意现有代码。
+- ## 三、已有项目排除边界
+- 以下请求必须转到 `ai-project-maintainer`：
+- 修改已有源码或现有功能；
+- 修复 Bug、回归或错误行为；
+- 重构已有项目；
+- 解释、审查或诊断现有产物而不要求创建新实现。
+- 路径、spec、资产和附件只是定位或需求输入，不能单独证明目标是新项目，也不能授予修改现有仓库的权限。
+- ## 四、触发确认
+- 当 `ai-project-bootstrapper` 实际被加载后，首次面向用户的工作更新必须明确写出：
+- ```text
+- 已触发 ai-project-bootstrapper；当前档位为 STANDARD。
+- ```
+- 其中档位可为 `MICRO`、`STANDARD` 或 `DURABLE`。只有实际加载该 Skill 后才能使用这句确认；普通回答、通用工具或代理不得伪称 Skill 已触发。维护任务同样要求确认“已触发 ai-project-maintainer”并标明对应 gate。
+- ## 五、评估与验证
+- 新增评估覆盖：
+- 无项目名、无文件路径的中文“从零开始搭建独立项目”请求；
+- 英文 `scaffold`、`new project`、`standalone`、`from scratch` 请求；
+- “修复现有项目 Bug”与“修改现有源码”的反向分流；
+- bootstrapper 首次工作更新的触发确认和档位报告。
+- 仓库验证器新增中英文触发词、已有项目排除、触发确认和原有根目录边界断言。
+- ## 六、兼容性
+- 不改变 `MICRO`、`STANDARD`、`DURABLE` 档位的职责和验证要求；
+- 不改变现有安装入口、插件能力或外部操作授权；
+- 继续保留 `ai-project-maintainer` 对已有项目的维护优先级；
+- 需要发布、推送、部署或其他远端操作时，仍需走独立的 `EXTERNAL_ACTION` gate。
+- ## 七、发布验证
+- 发布前运行：
+- ```text
+- node scripts/verify-skill-repo.mjs
+- node --test scripts/tests/index-health.test.mjs scripts/tests/skill-frontmatter.test.mjs scripts/tests/release.test.mjs
+- git diff --check
+- ```
+- 结果：仓库验证通过，33/33 Node 测试通过，空白检查通过。实际客户端中的 Skill 竞争触发排序仍需在支持 Skills 的新会话中使用新增评估提示进行人工 forward-test。
+- ## 八、安装与同步
+- ```bash
+- npx skills add https://github.com/canglei9527/flow-pilot
+- ```
+- 已安装旧版本的使用者需要重新同步或重新安装 Skill，才能获得 v0.4.12 的新项目触发条件和触发确认规则。
+
 ## 0.4.11 - 2026-08-29
 
 - # v0.4.11 发布介绍：收紧 Bug 调查停止点和最小修改边界
