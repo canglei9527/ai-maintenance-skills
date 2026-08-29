@@ -141,6 +141,8 @@ check(maintainer.includes('EXTERNAL_ACTION') && maintainer.includes('does not au
 check(maintainer.includes('fast-path.md') && maintainer.includes('structural-change.md') && maintainer.includes('verification-and-safety.md'), 'maintainer direct reference routing missing');
 check(maintainer.includes('requirements-dialogue.md') && maintainerRequirements.includes('开始需求问卷') && maintainerRequirements.includes('完全不问，直接执行'), 'maintainer requirements dialogue routing missing');
 check(fastPath.includes('50 search hits') && fastPath.includes('12 candidate files') && fastPath.includes('one dependency hop'), 'maintainer search limits missing');
+check(maintainer.includes('规范实现文件') && maintainer.includes('流程停止点') && maintainer.includes('修改文件列表') && maintainer.includes('验证结果'), 'maintainer bounded investigation report contract missing');
+check(fastPath.includes('首个可验证根因后停止') && fastPath.includes('不做全量调用链扩展') && fastPath.includes('最小兼容修改'), 'maintainer bounded investigation stop gate missing');
 check(fastPath.includes('A 900-line target does not require a prior refactor'), 'large-file normal-change rule missing');
 check(structuralChange.includes('Migration Table') && structuralChange.includes('old implementation is deleted'), 'structural migration ownership rule missing');
 check(maintainerSafety.includes('Do not choose a license') && maintainerSafety.includes('NOT_RUN'), 'maintainer safety and verification status rules missing');

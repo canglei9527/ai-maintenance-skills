@@ -1,3 +1,12 @@
+## 2026-08-29：增加维护任务调查停止门和最小修改契约
+
+- 现象：修复现有项目 Bug 时，代理可能在根因尚未确认前全量扩展调用链、反复扫描无关模块，并预先修改桥接层、数据库或生成产物；最终报告也可能没有明确流程停止点和规范实现文件。
+- 根因：已有预算和阶段闸门限制了读取规模，但没有把“确认规范实现文件 -> 验证首个根因 -> 停止无关扩展 -> 输出固定证据字段”定义为独立契约。
+- 修改文件：`skills/ai-project-maintainer/SKILL.md`、`skills/ai-project-maintainer/references/fast-path.md`、`evals/prompts.md`、`scripts/verify-skill-repo.mjs`、`BUG_HISTORY.md`。
+- 修改方式：新增调查停止门，要求确认规范实现文件和首个可验证根因后停止全量调用链扩展；只有证据显示跨模块时才按一跳依赖扩展。新增最小修改门，禁止无关重构、预先修改桥接层/数据库/生成物；生成文件必须由规范源文件重新生成。完成报告新增流程停止点、根因、修改文件列表、修改原因和验证结果字段。
+- 验证命令：`node scripts/verify-skill-repo.mjs`、`node --test scripts/tests/index-health.test.mjs scripts/tests/skill-frontmatter.test.mjs scripts/tests/release.test.mjs`、`git diff --check`。
+- 验证结果：新增停止扩展和报告契约断言先按 RED 失败，补规则后通过；完整 Node 测试 33/33 通过；Skill 仓库验证通过；空白检查通过。
+
 ## 2026-08-27：增强维护 Skill 的中文自动触发
 
 - 现象：用户使用“刷新后取消的下载任务又出来了，修复这个 BUG”等无项目名、无文件路径的中文短句时，`ai-project-maintainer` 自动触发不稳定，容易退化为通用探索。
