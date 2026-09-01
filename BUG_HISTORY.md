@@ -1,3 +1,21 @@
+## 2026-09-02：优化 token 消耗，消除重复和精简冗余规则
+
+- 现象：用户反馈感觉 token 消耗变多了，要求分析并优化 skills 目录的 token 使用。
+- 分析：发现三个主要问题：(1) `requirements-dialogue.md` 在两个 Skill 中完全重复（43 行 × 2）；(2) `v2-migration-notes.md` 作为历史文档仍在运行时引用路径中（41 行）；(3) `fast-path.md`（115 行）和 `navigation-and-budgets.md`（75 行）中存在冗长重复的规则表述。
+- 根因：按需加载设计中没有识别出可共享的文档；历史迁移证据未移出运行时路径；规则表述优先保证完整性而未考虑简洁性。
+- 修改文件：
+  - 新建 `skills/shared/requirements-dialogue.md` 作为两个 Skill 的共享引用
+  - 删除 `skills/ai-project-maintainer/references/requirements-dialogue.md`
+  - 删除 `skills/ai-project-bootstrapper/references/requirements-dialogue.md`
+  - 移动 `skills/ai-project-maintainer/references/v2-migration-notes.md` → `docs/history/v2-migration-notes.md`
+  - 精简 `skills/ai-project-maintainer/references/fast-path.md` 中的"每轮读取与搜索预算"、"搜索与读取限制"、"输出预算门"等章节
+  - 精简 `skills/ai-project-bootstrapper/references/navigation-and-budgets.md` 中的"导航有成本门槛"、"默认阈值"、"拆分决策顺序"、"规范规则与实现"、"项目边界"等章节
+  - 更新 `ARCHITECTURE.md` 反映新的文件组织
+  - 更新 `scripts/verify-skill-repo.mjs` 支持共享引用和新的验证规则
+- 修改方式：将重复内容提取到共享位置并更新引用路径（`../shared/requirements-dialogue.md`）；历史文档移至 `docs/history/` 归档；将冗长段落规则改为简洁列表格式，使用 `|` 分隔、加粗标题和紧凑表述，保持规则完整性但减少重复说明。
+- 验证命令：`node scripts/verify-skill-repo.mjs`、`node --test scripts/tests/index-health.test.mjs scripts/tests/skill-frontmatter.test.mjs scripts/tests/release.test.mjs`、`git diff --check`。
+- 验证结果：所有测试通过；仓库验证通过；预计 token 消耗减少约 15-20%，主要来自消除 43 行重复、移除 41 行历史文档和精简 30-40 行冗余表述。
+
 ## 2026-08-30：增加文档整理迁移和新项目文档目录约定
 
 - 现象：用户希望通过“整理维护文档”统一老项目的 Markdown 文档，并要求新项目后续维护文档默认归档到统一目录；原有 Skill 没有专用迁移路径，也没有引用修复、已有目录复用和幂等约束。

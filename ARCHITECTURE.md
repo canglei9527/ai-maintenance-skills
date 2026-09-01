@@ -19,12 +19,12 @@
 | `skills/ai-project-maintainer/references/documentation-migration.md` | 明确命令触发的全项目 Markdown 整理、目录复用、引用修复和幂等验证 |
 | `skills/ai-project-maintainer/references/structural-change.md` | 已授权结构变更的基线、迁移表、兼容与完成状态 |
 | `skills/ai-project-maintainer/references/verification-and-safety.md` | 授权、秘密、依赖、验证证据和实时项目安全边界 |
-| `skills/ai-project-maintainer/references/requirements-dialogue.md` | 新增功能的三选一需求澄清门、动态问卷、直接执行和 IDE 计划模式边界 |
 | `skills/ai-project-bootstrapper/SKILL.md` | 新项目分流、需求澄清门、MICRO/STANDARD/DURABLE 档位和最短创建闭环 |
 | `skills/ai-project-bootstrapper/references/workflow.md` | 三档新项目的最小工作流和当前记录门槛 |
 | `skills/ai-project-bootstrapper/references/navigation-and-budgets.md` | 导航价值、索引格式、新鲜度检查、审查阈值、严格治理门和唯一所有权 |
 | `skills/ai-project-bootstrapper/references/verification-and-exceptions.md` | 验证状态、具名例外和 TMS320/CCS 实时约束 |
-| `skills/ai-project-bootstrapper/references/requirements-dialogue.md` | 新项目的三选一需求澄清门、动态问卷、直接执行和 IDE 计划模式边界 |
+| `skills/shared/requirements-dialogue.md` | 两个 Skill 共享的需求澄清门，三选一需求澄清流程、动态问卷、直接执行和 IDE 计划模式边界 |
+| `docs/history/v2-migration-notes.md` | V2 重构的历史迁移证据和行为变更记录（仅供参考） |
 | `examples/minimal-project/` | 与语言无关的项目文档示例，不包含真实业务代码 |
 | `examples/minimal-project/ai-context/INDEX.md` | 最小项目的审核后任务导航示例 |
 | `scripts/index-health.mjs` | 只读检查索引本地引用、审核提交/日期新鲜度和未解析路由 |

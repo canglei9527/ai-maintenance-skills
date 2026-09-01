@@ -39,13 +39,12 @@ const required = [
   'skills/ai-project-maintainer/references/documentation-migration.md',
   'skills/ai-project-maintainer/references/structural-change.md',
   'skills/ai-project-maintainer/references/verification-and-safety.md',
-  'skills/ai-project-maintainer/references/requirements-dialogue.md',
-  'skills/ai-project-maintainer/references/v2-migration-notes.md',
   'skills/ai-project-bootstrapper/SKILL.md',
   'skills/ai-project-bootstrapper/references/workflow.md',
   'skills/ai-project-bootstrapper/references/navigation-and-budgets.md',
   'skills/ai-project-bootstrapper/references/verification-and-exceptions.md',
-  'skills/ai-project-bootstrapper/references/requirements-dialogue.md',
+  'skills/shared/requirements-dialogue.md',
+  'docs/history/v2-migration-notes.md',
   'scripts/skill-frontmatter.mjs',
   'scripts/index-health.mjs',
   'scripts/tests/index-health.test.mjs',
@@ -77,10 +76,12 @@ for (const name of skillNames) {
     check(document.body.length <= 14000, `${name}: SKILL.md body exceeds 14000 characters`);
     check(text.split(/\r?\n/).length <= 200, `${name}: SKILL.md exceeds 200 lines`);
 
-    const pointers = [...text.matchAll(/\]\((references\/[^)]+)\)/g)].map((match) => match[1]);
+    const pointers = [...text.matchAll(/\]\(((?:\.\.\/shared|references)\/[^)]+)\)/g)].map((match) => match[1]);
     for (const pointer of pointers) {
-      check(!pointer.startsWith('../'), `${name}: cross-skill reference is not self-contained (${pointer})`);
-      check(existsSync(resolve(skillRoot, pointer)), `${name}: missing reference ${pointer}`);
+      const resolvedPath = pointer.startsWith('../shared')
+        ? resolve(skillRoot, '..', pointer.slice(3))
+        : resolve(skillRoot, pointer);
+      check(existsSync(resolvedPath), `${name}: missing reference ${pointer}`);
     }
   } catch (error) {
     failures.push(`${name}: invalid frontmatter (${error.message})`);
@@ -129,11 +130,10 @@ const fastPath = readFileSync(join(root, 'skills', 'ai-project-maintainer', 'ref
 const documentationMigration = readFileSync(join(root, 'skills', 'ai-project-maintainer', 'references', 'documentation-migration.md'), 'utf8');
 const structuralChange = readFileSync(join(root, 'skills', 'ai-project-maintainer', 'references', 'structural-change.md'), 'utf8');
 const maintainerSafety = readFileSync(join(root, 'skills', 'ai-project-maintainer', 'references', 'verification-and-safety.md'), 'utf8');
-const maintainerRequirements = readFileSync(join(root, 'skills', 'ai-project-maintainer', 'references', 'requirements-dialogue.md'), 'utf8');
+const sharedRequirements = readFileSync(join(root, 'skills', 'shared', 'requirements-dialogue.md'), 'utf8');
 const bootstrapWorkflow = readFileSync(join(root, 'skills', 'ai-project-bootstrapper', 'references', 'workflow.md'), 'utf8');
 const navigation = readFileSync(join(root, 'skills', 'ai-project-bootstrapper', 'references', 'navigation-and-budgets.md'), 'utf8');
 const bootstrapExceptions = readFileSync(join(root, 'skills', 'ai-project-bootstrapper', 'references', 'verification-and-exceptions.md'), 'utf8');
-const bootstrapRequirements = readFileSync(join(root, 'skills', 'ai-project-bootstrapper', 'references', 'requirements-dialogue.md'), 'utf8');
 const evals = readFileSync(join(root, 'evals', 'prompts.md'), 'utf8');
 
 check(maintainerDescription.includes('现有产品行为') && maintainerDescription.includes('期望行为') && maintainerDescription.includes('修复'), 'maintainer natural-language bug trigger coverage missing');
@@ -141,7 +141,7 @@ check(maintainerDescription.includes('刷新后又出现') && maintainerDescript
 check(maintainer.includes('READ_ONLY') && maintainer.includes('NORMAL_CHANGE') && maintainer.includes('STRUCTURAL_CHANGE'), 'maintainer operation paths missing');
 check(maintainer.includes('EXTERNAL_ACTION') && maintainer.includes('does not authorize writing'), 'maintainer authorization boundary missing');
 check(maintainer.includes('fast-path.md') && maintainer.includes('structural-change.md') && maintainer.includes('verification-and-safety.md') && maintainer.includes('documentation-migration.md'), 'maintainer direct reference routing missing');
-check(maintainer.includes('requirements-dialogue.md') && maintainerRequirements.includes('开始需求问卷') && maintainerRequirements.includes('完全不问，直接执行'), 'maintainer requirements dialogue routing missing');
+check(maintainer.includes('requirements-dialogue.md') && sharedRequirements.includes('开始需求问卷') && sharedRequirements.includes('完全不问，直接执行'), 'maintainer requirements dialogue routing missing');
 check(fastPath.includes('50 search hits') && fastPath.includes('12 candidate files') && fastPath.includes('one dependency hop'), 'maintainer search limits missing');
 check(maintainer.includes('规范实现文件') && maintainer.includes('流程停止点') && maintainer.includes('修改文件列表') && maintainer.includes('验证结果'), 'maintainer bounded investigation report contract missing');
 check(maintainer.includes('已触发 ai-project-maintainer') &&
@@ -158,7 +158,7 @@ check(fastPath.includes('新增或扩展功能必须同步更新') &&
   fastPath.includes('纯样式调整') &&
   fastPath.includes('普通 Bug 修复'),
   'maintainer feature architecture boundary missing');
-check(fastPath.includes('首个可验证根因后停止') && fastPath.includes('不做全量调用链扩展') && fastPath.includes('最小兼容修改'), 'maintainer bounded investigation stop gate missing');
+check(fastPath.includes('确认根因后停止') && fastPath.includes('仅在跨模块证据下按一跳扩展') && fastPath.includes('最小兼容修改'), 'maintainer bounded investigation stop gate missing');
 check(maintainer.includes('文档整理触发门') &&
   maintainer.includes('整理维护文档') &&
   maintainer.includes('全量扫描') &&
@@ -186,9 +186,9 @@ check(bootstrapper.includes('后续新增') && bootstrapper.includes('直接写�
 check(bootstrapWorkflow.includes('新项目默认建立根 `文档/`') && bootstrapWorkflow.includes('将 `ARCHITECTURE.md`、`BUG_HISTORY.md`、维护记录和发布说明放入其中') && bootstrapWorkflow.includes('不重复迁移'), 'bootstrapper workflow documentation destination missing');
 check(bootstrapper.includes('MICRO') && bootstrapper.includes('STANDARD') && bootstrapper.includes('DURABLE'), 'bootstrapper tier routing missing');
 check(bootstrapper.includes('workflow.md') && bootstrapper.includes('navigation-and-budgets.md') && bootstrapper.includes('verification-and-exceptions.md'), 'bootstrapper direct reference routing missing');
-check(bootstrapper.includes('requirements-dialogue.md') && bootstrapRequirements.includes('跳过问卷') && bootstrapRequirements.includes('IDE 的计划模式'), 'bootstrapper requirements dialogue routing missing');
+check(bootstrapper.includes('requirements-dialogue.md') && sharedRequirements.includes('跳过问卷') && sharedRequirements.includes('IDE 的计划模式'), 'bootstrapper requirements dialogue routing missing');
 check(bootstrapWorkflow.includes('Do not create `AGENTS.md`') && bootstrapWorkflow.includes('Keep a requested single-file tool single-file'), 'MICRO workflow guard missing');
-check(navigation.includes('review thresholds') && navigation.includes('Strict budgets are acceptance gates'), 'budget review and strict-gate distinction missing');
+check(navigation.includes('Review thresholds') && navigation.includes('Strict budgets'), 'budget review and strict-gate distinction missing');
 check(bootstrapExceptions.includes('NOT_AVAILABLE'), 'bootstrapper exception and real-time verification rules missing');
 check(evals.includes('独立程序需求的分流') && evals.includes('现有项目证据的维护分流') && evals.includes('意图不明确时只问一次'), 'routing evaluation prompts missing');
 

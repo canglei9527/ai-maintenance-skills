@@ -29,7 +29,7 @@ description: "Use when the user asks to explain, diagnose, review, fix, extend, 
 | `NORMAL_CHANGE` 目标是大文件或反复补丁文件 | `fast-path.md` 维护性检查点和必要验证章节 | 结构迁移流程（除非单独授权） |
 | `STRUCTURAL_CHANGE` 或导入项目整理 | [`references/structural-change.md`](references/structural-change.md)、[`references/verification-and-safety.md`](references/verification-and-safety.md) | 无关的快速路径章节 |
 | 明确要求“整理维护文档”、迁移 Markdown 或统一文档目录 | [`references/documentation-migration.md`](references/documentation-migration.md)、[`references/verification-and-safety.md`](references/verification-and-safety.md) | 普通 Bug 快速路径和无关源码模块 |
-| 新增或扩展功能 | [`references/requirements-dialogue.md`](references/requirements-dialogue.md)，然后按变更路径读取其他参考 | 修 Bug、解释、审查、诊断、普通配置调整和仅重构不读取此参考 |
+| 新增或扩展功能 | [`../shared/requirements-dialogue.md`](../shared/requirements-dialogue.md)，然后按变更路径读取其他参考 | 修 Bug、解释、审查、诊断、普通配置调整和仅重构不读取此参考 |
 | 外部、破坏性、远端、生产、依赖、许可证、密钥或 CI 问题 | [`references/verification-and-safety.md`](references/verification-and-safety.md) 相关章节 | 无关的迁移模板 |
 
 所有必要参考文件均从本文件一跳可达，且可独立使用。
@@ -54,7 +54,7 @@ description: "Use when the user asks to explain, diagnose, review, fix, extend, 
 
 ## 新增功能的需求澄清门
 
-确认请求属于新增或扩展功能后、读取项目源码或创建文件前，读取 [`references/requirements-dialogue.md`](references/requirements-dialogue.md)，先显示 `开始需求问卷`、`跳过问卷` 和 `完全不问，直接执行` 三个选项。修 Bug、解释、审查、诊断、普通配置调整和仅重构不显示此选择。该需求门是可选的需求澄清，不调用或替代 IDE 计划模式；`完全不问` 不主动制造计划审批，但不绕过客户端或系统强制的计划门。
+确认请求属于新增或扩展功能后、读取项目源码或创建文件前，读取 [`../shared/requirements-dialogue.md`](../shared/requirements-dialogue.md)，先显示 `开始需求问卷`、`跳过问卷` 和 `完全不问，直接执行` 三个选项。修 Bug、解释、审查、诊断、普通配置调整和仅重构不显示此选择。该需求门是可选的需求澄清，不调用或替代 IDE 计划模式；`完全不问` 不主动制造计划审批，但不绕过客户端或系统强制的计划门。
 
 ## 简短工作流
 
