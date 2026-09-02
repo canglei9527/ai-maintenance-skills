@@ -1,5 +1,12 @@
 # 变更记录
 
+## 0.4.14 - 2026-09-02
+
+- 优化 Skills 的 token 消耗：移除重复 `requirements-dialogue.md`，改为 `skills/shared/requirements-dialogue.md`
+- 精简 maintainer `fast-path.md` 和 bootstrapper `navigation-and-budgets.md` 规则
+- 将 `v2-migration-notes.md` 归档到 `docs/history/`
+- 更新验证脚本、架构索引和维护历史记录
+
 ## 0.4.13 - 2026-08-29
 
 - # v0.4.13 发布介绍：文档整理迁移与统一目录约定
