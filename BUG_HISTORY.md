@@ -3,6 +3,7 @@
 - 现象：用户反馈感觉 token 消耗变多了，要求分析并优化 skills 目录的 token 使用。
 - 分析：发现三个主要问题：(1) `requirements-dialogue.md` 在两个 Skill 中完全重复（43 行 × 2）；(2) `v2-migration-notes.md` 作为历史文档仍在运行时引用路径中（41 行）；(3) `fast-path.md`（115 行）和 `navigation-and-budgets.md`（75 行）中存在冗长重复的规则表述。
 - 根因：按需加载设计中没有识别出可共享的文档；历史迁移证据未移出运行时路径；规则表述优先保证完整性而未考虑简洁性。
+- 发布补充：首次发布尝试发现仓库远端为 `canglei9527/flow-pilot`，而发布配置仍指向旧仓库 `canglei9527/ai-maintenance-skills`，导致发布脚本安全校验阻止 Release 创建；已修正 `scripts/release-config.mjs` 的仓库约束并在提交前重新验证。
 - 修改文件：
   - 新建 `skills/shared/requirements-dialogue.md` 作为两个 Skill 的共享引用
   - 删除 `skills/ai-project-maintainer/references/requirements-dialogue.md`

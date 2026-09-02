@@ -5,7 +5,7 @@ export const DEFAULT_RETRIES = 3;
 export const DEFAULT_RETRY_DELAY_MS = 1500;
 
 // 防止误发布：只允许发布到这个仓库
-export const REQUIRED_REPOSITORY = 'canglei9527/ai-maintenance-skills';
+export const REQUIRED_REPOSITORY = 'canglei9527/flow-pilot';
 
 export const RELEASE_FILES = {
   claudePlugin: '.claude-plugin/plugin.json',
