@@ -5,7 +5,7 @@ import { parseSkillDocument } from './skill-frontmatter.mjs';
 import { inspectIndex } from './index-health.mjs';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
-const releaseVersion = '0.4.14';
+const releaseVersion = '0.4.15';
 const failures = [];
 const check = (condition, message) => {
   if (!condition) failures.push(message);
