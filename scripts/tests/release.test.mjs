@@ -5,7 +5,7 @@ import { join } from 'node:path';
 import test from 'node:test';
 import { assertGitPreflight, retry } from '../release-git.mjs';
 import { publishRelease } from '../release-github.mjs';
-import { compareVersions, parseVersion, prepareReleaseMetadata } from '../release-version.mjs';
+import { compareVersions, parseVersion, prepareReleaseMetadata, readReleaseMetadata, applyReleaseMetadata } from '../release-version.mjs';
 
 function metadata() {
   return {
@@ -14,7 +14,11 @@ function metadata() {
     codexPlugin: { name: 'ai-maintenance-skills', version: '0.4.0' },
     marketplace: { plugins: [{ name: 'ai-maintenance-skills', version: '0.4.0' }] },
     verifier: "const releaseVersion = '0.4.0';\n",
-    changelog: '# 变更记录\n\n## 0.4.0 - 2026-08-06\n\n- Existing release.\n'
+    changelog: '# 变更记录\n\n## 0.4.0 - 2026-08-06\n\n- Existing release.\n',
+    skills: {
+      maintainer: '---\nname: ai-project-maintainer\nversion: "0.4.0"\ndescription: "Maintainer"\n---\n\n# Maintainer\n',
+      bootstrapper: '---\nname: ai-project-bootstrapper\nversion: "0.4.0"\ndescription: "Bootstrapper"\n---\n\n# Bootstrapper\n'
+    }
   };
 }
 
@@ -31,9 +35,35 @@ test('prepares all version metadata and changelog section', () => {
   assert.match(updates['.codex-plugin/plugin.json'], /"version": "0\.5\.0"/);
   assert.match(updates['.claude-plugin/marketplace.json'], /"version": "0\.5\.0"/);
   assert.match(updates['scripts/verify-skill-repo.mjs'], /releaseVersion = '0\.5\.0'/);
+  assert.match(updates['skills/ai-project-maintainer/SKILL.md'], /version: "0\.5\.0"/);
+  assert.match(updates['skills/ai-project-bootstrapper/SKILL.md'], /version: "0\.5\.0"/);
   assert.match(updates['CHANGELOG.md'], /## 0\.5\.0 - 2026-08-06/);
   assert.match(updates['CHANGELOG.md'], /- Improve release flow\n- Add resume support/);
   assert.throws(() => prepareReleaseMetadata(metadata(), '0.4.0', 'Noop', '2026-08-06'), /newer/);
+});
+
+test('preserves Skill text and rejects missing version metadata', () => {
+  const input = metadata();
+  input.skills.bootstrapper = input.skills.bootstrapper.replaceAll('\n', '\r\n');
+  const updates = prepareReleaseMetadata(input, '0.5.0', 'Test', '2026-09-05');
+  for (const [name, text] of Object.entries(input.skills)) {
+    assert.equal(updates[`skills/ai-project-${name}/SKILL.md`], text.replace('0.4.0', '0.5.0'));
+  }
+  input.skills.maintainer = input.skills.maintainer.replace('version: "0.4.0"\n', '');
+  assert.throws(() => prepareReleaseMetadata(input, '0.5.0', 'Test', '2026-09-05'), /version metadata is missing/);
+});
+
+test('reads synchronized metadata and rejects Skill version drift', async () => {
+  const root = await mkdtemp(join(tmpdir(), 'release-metadata-'));
+  const updates = prepareReleaseMetadata(metadata(), '0.5.0', 'Test', '2026-09-05');
+  for (const path of Object.keys(updates)) {
+    await mkdir(join(root, path, '..'), { recursive: true });
+  }
+  await applyReleaseMetadata(root, updates);
+  assert.equal((await readReleaseMetadata(root)).version, '0.5.0');
+  const skillPath = 'skills/ai-project-maintainer/SKILL.md';
+  await writeFile(join(root, skillPath), updates[skillPath].replace('0.5.0', '0.4.0'));
+  await assert.rejects(() => readReleaseMetadata(root), /metadata disagrees/);
 });
 
 test('rejects unsafe Git release states', () => {

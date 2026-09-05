@@ -1,6 +1,6 @@
 ---
 name: ai-project-bootstrapper
-version: "0.4.3"
+version: "0.4.14"
 description: "Use when the user asks to create, build, scaffold, initialize, or develop a new standalone software project from scratch, including 创建、新建、开发、搭建、实现一个新应用/网站/服务/接口/CLI/脚本/机器人/自动化工具，或初始化新目录/空目录；即使没有项目名或文件路径，只要目标是独立项目也适用。规格、资产或输出路径可以作为输入。Do not use for modifying existing source, fixing a Bug, refactoring an existing project, or merely explaining/reviewing an artifact; route those to ai-project-maintainer."
 ---
 
@@ -43,8 +43,8 @@ description: "Use when the user asks to create, build, scaffold, initialize, or 
 | 档位 | 适用场景 | 必要形态 |
 |---|---|---|
 | `MICRO` | 一次性脚本、教学实验或快速原型，无服务生命周期、复杂持久化、公共多模块接口、安全关键行为、硬件时序，也无长期 AI 维护需求 | 交付行为、输入错误处理和运行说明；单文件时保持单文件；不创建治理树 |
-| `STANDARD` | 普通 CLI、桌面工具、Web 应用、服务、自动化和多文件独立应用（无 DURABLE 需求时使用） | 清晰入口、集中配置、内聚模块边界、README 或项目标准启动文档，以及聚焦测试或等效验证 |
-| `DURABLE` | 适用于明确需要长期 AI 维护的项目；也适用于多人或多 AI 协作、多个稳定工作流/入口，或高安全/硬件/财务/数据一致性要求；不因项目规模大或描述复杂就自动选择 | 必须建立 `AGENTS.md`、`ai-context/INDEX.md`（目录→职责映射表）、根任务路由；按需添加架构主题和操作记录；不创建空 Bug 记录或推测性主题 |
+| `STANDARD` | 仅在用户明确要求轻量、无需长期 AI 导航的普通 CLI、桌面工具、Web 应用、服务、自动化和多文件独立应用中使用 | 清晰入口、集中配置、内聚模块边界、README 或项目标准启动文档，以及聚焦测试或等效验证 |
+| `DURABLE` | 默认档位，适用于需要长期 AI 维护的项目；也适用于多人或多 AI 协作、多个稳定工作流/入口，或高安全/硬件/财务/数据一致性要求 | 必须建立 `AGENTS.md`、`ai-context/INDEX.md`（目录→职责映射表）、根任务路由；按需添加架构主题和操作记录；不创建空 Bug 记录或推测性主题 |
 
 按需选择性读取参考文件：
 

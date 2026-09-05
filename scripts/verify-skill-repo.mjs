@@ -10,6 +10,11 @@ const failures = [];
 const check = (condition, message) => {
   if (!condition) failures.push(message);
 };
+const readRequired = (relativePath) => {
+  const path = join(root, relativePath);
+  if (!existsSync(path)) return null;
+  return readFileSync(path, 'utf8');
+};
 
 const required = [
   'README.md',
@@ -72,6 +77,7 @@ for (const name of skillNames) {
     const document = parseSkillDocument(text);
     skillDocuments.set(name, { ...document, text });
     check(document.metadata.name === name, `${name}: frontmatter name mismatch`);
+    check(document.metadata.version === releaseVersion, `${name}: frontmatter version mismatch`);
     check(document.metadata.description.length <= 1000, `${name}: description exceeds 1000 characters`);
     check(document.body.length <= 14000, `${name}: SKILL.md body exceeds 14000 characters`);
     check(text.split(/\r?\n/).length <= 200, `${name}: SKILL.md exceeds 200 lines`);
@@ -116,8 +122,8 @@ if (marketplace) {
   check(entry?.version === releaseVersion, 'Claude marketplace version mismatch');
 }
 
-const readme = readFileSync(join(root, 'README.md'), 'utf8');
-const installation = readFileSync(join(root, 'docs', 'installation.md'), 'utf8');
+const readme = readRequired('README.md') ?? '';
+const installation = readRequired('docs/installation.md') ?? '';
 check(readme.includes('npx skills add https://github.com/canglei9527/ai-maintenance-skills'), 'README install command missing');
 check(readme.includes('skills/ai-project-maintainer/SKILL.md'), 'README canonical skill path missing');
 check(installation.includes('--skill ai-project-maintainer'), 'single-skill install guidance missing');
@@ -126,15 +132,15 @@ check(installation.includes('npx skills add . --list'), 'local discovery verific
 const maintainer = skillDocuments.get('ai-project-maintainer')?.text ?? '';
 const maintainerDescription = skillDocuments.get('ai-project-maintainer')?.metadata.description ?? '';
 const bootstrapper = skillDocuments.get('ai-project-bootstrapper')?.text ?? '';
-const fastPath = readFileSync(join(root, 'skills', 'ai-project-maintainer', 'references', 'fast-path.md'), 'utf8');
-const documentationMigration = readFileSync(join(root, 'skills', 'ai-project-maintainer', 'references', 'documentation-migration.md'), 'utf8');
-const structuralChange = readFileSync(join(root, 'skills', 'ai-project-maintainer', 'references', 'structural-change.md'), 'utf8');
-const maintainerSafety = readFileSync(join(root, 'skills', 'ai-project-maintainer', 'references', 'verification-and-safety.md'), 'utf8');
-const sharedRequirements = readFileSync(join(root, 'skills', 'shared', 'requirements-dialogue.md'), 'utf8');
-const bootstrapWorkflow = readFileSync(join(root, 'skills', 'ai-project-bootstrapper', 'references', 'workflow.md'), 'utf8');
-const navigation = readFileSync(join(root, 'skills', 'ai-project-bootstrapper', 'references', 'navigation-and-budgets.md'), 'utf8');
-const bootstrapExceptions = readFileSync(join(root, 'skills', 'ai-project-bootstrapper', 'references', 'verification-and-exceptions.md'), 'utf8');
-const evals = readFileSync(join(root, 'evals', 'prompts.md'), 'utf8');
+const fastPath = readRequired('skills/ai-project-maintainer/references/fast-path.md') ?? '';
+const documentationMigration = readRequired('skills/ai-project-maintainer/references/documentation-migration.md') ?? '';
+const structuralChange = readRequired('skills/ai-project-maintainer/references/structural-change.md') ?? '';
+const maintainerSafety = readRequired('skills/ai-project-maintainer/references/verification-and-safety.md') ?? '';
+const sharedRequirements = readRequired('skills/shared/requirements-dialogue.md') ?? '';
+const bootstrapWorkflow = readRequired('skills/ai-project-bootstrapper/references/workflow.md') ?? '';
+const navigation = readRequired('skills/ai-project-bootstrapper/references/navigation-and-budgets.md') ?? '';
+const bootstrapExceptions = readRequired('skills/ai-project-bootstrapper/references/verification-and-exceptions.md') ?? '';
+const evals = readRequired('evals/prompts.md') ?? '';
 
 check(maintainerDescription.includes('现有产品行为') && maintainerDescription.includes('期望行为') && maintainerDescription.includes('修复'), 'maintainer natural-language bug trigger coverage missing');
 check(maintainerDescription.includes('刷新后又出现') && maintainerDescription.includes('无需现有项目名或文件路径'), 'maintainer short Chinese bug trigger coverage missing');

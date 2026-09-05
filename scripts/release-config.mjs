@@ -12,6 +12,8 @@ export const RELEASE_FILES = {
   codexPlugin: '.codex-plugin/plugin.json',
   marketplace: '.claude-plugin/marketplace.json',
   verifier: 'scripts/verify-skill-repo.mjs',
+  maintainerSkill: 'skills/ai-project-maintainer/SKILL.md',
+  bootstrapperSkill: 'skills/ai-project-bootstrapper/SKILL.md',
   changelog: 'CHANGELOG.md'
 };
 

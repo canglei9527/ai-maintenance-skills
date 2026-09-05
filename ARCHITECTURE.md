@@ -34,7 +34,7 @@
 | `scripts/verify-skill-repo.mjs` | 检查文件、frontmatter、引用和仓库边界 |
 | `scripts/release.mjs` | 发布 CLI 编排：dry-run、版本准备、验证、提交、推送、tag 和 Release 阶段 |
 | `scripts/release-config.mjs` | 发布路径、默认分支、验证命令和重试策略的唯一所有者 |
-| `scripts/release-version.mjs` | SemVer、四处版本元数据同步和 changelog 顶部段落 |
+| `scripts/release-version.mjs` | SemVer、插件/marketplace/verifier/两个 Skill frontmatter 版本元数据同步和 changelog 顶部段落 |
 | `scripts/release-git.mjs` | Git 预检、提交、推送、tag 与可重试命令执行 |
 | `scripts/release-github.mjs` | 认证的 `gh` Release 查询、创建和传播轮询 |
 | `scripts/release.test.mjs` | 发布模块的离线行为测试 |

@@ -1,6 +1,12 @@
 import { readFile, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { RELEASE_FILES } from './release-config.mjs';
+import { parseSkillDocument } from './skill-frontmatter.mjs';
+
+const SKILL_FILES = {
+  maintainer: RELEASE_FILES.maintainerSkill,
+  bootstrapper: RELEASE_FILES.bootstrapperSkill
+};
 
 const SEMVER = /^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$/;
 const VERSION_PATTERN = /const releaseVersion = '([^']+)';/;
@@ -24,6 +30,15 @@ function changelogHeading(version) {
   return new RegExp(`^## ${version.replaceAll('.', '\\.')} - `, 'm');
 }
 
+function updateSkillVersion(text, version) {
+  const { metadata } = parseSkillDocument(text);
+  if (!metadata.version) throw new Error('Skill version metadata is missing');
+  parseVersion(metadata.version);
+  const frontmatter = text.match(/^---\r?\n[\s\S]*?\r?\n---/)[0];
+  const updated = frontmatter.replace(/^(version:[ \t]*["']?)\d+\.\d+\.\d+/m, `$1${version}`);
+  return updated + text.slice(frontmatter.length);
+}
+
 function bulletList(notes) {
   const lines = notes.trim().split(/\r?\n/).map((line) => line.trim()).filter(Boolean);
   if (!lines.length) throw new Error('Release notes are required');
@@ -35,21 +50,25 @@ async function readJson(root, relativePath) {
 }
 
 export async function readReleaseMetadata(root) {
-  const [claudePlugin, codexPlugin, marketplace, verifier, changelog] = await Promise.all([
+  const [claudePlugin, codexPlugin, marketplace, verifier, changelog, maintainerSkill, bootstrapperSkill] = await Promise.all([
     readJson(root, RELEASE_FILES.claudePlugin),
     readJson(root, RELEASE_FILES.codexPlugin),
     readJson(root, RELEASE_FILES.marketplace),
     readFile(join(root, RELEASE_FILES.verifier), 'utf8'),
-    readFile(join(root, RELEASE_FILES.changelog), 'utf8')
+    readFile(join(root, RELEASE_FILES.changelog), 'utf8'),
+    readFile(join(root, SKILL_FILES.maintainer), 'utf8'),
+    readFile(join(root, SKILL_FILES.bootstrapper), 'utf8')
   ]);
   const verifierMatch = VERSION_PATTERN.exec(verifier);
   const marketplaceVersion = marketplace.plugins?.find(
     (plugin) => plugin.name === 'ai-maintenance-skills'
   )?.version;
-  const versions = [claudePlugin.version, codexPlugin.version, marketplaceVersion, verifierMatch?.[1]];
+  const maintainerMetadata = parseSkillDocument(maintainerSkill).metadata;
+  const bootstrapperMetadata = parseSkillDocument(bootstrapperSkill).metadata;
+  const versions = [claudePlugin.version, codexPlugin.version, marketplaceVersion, verifierMatch?.[1], maintainerMetadata.version, bootstrapperMetadata.version];
   if (versions.some((version) => !version)) throw new Error('Release version metadata is incomplete');
   if (new Set(versions).size !== 1) throw new Error(`Release version metadata disagrees: ${versions.join(', ')}`);
-  return { version: versions[0], claudePlugin, codexPlugin, marketplace, verifier, changelog };
+  return { version: versions[0], claudePlugin, codexPlugin, marketplace, verifier, changelog, skills: { maintainer: maintainerSkill, bootstrapper: bootstrapperSkill } };
 }
 
 export function prepareReleaseMetadata(metadata, version, notes, date) {
@@ -71,6 +90,8 @@ export function prepareReleaseMetadata(metadata, version, notes, date) {
     [RELEASE_FILES.codexPlugin]: `${JSON.stringify({ ...metadata.codexPlugin, version }, null, 2)}\n`,
     [RELEASE_FILES.marketplace]: `${JSON.stringify(marketplace, null, 2)}\n`,
     [RELEASE_FILES.verifier]: verifier,
+    [SKILL_FILES.maintainer]: updateSkillVersion(metadata.skills.maintainer, version),
+    [SKILL_FILES.bootstrapper]: updateSkillVersion(metadata.skills.bootstrapper, version),
     [RELEASE_FILES.changelog]: metadata.changelog.replace(/^# 变更记录\r?\n\r?\n/, `# 变更记录\n\n${section}`)
   };
 }

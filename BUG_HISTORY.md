@@ -1,3 +1,19 @@
+## 2026-09-05：统一默认 DURABLE 路由并修复验证器缺失文件诊断
+
+- 现象：Bootstrapper 的档位规则一处将 `STANDARD` 作为不确定时默认值，另一处却将严格预算描述为默认 `DURABLE`；仓库验证器发现必需文件缺失后仍无条件读取，可能直接抛出未处理的 `ENOENT`。
+- 根因：默认项目级别约定未同步到 Bootstrapper 的全部参考文本；验证器的必需文件检查与后续内容检查之间缺少安全读取边界。
+- 修改文件：`skills/ai-project-bootstrapper/SKILL.md`、`skills/ai-project-bootstrapper/references/workflow.md`、`skills/ai-project-bootstrapper/references/navigation-and-budgets.md`、`scripts/verify-skill-repo.mjs`、`BUG_HISTORY.md`。
+- 修改方式：将 `DURABLE` 定义为默认档位，仅用户明确要求轻量且无需长期 AI 导航时使用 `STANDARD`；增加安全读取函数，使缺失文件继续汇总为统一 `FAIL`，不再因 `readFileSync` 抛出 `ENOENT` 中断。
+- 验证结果：35/35 Node 测试通过；`git diff --check` 通过；仓库验证器正确汇总失败，但被工作区已有 `.zcode` 禁止目录阻塞，未将该环境问题归因于本次改动。
+
+## 2026-09-05：修复 Skill frontmatter 版本漂移
+
+- 现象：两个 `SKILL.md` 的 frontmatter 仍声明 `0.4.3`，而插件与仓库发布版本已是 `0.4.14`；发布脚本和验证器未检查该差异。
+- 根因：Skill 版本字段未纳入发布元数据读取、写入和一致性验证。
+- 修改文件：`skills/ai-project-maintainer/SKILL.md`、`skills/ai-project-bootstrapper/SKILL.md`、`scripts/release-config.mjs`、`scripts/release-version.mjs`、`scripts/verify-skill-repo.mjs`、`scripts/tests/release.test.mjs`、`ARCHITECTURE.md`。
+- 修改方式：将两个 Skill 版本同步到 `0.4.14`；发布准备和元数据读取纳入两个 frontmatter 版本；验证器拒绝版本漂移；新增保留 Markdown 格式、CRLF 和缺失版本的回归测试。
+- 验证结果：发布测试 8/8 通过；完整仓库验证因工作区已有 `.zcode` 禁止目录而阻塞，未将该环境问题归因于本次改动。
+
 ## 2026-09-02：优化 token 消耗，消除重复和精简冗余规则
 
 - 现象：用户反馈感觉 token 消耗变多了，要求分析并优化 skills 目录的 token 使用。
