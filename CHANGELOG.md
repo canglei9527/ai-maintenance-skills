@@ -1,5 +1,11 @@
 # 变更记录
 
+## 0.4.15 - 2026-09-05
+
+- Default new projects to DURABLE for long-term AI maintenance.
+- Make repository verification report missing files without uncaught ENOENT errors.
+- Preserve focused, bounded file-reading guidance.
+
 ## 0.4.14 - 2026-09-02
 
 - 优化 Skills 的 token 消耗：移除重复 `requirements-dialogue.md`，改为 `skills/shared/requirements-dialogue.md`

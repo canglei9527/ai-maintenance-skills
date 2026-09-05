@@ -85,6 +85,7 @@ export function prepareReleaseMetadata(metadata, version, notes, date) {
   const verifier = metadata.verifier.replace(VERSION_PATTERN, `const releaseVersion = '${version}';`);
   if (verifier === metadata.verifier) throw new Error('Verifier version constant was not found');
   const section = `## ${version} - ${date}\n\n${bulletList(notes)}\n\n`;
+  const releaseDocument = `# v${version} 发布介绍\n\n发布日期：${date} · 版本线：${metadata.version} -> ${version}\n\n## 主要变更\n\n${bulletList(notes)}\n\n`;
   return {
     [RELEASE_FILES.claudePlugin]: `${JSON.stringify({ ...metadata.claudePlugin, version }, null, 2)}\n`,
     [RELEASE_FILES.codexPlugin]: `${JSON.stringify({ ...metadata.codexPlugin, version }, null, 2)}\n`,
@@ -92,7 +93,8 @@ export function prepareReleaseMetadata(metadata, version, notes, date) {
     [RELEASE_FILES.verifier]: verifier,
     [SKILL_FILES.maintainer]: updateSkillVersion(metadata.skills.maintainer, version),
     [SKILL_FILES.bootstrapper]: updateSkillVersion(metadata.skills.bootstrapper, version),
-    [RELEASE_FILES.changelog]: metadata.changelog.replace(/^# 变更记录\r?\n\r?\n/, `# 变更记录\n\n${section}`)
+    [RELEASE_FILES.changelog]: metadata.changelog.replace(/^# 变更记录\r?\n\r?\n/, `# 变更记录\n\n${section}`),
+    [`docs/releases/v${version}.md`]: releaseDocument
   };
 }
 

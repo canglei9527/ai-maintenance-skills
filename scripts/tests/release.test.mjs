@@ -39,6 +39,8 @@ test('prepares all version metadata and changelog section', () => {
   assert.match(updates['skills/ai-project-bootstrapper/SKILL.md'], /version: "0\.5\.0"/);
   assert.match(updates['CHANGELOG.md'], /## 0\.5\.0 - 2026-08-06/);
   assert.match(updates['CHANGELOG.md'], /- Improve release flow\n- Add resume support/);
+  assert.match(updates['docs/releases/v0.5.0.md'], /# v0\.5\.0/);
+  assert.match(updates['docs/releases/v0.5.0.md'], /Improve release flow/);
   assert.throws(() => prepareReleaseMetadata(metadata(), '0.4.0', 'Noop', '2026-08-06'), /newer/);
 });
 
